@@ -51,6 +51,7 @@ func (g *Game) Update() error {
 			}
 		}
 	}
+	g.runner.Normalize()
 	return nil
 }
 
@@ -81,6 +82,23 @@ func (r *Runner) Center() {
 	r.Pos.Y = int(-(frameHeight * r.Scale) / 2)
 	r.Pos.X += screenWidth / 2
 	r.Pos.Y += screenHeight / 2
+}
+
+func (r *Runner) Normalize() {
+	pos := &r.Pos
+
+	if pos.X < 0 {
+		pos.X = 0
+	}
+	if pos.X > screenWidth-int(frameWidth*r.Scale) {
+		pos.X = screenWidth - int(frameWidth*r.Scale)
+	}
+	if pos.Y < 0 {
+		pos.Y = 0
+	}
+	if pos.Y > screenHeight-int(frameHeight*r.Scale) {
+		pos.Y = screenHeight - int(frameHeight*r.Scale)
+	}
 }
 
 func NewRunner() Runner {
