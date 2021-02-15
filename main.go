@@ -3,15 +3,19 @@ package main
 import (
 	"bytes"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"github.com/hajimehoshi/ebiten/examples/resources/images"
 	"image"
 	_ "image/png"
 	"log"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 360
+	screenWidth  = 1280
+	screenHeight = 720
 
 	frameOX     = 0
 	frameOY     = 32
@@ -21,6 +25,7 @@ const (
 )
 
 var (
+	bgImage     *ebiten.Image
 	runnerImage *ebiten.Image
 )
 
@@ -34,17 +39,44 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-float64(frameWidth)/2, -float64(frameHeight)/2)
-	op.GeoM.Translate(screenWidth/2, screenHeight/2)
-	i := (g.count / 5) % frameNum
-	sx, sy := frameOX+i*frameWidth, frameOY
-	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
-	screen.DrawImage(runnerImage.SubImage(rect).(*ebiten.Image), op)
+	drawBg(screen)
+	drawRunner(screen, g.count)
 }
 
 func (g *Game) Layout(int, int) (int, int) {
 	return screenWidth, screenHeight
+}
+
+func drawBg(screen *ebiten.Image) {
+	screen.DrawImage(bgImage, nil)
+}
+
+func drawRunner(screen *ebiten.Image, count int) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(2, 2)
+	op.GeoM.Translate(-float64(frameWidth*2)/2, -float64(frameHeight*2)/2)
+	op.GeoM.Translate(screenWidth/2, screenHeight/2)
+	i := (count / 5) % frameNum
+	sx, sy := frameOX+i*frameWidth, frameOY
+	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
+
+	screen.DrawImage(runnerImage.SubImage(rect).(*ebiten.Image), op)
+}
+
+func loadBg() {
+	rand.Seed(time.Now().UnixNano())
+	bgNumber := rand.Intn(3) + 1
+	bgName := "bg_" + strconv.Itoa(bgNumber) + ".png"
+	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/" + bgName)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	bgImage = bgImg
+}
+
+func init() {
+	loadBg()
 }
 
 func main() {
@@ -55,7 +87,7 @@ func main() {
 	}
 	runnerImage = ebiten.NewImageFromImage(img)
 
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
 	if err := ebiten.RunGame(&Game{}); err != nil {
