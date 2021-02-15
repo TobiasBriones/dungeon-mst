@@ -48,13 +48,6 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func main() {
-	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	runnerImage = ebiten.NewImageFromImage(img)
-
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
@@ -65,6 +58,7 @@ func main() {
 
 func init() {
 	loadBg()
+	loadRunner()
 }
 
 func loadBg() {
@@ -77,6 +71,15 @@ func loadBg() {
 		log.Fatal(err)
 	}
 	bgImage = bgImg
+}
+
+func loadRunner() {
+	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	runnerImage = ebiten.NewImageFromImage(img)
 }
 
 func drawBg(screen *ebiten.Image) {
