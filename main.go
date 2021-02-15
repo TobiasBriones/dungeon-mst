@@ -47,38 +47,6 @@ func (g *Game) Layout(int, int) (int, int) {
 	return screenWidth, screenHeight
 }
 
-func drawBg(screen *ebiten.Image) {
-	screen.DrawImage(bgImage, nil)
-}
-
-func drawRunner(screen *ebiten.Image, count int) {
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(2, 2)
-	op.GeoM.Translate(-float64(frameWidth*2)/2, -float64(frameHeight*2)/2)
-	op.GeoM.Translate(screenWidth/2, screenHeight/2)
-	i := (count / 5) % frameNum
-	sx, sy := frameOX+i*frameWidth, frameOY
-	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
-
-	screen.DrawImage(runnerImage.SubImage(rect).(*ebiten.Image), op)
-}
-
-func loadBg() {
-	rand.Seed(time.Now().UnixNano())
-	bgNumber := rand.Intn(3) + 1
-	bgName := "bg_" + strconv.Itoa(bgNumber) + ".png"
-	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/" + bgName)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	bgImage = bgImg
-}
-
-func init() {
-	loadBg()
-}
-
 func main() {
 	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
 
@@ -93,4 +61,36 @@ func main() {
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func init() {
+	loadBg()
+}
+
+func loadBg() {
+	rand.Seed(time.Now().UnixNano())
+	bgNumber := rand.Intn(3) + 1
+	bgName := "bg_" + strconv.Itoa(bgNumber) + ".png"
+	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/" + bgName)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	bgImage = bgImg
+}
+
+func drawBg(screen *ebiten.Image) {
+	screen.DrawImage(bgImage, nil)
+}
+
+func drawRunner(screen *ebiten.Image, count int) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(2, 2)
+	op.GeoM.Translate(-float64(frameWidth*2)/2, -float64(frameHeight*2)/2)
+	op.GeoM.Translate(screenWidth/2, screenHeight/2)
+	i := (count / 5) % frameNum
+	sx, sy := frameOX+i*frameWidth, frameOY
+	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
+
+	screen.DrawImage(runnerImage.SubImage(rect).(*ebiten.Image), op)
 }
