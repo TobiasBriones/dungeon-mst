@@ -5,16 +5,16 @@ type Point struct {
 	Y int
 }
 
-type Size struct {
+type Dimension struct {
 	Width  int
 	Height int
 }
 
-func (s *Size) SemiWidth() int {
+func (s *Dimension) SemiWidth() int {
 	return s.Width / 2
 }
 
-func (s *Size) SemiHeight() int {
+func (s *Dimension) SemiHeight() int {
 	return s.Height / 2
 }
 

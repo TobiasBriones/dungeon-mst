@@ -98,15 +98,15 @@ func NewDungeon(x0 int, y0 int, sizeX int, sizeY int) Dungeon {
 	return Dungeon{rect, brickImg, brickYImg}
 }
 
-func GetDungeonHorizontalUnitSize() Size {
-	return Size{
+func GetDungeonHorizontalUnitSize() Dimension {
+	return Dimension{
 		Width:  horizontalUnitWidthPx,
 		Height: horizontalUnitHeightPx,
 	}
 }
 
-func GetDungeonVerticalUnitSize() Size {
-	return Size{
+func GetDungeonVerticalUnitSize() Dimension {
+	return Dimension{
 		Width:  verticalUnitWidthPx,
 		Height: verticalUnitHeightPx,
 	}
