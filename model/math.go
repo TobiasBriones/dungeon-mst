@@ -10,6 +10,14 @@ type Size struct {
 	Height int
 }
 
+func (s *Size) SemiWidth() int {
+	return s.Width / 2
+}
+
+func (s *Size) SemiHeight() int {
+	return s.Height / 2
+}
+
 type Rect struct {
 	Left   int
 	Top    int
