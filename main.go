@@ -53,6 +53,7 @@ func main() {
 	//dungeons = ai.GenerateDungeons(getSize())
 	dungeons = genSomeDungeons()
 
+	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
@@ -95,5 +96,75 @@ func genSomeDungeons() []model.Dungeon {
 		model.NewDungeon(model.Point{X: 20, Y: 540}, 4, 1),
 		model.NewDungeon(model.Point{X: 200, Y: 140}, 3, 2),
 		model.NewDungeon(model.Point{X: 350, Y: 90}, 4, 1),
+	}
+}
+
+func testRectIntersect() {
+	r1 := model.Rect{
+		Left:   0,
+		Top:    0,
+		Right:  50,
+		Bottom: 40,
+	}
+	r2 := model.Rect{
+		Left:   10,
+		Top:    20,
+		Right:  30,
+		Bottom: 30,
+	}
+	r3 := model.Rect{
+		Left:   24,
+		Top:    30,
+		Right:  30,
+		Bottom: 70,
+	}
+	r4 := model.Rect{
+		Left:   30,
+		Top:    20,
+		Right:  330,
+		Bottom: 300,
+	}
+	r5 := model.Rect{
+		Left:   100,
+		Top:    20,
+		Right:  300,
+		Bottom: 30,
+	}
+	r6 := model.Rect{
+		Left:   10,
+		Top:    200,
+		Right:  80,
+		Bottom: 230,
+	}
+
+	if !r1.Intersects(&r2) {
+		fmt.Println("FAILED R1-R2")
+	}
+	if !r2.Intersects(&r1) {
+		fmt.Println("FAILED R1-R2")
+	}
+	if !r1.Intersects(&r3) {
+		fmt.Println("FAILED R1-R3")
+	}
+	if !r3.Intersects(&r1) {
+		fmt.Println("FAILED R1-R3")
+	}
+	if !r1.Intersects(&r4) {
+		fmt.Println("FAILED R1-R4")
+	}
+	if !r4.Intersects(&r1) {
+		fmt.Println("FAILED R1-R4")
+	}
+	if r1.Intersects(&r5) {
+		fmt.Println("FAILED R1-R5")
+	}
+	if r5.Intersects(&r1) {
+		fmt.Println("FAILED R1-R5")
+	}
+	if r1.Intersects(&r6) {
+		fmt.Println("FAILED R1-R6")
+	}
+	if r6.Intersects(&r1) {
+		fmt.Println("FAILED R1-R6")
 	}
 }
