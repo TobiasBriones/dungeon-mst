@@ -15,24 +15,25 @@ const (
 
 type Dungeon struct {
 	rect        Rect
+	factor      DimensionFactor
 	brickImage  *ebiten.Image
 	brickYImage *ebiten.Image
 }
 
 func (d *Dungeon) Width() int {
-	return d.rect.Right - d.rect.Left
+	return d.rect.Width()
 }
 
 func (d *Dungeon) Height() int {
-	return d.rect.Bottom - d.rect.Top
+	return d.rect.Height()
 }
 
 func (d *Dungeon) Cx() int {
-	return d.rect.Left + d.Width()/2
+	return d.rect.Cx()
 }
 
 func (d *Dungeon) Cy() int {
-	return d.rect.Top + d.Height()/2
+	return d.rect.Cy()
 }
 
 func (d *Dungeon) Overlaps(other *Dungeon, margin int) bool {
@@ -51,33 +52,37 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	sizeX := d.Width() / horizontalUnitWidthPx
-	sizeY := d.Height() / verticalUnitHeightPx
+	wFactor := d.factor.Width
+	hFactor := d.factor.Height
 	blockWidth := horizontalUnitHeightPx
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 
-	for i := 0; i < sizeX; i++ {
+	// Draw Top
+	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
+	for i := 0; i < wFactor; i++ {
 		screen.DrawImage(d.brickImage, op)
 		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
+	// Draw Bottom
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Bottom-blockWidth))
-	for i := 0; i < sizeX; i++ {
+	for i := 0; i < wFactor; i++ {
 		screen.DrawImage(d.brickImage, op)
 		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
+	// Draw Left
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
-	for i := 0; i < sizeY; i++ {
+	for i := 0; i < hFactor; i++ {
 		screen.DrawImage(d.brickYImage, op)
 		op.GeoM.Translate(0, verticalUnitHeightPx)
 	}
 
+	// Draw Right
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Right-blockWidth), float64(d.rect.Top))
-	for i := 0; i < sizeY; i++ {
+	for i := 0; i < hFactor; i++ {
 		screen.DrawImage(d.brickYImage, op)
 		op.GeoM.Translate(0, verticalUnitHeightPx)
 	}
@@ -99,7 +104,7 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	w := factor.Width * horizontalUnitWidthPx
 	h := factor.Height * verticalUnitHeightPx
 	rect := Rect{x0, y0, x0 + w, y0 + h}
-	return Dungeon{rect, brickImg, brickYImg}
+	return Dungeon{rect, factor, brickImg, brickYImg}
 }
 
 type DimensionFactor struct {
