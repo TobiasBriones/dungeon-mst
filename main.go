@@ -68,6 +68,35 @@ func NewGame() Game {
 	}
 }
 
+type Dungeon struct {
+	Left   int
+	Top    int
+	Right  int
+	Bottom int
+}
+
+func (d *Dungeon) Width() int {
+	return d.Right - d.Left
+}
+
+func (d *Dungeon) Height() int {
+	return d.Bottom - d.Top
+}
+
+func (d *Dungeon) Cx() int {
+	return d.Left + d.Width()/2
+}
+
+func (d *Dungeon) Cy() int {
+	return d.Top + d.Height()/2
+}
+
+func (d *Dungeon) Overlaps(other Dungeon, margin int) bool {
+	xo := (d.Left-margin) <= (other.Right+margin) && (d.Right+margin) >= (other.Left-margin)
+	yo := (d.Top-margin) <= (other.Bottom+margin) && (d.Bottom+margin) >= (other.Top-margin)
+	return xo && yo
+}
+
 func (g *Game) Layout(int, int) (int, int) {
 	return screenWidth, screenHeight
 }
