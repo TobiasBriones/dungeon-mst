@@ -41,6 +41,18 @@ func (r *Rect) SemiHeight() int {
 	return r.Height() / 2
 }
 
+func (r *Rect) Cx() int {
+	return r.Left + r.SemiWidth()
+}
+
+func (r *Rect) Cy() int {
+	return r.Top + r.SemiHeight()
+}
+
+func (r *Rect) Center() Point {
+	return Point{r.Cx(), r.Cy()}
+}
+
 func (r *Rect) Intersects(rect *Rect) bool {
 	xi := r.Left <= rect.Right &&
 		r.Right >= rect.Left
