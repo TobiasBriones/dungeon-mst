@@ -16,3 +16,13 @@ type Rect struct {
 	Right  int
 	Bottom int
 }
+
+func (r *Rect) Intersects(rect *Rect) bool {
+	xo := r.Left <= rect.Right &&
+		r.Right >= rect.Left
+
+	yo := r.Top <= rect.Bottom &&
+		r.Bottom >= rect.Top
+
+	return xo && yo
+}
