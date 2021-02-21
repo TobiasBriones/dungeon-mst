@@ -42,11 +42,11 @@ func (r *Rect) SemiHeight() int {
 }
 
 func (r *Rect) Intersects(rect *Rect) bool {
-	xo := r.Left <= rect.Right &&
+	xi := r.Left <= rect.Right &&
 		r.Right >= rect.Left
 
-	yo := r.Top <= rect.Bottom &&
+	yi := r.Top <= rect.Bottom &&
 		r.Bottom >= rect.Top
 
-	return xo && yo
+	return xi && yi
 }
