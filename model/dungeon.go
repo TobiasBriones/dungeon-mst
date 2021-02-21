@@ -83,7 +83,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	}
 }
 
-func NewDungeon(x0 int, y0 int, sizeX int, sizeY int) Dungeon {
+func NewDungeon(p0 Point, sizeX int, sizeY int) Dungeon {
 	brickImg, _, err := ebitenutil.NewImageFromFile("./assets/brick.png")
 
 	if err != nil {
@@ -94,7 +94,7 @@ func NewDungeon(x0 int, y0 int, sizeX int, sizeY int) Dungeon {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rect := Rect{x0, y0, x0 + sizeX*horizontalUnitWidthPx, y0 + sizeY*verticalUnitHeightPx}
+	rect := Rect{p0.X, p0.Y, p0.X + sizeX*horizontalUnitWidthPx, p0.Y + sizeY*verticalUnitHeightPx}
 	return Dungeon{rect, brickImg, brickYImg}
 }
 
