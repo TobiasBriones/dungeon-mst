@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	horizontalUnitWidthPx  = 128
-	horizontalUnitHeightPx = 24
+	horizontalUnitWidthPx  = 64
+	horizontalUnitHeightPx = 12
 	verticalUnitWidthPx    = horizontalUnitHeightPx
 	verticalUnitHeightPx   = horizontalUnitWidthPx
 )
@@ -35,7 +35,7 @@ func (d *Dungeon) Cy() int {
 	return d.rect.Top + d.Height()/2
 }
 
-func (d *Dungeon) Overlaps(other Dungeon, margin int) bool {
+func (d *Dungeon) Overlaps(other *Dungeon, margin int) bool {
 	xo := (d.rect.Left-margin) <= (other.rect.Right+margin) &&
 		(d.rect.Right+margin) >= (other.rect.Left-margin)
 
@@ -45,36 +45,41 @@ func (d *Dungeon) Overlaps(other Dungeon, margin int) bool {
 	return xo && yo
 }
 
+func (d *Dungeon) Intersects(rect *Rect) bool {
+	return d.rect.Intersects(rect)
+}
+
 func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	sizeX := d.Width() / 128
-	sizeY := d.Height() / 128
+	sizeX := d.Width() / horizontalUnitWidthPx
+	sizeY := d.Height() / verticalUnitHeightPx
+	blockWidth := horizontalUnitHeightPx
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 
 	for i := 0; i < sizeX; i++ {
 		screen.DrawImage(d.brickImage, op)
-		op.GeoM.Translate(128, 0)
+		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
 	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Bottom-24))
+	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Bottom-blockWidth))
 	for i := 0; i < sizeX; i++ {
 		screen.DrawImage(d.brickImage, op)
-		op.GeoM.Translate(128, 0)
+		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 	for i := 0; i < sizeY; i++ {
 		screen.DrawImage(d.brickYImage, op)
-		op.GeoM.Translate(0, 128)
+		op.GeoM.Translate(0, verticalUnitHeightPx)
 	}
 
 	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Right-24), float64(d.rect.Top))
+	op.GeoM.Translate(float64(d.rect.Right-blockWidth), float64(d.rect.Top))
 	for i := 0; i < sizeY; i++ {
 		screen.DrawImage(d.brickYImage, op)
-		op.GeoM.Translate(0, 128)
+		op.GeoM.Translate(0, verticalUnitHeightPx)
 	}
 }
 
@@ -89,7 +94,7 @@ func NewDungeon(x0 int, y0 int, sizeX int, sizeY int) Dungeon {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rect := Rect{x0, y0, x0 + sizeX*128, y0 + sizeY*128}
+	rect := Rect{x0, y0, x0 + sizeX*horizontalUnitWidthPx, y0 + sizeY*verticalUnitHeightPx}
 	return Dungeon{rect, brickImg, brickYImg}
 }
 
