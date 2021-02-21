@@ -85,7 +85,7 @@ func (r *Runner) Draw(screen *ebiten.Image) {
 func NewRunner() Runner {
 	runner := Runner{
 		Pos:   image.Point{},
-		Scale: 2,
+		Scale: 1,
 		count: 0,
 	}
 	runner.Center()
