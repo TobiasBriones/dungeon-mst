@@ -68,33 +68,46 @@ func NewGame() Game {
 	}
 }
 
-type Dungeon struct {
+type Rect struct {
 	Left   int
 	Top    int
 	Right  int
 	Bottom int
 }
 
+type Dungeon struct {
+	Rect  Rect
+	image *ebiten.Image
+}
+
 func (d *Dungeon) Width() int {
-	return d.Right - d.Left
+	return d.Rect.Right - d.Rect.Left
 }
 
 func (d *Dungeon) Height() int {
-	return d.Bottom - d.Top
+	return d.Rect.Bottom - d.Rect.Top
 }
 
 func (d *Dungeon) Cx() int {
-	return d.Left + d.Width()/2
+	return d.Rect.Left + d.Width()/2
 }
 
 func (d *Dungeon) Cy() int {
-	return d.Top + d.Height()/2
+	return d.Rect.Top + d.Height()/2
 }
 
 func (d *Dungeon) Overlaps(other Dungeon, margin int) bool {
-	xo := (d.Left-margin) <= (other.Right+margin) && (d.Right+margin) >= (other.Left-margin)
-	yo := (d.Top-margin) <= (other.Bottom+margin) && (d.Bottom+margin) >= (other.Top-margin)
+	xo := (d.Rect.Left-margin) <= (other.Rect.Right+margin) &&
+		(d.Rect.Right+margin) >= (other.Rect.Left-margin)
+
+	yo := (d.Rect.Top-margin) <= (other.Rect.Bottom+margin) &&
+		(d.Rect.Bottom+margin) >= (other.Rect.Top-margin)
+
 	return xo && yo
+}
+
+func NewDungeon(rect Rect) Dungeon {
+	return Dungeon{rect, nil}
 }
 
 func (g *Game) Layout(int, int) (int, int) {
