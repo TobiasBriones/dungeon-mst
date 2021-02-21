@@ -6,6 +6,13 @@ import (
 	"log"
 )
 
+const (
+	horizontalUnitWidthPx  = 128
+	horizontalUnitHeightPx = 24
+	verticalUnitWidthPx    = horizontalUnitHeightPx
+	verticalUnitHeightPx   = horizontalUnitWidthPx
+)
+
 type Dungeon struct {
 	rect        Rect
 	brickImage  *ebiten.Image
@@ -84,4 +91,18 @@ func NewDungeon(x0 int, y0 int, sizeX int, sizeY int) Dungeon {
 	}
 	rect := Rect{x0, y0, x0 + sizeX*128, y0 + sizeY*128}
 	return Dungeon{rect, brickImg, brickYImg}
+}
+
+func GetDungeonHorizontalUnitSize() Size {
+	return Size{
+		Width:  horizontalUnitWidthPx,
+		Height: horizontalUnitHeightPx,
+	}
+}
+
+func GetDungeonVerticalUnitSize() Size {
+	return Size{
+		Width:  verticalUnitWidthPx,
+		Height: verticalUnitHeightPx,
+	}
 }
