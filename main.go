@@ -92,10 +92,10 @@ func drawSomeDungeons(screen *ebiten.Image) {
 
 func genSomeDungeons() []model.Dungeon {
 	return []model.Dungeon{
-		model.NewDungeon(model.Point{}, 1, 1),
-		model.NewDungeon(model.Point{X: 20, Y: 540}, 4, 1),
-		model.NewDungeon(model.Point{X: 200, Y: 140}, 3, 2),
-		model.NewDungeon(model.Point{X: 350, Y: 90}, 4, 1),
+		model.NewDungeon(model.Point{}, model.DimensionFactor{Width: 1, Height: 1}),
+		model.NewDungeon(model.Point{X: 20, Y: 540}, model.DimensionFactor{Width: 4, Height: 1}),
+		model.NewDungeon(model.Point{X: 200, Y: 140}, model.DimensionFactor{Width: 3, Height: 2}),
+		model.NewDungeon(model.Point{X: 350, Y: 90}, model.DimensionFactor{Width: 4, Height: 1}),
 	}
 }
 
