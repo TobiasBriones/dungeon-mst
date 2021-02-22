@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dungeon-mst/ai"
 	"dungeon-mst/model"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -55,9 +54,10 @@ func (g *Game) Layout(int, int) (int, int) {
 
 func main() {
 	game := NewGame()
-	dungeons = ai.GenerateDungeons(getSize())
-	//dungeons = genSomeDungeons()
+	//dungeons = ai.GenerateDungeons(getSize())
+	dungeons = genSomeDungeons()
 
+	//ai.GetNeighborhoods(dungeons)
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
@@ -89,21 +89,21 @@ func loadBg() {
 	bgImage = bgImg
 }
 
-func genSomeDungeons() []model.Dungeon {
-	dungeons := []model.Dungeon{
-		model.NewDungeon(model.Point{}, model.DimensionFactor{Width: 1, Height: 1}),
-		model.NewDungeon(model.Point{X: 20, Y: 540}, model.DimensionFactor{Width: 4, Height: 1}),
-		model.NewDungeon(model.Point{X: 200, Y: 140}, model.DimensionFactor{Width: 3, Height: 2}),
-		model.NewDungeon(model.Point{X: 350, Y: 90}, model.DimensionFactor{Width: 4, Height: 1}),
-	}
-	dungeons[0].AddNeighbor(&dungeons[1])
-	dungeons[0].AddNeighbor(&dungeons[2])
-	dungeons[1].AddNeighbor(&dungeons[0])
-	dungeons[1].AddNeighbor(&dungeons[2])
-	dungeons[2].AddNeighbor(&dungeons[0])
-	dungeons[2].AddNeighbor(&dungeons[1])
-	dungeons[2].AddNeighbor(&dungeons[3])
-	dungeons[3].AddNeighbor(&dungeons[2])
+func genSomeDungeons() []*model.Dungeon {
+	d0 := model.NewDungeon(model.Point{}, model.DimensionFactor{Width: 1, Height: 1})
+	d1 := model.NewDungeon(model.Point{X: 20, Y: 540}, model.DimensionFactor{Width: 4, Height: 1})
+	d2 := model.NewDungeon(model.Point{X: 200, Y: 140}, model.DimensionFactor{Width: 3, Height: 2})
+	d3 := model.NewDungeon(model.Point{X: 350, Y: 90}, model.DimensionFactor{Width: 4, Height: 1})
+
+	dungeons := []*model.Dungeon{&d0, &d1, &d2, &d3}
+	dungeons[0].AddNeighbor(dungeons[1])
+	dungeons[0].AddNeighbor(dungeons[2])
+	dungeons[1].AddNeighbor(dungeons[0])
+	dungeons[1].AddNeighbor(dungeons[2])
+	dungeons[2].AddNeighbor(dungeons[0])
+	dungeons[2].AddNeighbor(dungeons[1])
+	dungeons[2].AddNeighbor(dungeons[3])
+	dungeons[3].AddNeighbor(dungeons[2])
 	return dungeons
 }
 
