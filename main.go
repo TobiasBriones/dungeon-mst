@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dungeon-mst/ai"
 	"dungeon-mst/model"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -54,11 +55,11 @@ func (g *Game) Layout(int, int) (int, int) {
 
 func main() {
 	game := NewGame()
-	//dungeons = ai.GenerateDungeons(getSize())
-	dungeons = genSomeDungeons()
+	dungeons = ai.GenerateDungeons(getSize())
+	//dungeons = genSomeDungeons()
 
-	genSomeNeighbors(dungeons)
-	//ai.GetNeighborhoods(dungeons)
+	//genSomeNeighbors(dungeons)
+	ai.GetNeighborhoods(dungeons)
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")

@@ -9,11 +9,11 @@ import (
 )
 
 const (
+	PathWidthPx            = 16
 	horizontalUnitWidthPx  = 64
 	horizontalUnitHeightPx = 12
 	verticalUnitWidthPx    = horizontalUnitHeightPx
 	verticalUnitHeightPx   = horizontalUnitWidthPx
-	pathWidthPx            = 32
 )
 
 type Dungeon struct {
@@ -109,7 +109,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
 	for _, neighbor := range d.neighborhood {
 		center := d.Center()
-		sw := pathWidthPx / 2
+		sw := PathWidthPx / 2
 		path := pathTrace{
 			p00: Point{center.X - sw, center.Y + sw},
 			p01: Point{center.X - sw, neighbor.Cy() + sw},
@@ -142,7 +142,7 @@ func (d *Dungeon) drawPathLine(p1 Point, p2 Point, screen *ebiten.Image) {
 func (d *Dungeon) drawHorizontalPath(y int, x0 int, x1 int, screen *ebiten.Image) {
 	x := min(x0, x1)
 	w := int(math.Abs(float64(x0 - x1)))
-	line := ebiten.NewImage(w, pathWidthPx)
+	line := ebiten.NewImage(w, PathWidthPx)
 	op := &ebiten.DrawImageOptions{}
 
 	line.Fill(color.Gray{})
@@ -153,7 +153,7 @@ func (d *Dungeon) drawHorizontalPath(y int, x0 int, x1 int, screen *ebiten.Image
 func (d *Dungeon) drawVerticalPath(x int, y0 int, y1 int, screen *ebiten.Image) {
 	y := min(y0, y1)
 	h := int(math.Abs(float64(y0 - y1)))
-	line := ebiten.NewImage(pathWidthPx, h)
+	line := ebiten.NewImage(PathWidthPx, h)
 	op := &ebiten.DrawImageOptions{}
 
 	line.Fill(color.Gray{})
