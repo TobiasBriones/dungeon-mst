@@ -3,7 +3,9 @@ package model
 import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"image/color"
 	"log"
+	"math"
 )
 
 const (
@@ -14,11 +16,11 @@ const (
 )
 
 type Dungeon struct {
-	Neighborhood []*Dungeon
 	rect         Rect
 	factor       DimensionFactor
 	brickImage   *ebiten.Image
 	brickYImage  *ebiten.Image
+	neighborhood []*Dungeon
 }
 
 func (d *Dungeon) Width() int {
@@ -58,6 +60,10 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 	return d.rect.Intersects(rect)
 }
 
+func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
+	d.neighborhood = append(d.neighborhood, dungeon)
+}
+
 func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	wFactor := d.factor.Width
@@ -94,6 +100,43 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 		screen.DrawImage(d.brickYImage, op)
 		op.GeoM.Translate(0, verticalUnitHeightPx)
 	}
+
+	// Draw the Neighborhood
+	d.drawNeighborhood(screen)
+}
+
+func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
+	for _, neighbor := range d.neighborhood {
+		center := d.Center()
+		w1 := int(math.Abs(float64(center.X - neighbor.Cx())))
+		h1 := 12
+		w2 := 12
+		h2 := int(math.Abs(float64(center.Y - neighbor.Cy())))
+		line1 := ebiten.NewImage(w1, h1)
+		line2 := ebiten.NewImage(w2, h2)
+		ltr := center.X-neighbor.Cx() < 0
+		ttb := center.Y-neighbor.Cy() < 0
+
+		op := &ebiten.DrawImageOptions{}
+
+		line1.Fill(color.Gray{})
+		line2.Fill(color.Gray{})
+
+		if ltr {
+			op.GeoM.Translate(float64(center.X), float64(center.Y))
+		} else {
+			op.GeoM.Translate(float64(neighbor.Cx()), float64(center.Y))
+		}
+		screen.DrawImage(line1, op)
+
+		op.GeoM.Reset()
+		if ttb {
+			op.GeoM.Translate(float64(d.Cx()), float64(center.Y))
+		} else {
+			op.GeoM.Translate(float64(center.X), float64(neighbor.Cy()))
+		}
+		screen.DrawImage(line2, op)
+	}
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
@@ -113,11 +156,11 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	h := factor.Height * verticalUnitHeightPx
 	rect := Rect{x0, y0, x0 + w, y0 + h}
 	return Dungeon{
-		[]*Dungeon{},
 		rect,
 		factor,
 		brickImg,
 		brickYImg,
+		[]*Dungeon{},
 	}
 }
 
