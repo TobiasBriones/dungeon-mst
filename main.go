@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dungeon-mst/ai"
 	"dungeon-mst/model"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -58,8 +57,8 @@ func main() {
 	//dungeons = ai.GenerateDungeons(getSize())
 	dungeons = genSomeDungeons()
 
-	//genSomeNeighbors(dungeons)
-	ai.GetNeighborhoods(dungeons)
+	genSomeNeighbors(dungeons)
+	//ai.GetNeighborhoods(dungeons)
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
@@ -103,14 +102,9 @@ func genSomeNeighbors(dungeons []*model.Dungeon) {
 	dungeons[0].AddNeighbor(dungeons[1])
 	dungeons[0].AddNeighbor(dungeons[2])
 
-	dungeons[1].AddNeighbor(dungeons[0])
 	dungeons[1].AddNeighbor(dungeons[2])
 
-	dungeons[2].AddNeighbor(dungeons[0])
-	dungeons[2].AddNeighbor(dungeons[1])
 	dungeons[2].AddNeighbor(dungeons[3])
-
-	dungeons[3].AddNeighbor(dungeons[2])
 }
 
 func testRectIntersect() {

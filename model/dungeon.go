@@ -13,6 +13,7 @@ const (
 	horizontalUnitHeightPx = 12
 	verticalUnitWidthPx    = horizontalUnitHeightPx
 	verticalUnitHeightPx   = horizontalUnitWidthPx
+	pathWidthPx            = 32
 )
 
 type Dungeon struct {
@@ -108,35 +109,56 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
 	for _, neighbor := range d.neighborhood {
 		center := d.Center()
-		w1 := int(math.Abs(float64(center.X-neighbor.Cx()))) + 1
-		h1 := 12
-		w2 := 12
-		h2 := int(math.Abs(float64(center.Y-neighbor.Cy()))) + 1
-		line1 := ebiten.NewImage(w1, h1)
-		line2 := ebiten.NewImage(w2, h2)
-		ltr := center.X-neighbor.Cx() < 0
-		ttb := center.Y-neighbor.Cy() < 0
-
-		op := &ebiten.DrawImageOptions{}
-
-		line1.Fill(color.Gray{})
-		line2.Fill(color.Gray{})
-
-		if ltr {
-			op.GeoM.Translate(float64(center.X), float64(center.Y))
-		} else {
-			op.GeoM.Translate(float64(neighbor.Cx()), float64(center.Y))
+		sw := pathWidthPx / 2
+		path := pathTrace{
+			p00: Point{center.X - sw, center.Y + sw},
+			p01: Point{center.X - sw, neighbor.Cy() + sw},
+			p10: Point{center.X - sw, neighbor.Cy() - sw},
+			p11: Point{neighbor.Cx() - sw, neighbor.Cy() - sw},
 		}
-		screen.DrawImage(line1, op)
-
-		op.GeoM.Reset()
-		if ttb {
-			op.GeoM.Translate(float64(d.Cx()), float64(center.Y))
-		} else {
-			op.GeoM.Translate(float64(center.X), float64(neighbor.Cy()))
-		}
-		screen.DrawImage(line2, op)
+		d.drawPath(path, screen)
 	}
+}
+
+func (d *Dungeon) drawPath(path pathTrace, screen *ebiten.Image) {
+	d.drawPathLine(path.p00, path.p01, screen)
+	d.drawPathLine(path.p10, path.p11, screen)
+}
+
+func (d *Dungeon) drawPathLine(p1 Point, p2 Point, screen *ebiten.Image) {
+	if p1.X == p2.X {
+		x := p1.X
+		y0 := p1.Y
+		y1 := p2.Y
+		d.drawVerticalPath(x, y0, y1, screen)
+	} else {
+		y := p1.Y
+		x0 := p1.X
+		x1 := p2.X
+		d.drawHorizontalPath(y, x0, x1, screen)
+	}
+}
+
+func (d *Dungeon) drawHorizontalPath(y int, x0 int, x1 int, screen *ebiten.Image) {
+	x := min(x0, x1)
+	w := int(math.Abs(float64(x0 - x1)))
+	line := ebiten.NewImage(w, pathWidthPx)
+	op := &ebiten.DrawImageOptions{}
+
+	line.Fill(color.Gray{})
+	op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(line, op)
+}
+
+func (d *Dungeon) drawVerticalPath(x int, y0 int, y1 int, screen *ebiten.Image) {
+	y := min(y0, y1)
+	h := int(math.Abs(float64(y0 - y1)))
+	line := ebiten.NewImage(pathWidthPx, h)
+	op := &ebiten.DrawImageOptions{}
+
+	line.Fill(color.Gray{})
+	op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(line, op)
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
@@ -169,6 +191,13 @@ type DimensionFactor struct {
 	Height int
 }
 
+type pathTrace struct {
+	p00 Point
+	p01 Point
+	p10 Point
+	p11 Point
+}
+
 func GetDungeonHorizontalUnitSize() Dimension {
 	return Dimension{
 		Width:  horizontalUnitWidthPx,
@@ -181,4 +210,10 @@ func GetDungeonVerticalUnitSize() Dimension {
 		Width:  verticalUnitWidthPx,
 		Height: verticalUnitHeightPx,
 	}
+}
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
