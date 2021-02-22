@@ -14,6 +14,8 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 	var dungeons []*model.Dungeon
 	minDim := getMinSize()
 	maxDim := getMaxSize()
+	xMap := map[int]bool{}
+	yMap := map[int]bool{}
 
 	for i := 0; i < n; i++ {
 		p := getRandomPoint(dimension, maxDim)
@@ -40,6 +42,22 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 		if shouldContinue {
 			continue
 		}
+
+		// Check if there's a dungeon aligned to this one already
+		if xMap[rect.Left] || xMap[rect.Left+rect.SemiWidth()] || xMap[rect.Left+rect.Width()] ||
+			yMap[rect.Top] || yMap[rect.Top+rect.SemiHeight()] || yMap[rect.Top+rect.Height()] {
+			continue
+		}
+
+		// Update corners
+		xMap[rect.Left] = true
+		xMap[rect.Cx()] = true
+		xMap[rect.Right] = true
+		yMap[rect.Top] = true
+		yMap[rect.Cy()] = true
+		yMap[rect.Bottom] = true
+
+		// Add the dungeon
 		dungeon := model.NewDungeon(p0, factor)
 		dungeons = append(dungeons, &dungeon)
 	}
