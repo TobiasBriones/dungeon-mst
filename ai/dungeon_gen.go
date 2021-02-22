@@ -85,7 +85,6 @@ func GetNeighborhoods(dungeons []*model.Dungeon) {
 			done[b] = true
 
 			a.AddNeighbor(b)
-			b.AddNeighbor(a)
 		}
 	}
 }
