@@ -44,8 +44,18 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 		}
 
 		// Check if there's a dungeon aligned to this one already
-		if xMap[rect.Left] || xMap[rect.Left+rect.SemiWidth()] || xMap[rect.Left+rect.Width()] ||
-			yMap[rect.Top] || yMap[rect.Top+rect.SemiHeight()] || yMap[rect.Top+rect.Height()] {
+		for i := 0; i <= model.PathWidthPx; i++ {
+			if xMap[rect.Left+i] ||
+				xMap[rect.Cx()-model.PathWidthPx/2+i] ||
+				xMap[rect.Right-i] ||
+				yMap[rect.Top+i] ||
+				yMap[rect.Cy()-model.PathWidthPx/2+i] ||
+				yMap[rect.Bottom-i] {
+				shouldContinue = true
+				break
+			}
+		}
+		if shouldContinue {
 			continue
 		}
 
@@ -56,6 +66,16 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 		yMap[rect.Top] = true
 		yMap[rect.Cy()] = true
 		yMap[rect.Bottom] = true
+
+		// Fill wall widths to avoid paths colliding with walls
+		for i := 1; i <= model.PathWidthPx; i++ {
+			xMap[rect.Left+i] = true
+			xMap[rect.Right-i] = true
+			xMap[rect.Cx()-model.PathWidthPx/2+i] = true
+			yMap[rect.Top+i] = true
+			yMap[rect.Bottom-i] = true
+			yMap[rect.Cy()-model.PathWidthPx/2+i] = true
+		}
 
 		// Add the dungeon
 		dungeon := model.NewDungeon(p0, factor)
