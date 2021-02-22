@@ -7,6 +7,11 @@ type Point struct {
 	Y int
 }
 
+type PointPair struct {
+	PointA Point
+	PointB Point
+}
+
 type Dimension struct {
 	Width  int
 	Height int
