@@ -60,6 +60,22 @@ func (r *Rect) Center() Point {
 	return Point{r.Cx(), r.Cy()}
 }
 
+func (r *Rect) CenterLeft() Point {
+	return Point{r.Cx() - r.SemiWidth(), r.Cy()}
+}
+
+func (r *Rect) CenterTop() Point {
+	return Point{r.Cx(), r.Cy() - r.SemiHeight()}
+}
+
+func (r *Rect) CenterRight() Point {
+	return Point{r.Cx() + r.SemiWidth(), r.Cy()}
+}
+
+func (r *Rect) CenterBottom() Point {
+	return Point{r.Cx(), r.Cy() + r.SemiHeight()}
+}
+
 func (r *Rect) Intersects(rect *Rect) bool {
 	xi := r.Left <= rect.Right &&
 		r.Right >= rect.Left
