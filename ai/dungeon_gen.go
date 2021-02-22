@@ -10,8 +10,8 @@ const n = 100000
 const maxWidthFactor = 8
 const maxHeightFactor = 5
 
-func GenerateDungeons(dimension model.Dimension) []model.Dungeon {
-	var dungeons []model.Dungeon
+func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
+	var dungeons []*model.Dungeon
 	minDim := getMinSize()
 	maxDim := getMaxSize()
 
@@ -40,7 +40,8 @@ func GenerateDungeons(dimension model.Dimension) []model.Dungeon {
 		if shouldContinue {
 			continue
 		}
-		dungeons = append(dungeons, model.NewDungeon(p0, factor))
+		dungeon := model.NewDungeon(p0, factor)
+		dungeons = append(dungeons, &dungeon)
 	}
 	return dungeons
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dungeon-mst/ai"
 	"dungeon-mst/model"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -19,7 +20,7 @@ const (
 
 var (
 	bgImage  *ebiten.Image
-	dungeons []model.Dungeon
+	dungeons []*model.Dungeon
 )
 
 type Game struct {
@@ -33,7 +34,11 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bgImage, nil)
-	drawSomeDungeons(screen)
+
+	for _, dungeon := range dungeons {
+		dungeon.Draw(screen)
+	}
+
 	g.runner.Draw(screen)
 }
 
@@ -50,8 +55,8 @@ func (g *Game) Layout(int, int) (int, int) {
 
 func main() {
 	game := NewGame()
-	//dungeons = ai.GenerateDungeons(getSize())
-	dungeons = genSomeDungeons()
+	dungeons = ai.GenerateDungeons(getSize())
+	//dungeons = genSomeDungeons()
 
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -82,12 +87,6 @@ func loadBg() {
 		log.Fatal(err)
 	}
 	bgImage = bgImg
-}
-
-func drawSomeDungeons(screen *ebiten.Image) {
-	for _, dungeon := range dungeons {
-		dungeon.Draw(screen)
-	}
 }
 
 func genSomeDungeons() []model.Dungeon {
