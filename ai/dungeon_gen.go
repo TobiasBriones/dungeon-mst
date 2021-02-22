@@ -46,6 +46,50 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 	return dungeons
 }
 
+func GetNeighborhoods(dungeons []*model.Dungeon) {
+	var tree []*model.Dungeon
+	done := map[*model.Dungeon]bool{}
+
+	tree = append(tree, dungeons[0])
+	done[dungeons[0]] = true
+
+	for true {
+		if len(tree) == len(dungeons) {
+			break
+		}
+		var a *model.Dungeon
+		var b *model.Dungeon
+		minDistance := 100000
+
+		for _, d1 := range tree {
+			p1 := d1.Center()
+
+			for _, d2 := range dungeons {
+				if done[d2] {
+					continue
+				}
+
+				p2 := d2.Center()
+				distance := model.Distance(p1, p2)
+
+				if distance < minDistance {
+					minDistance = distance
+					a = d1
+					b = d2
+				}
+			}
+		}
+
+		if a != nil && b != nil {
+			tree = append(tree, b)
+			done[b] = true
+
+			a.AddNeighbor(b)
+			b.AddNeighbor(a)
+		}
+	}
+}
+
 func getMinSize() model.Dimension {
 	baseSize := model.GetDungeonHorizontalUnitSize().Width
 	return model.Dimension{
