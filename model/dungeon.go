@@ -14,10 +14,11 @@ const (
 )
 
 type Dungeon struct {
-	rect        Rect
-	factor      DimensionFactor
-	brickImage  *ebiten.Image
-	brickYImage *ebiten.Image
+	Neighborhood []*Dungeon
+	rect         Rect
+	factor       DimensionFactor
+	brickImage   *ebiten.Image
+	brickYImage  *ebiten.Image
 }
 
 func (d *Dungeon) Width() int {
@@ -111,7 +112,13 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	w := factor.Width * horizontalUnitWidthPx
 	h := factor.Height * verticalUnitHeightPx
 	rect := Rect{x0, y0, x0 + w, y0 + h}
-	return Dungeon{rect, factor, brickImg, brickYImg}
+	return Dungeon{
+		[]*Dungeon{},
+		rect,
+		factor,
+		brickImg,
+		brickYImg,
+	}
 }
 
 type DimensionFactor struct {
