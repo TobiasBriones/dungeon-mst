@@ -36,6 +36,13 @@ func (d *Dungeon) Cy() int {
 	return d.rect.Cy()
 }
 
+func (d *Dungeon) Center() Point {
+	return Point{
+		X: d.Cx(),
+		Y: d.Cy(),
+	}
+}
+
 func (d *Dungeon) Overlaps(other *Dungeon, margin int) bool {
 	xo := (d.rect.Left-margin) <= (other.rect.Right+margin) &&
 		(d.rect.Right+margin) >= (other.rect.Left-margin)
