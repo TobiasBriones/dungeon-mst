@@ -108,10 +108,10 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
 	for _, neighbor := range d.neighborhood {
 		center := d.Center()
-		w1 := int(math.Abs(float64(center.X - neighbor.Cx())))
+		w1 := int(math.Abs(float64(center.X-neighbor.Cx()))) + 1
 		h1 := 12
 		w2 := 12
-		h2 := int(math.Abs(float64(center.Y - neighbor.Cy())))
+		h2 := int(math.Abs(float64(center.Y-neighbor.Cy()))) + 1
 		line1 := ebiten.NewImage(w1, h1)
 		line2 := ebiten.NewImage(w2, h2)
 		ltr := center.X-neighbor.Cx() < 0
