@@ -1,5 +1,7 @@
 package model
 
+import "math"
+
 type Point struct {
 	X int
 	Y int
@@ -61,4 +63,10 @@ func (r *Rect) Intersects(rect *Rect) bool {
 		r.Bottom >= rect.Top
 
 	return xi && yi
+}
+
+func Distance(p1 Point, p2 Point) int {
+	dx := p1.X - p2.X
+	dy := p1.Y - p2.Y
+	return int(math.Sqrt(float64(dx*dx + dy*dy)))
 }
