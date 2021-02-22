@@ -57,6 +57,7 @@ func main() {
 	//dungeons = ai.GenerateDungeons(getSize())
 	dungeons = genSomeDungeons()
 
+	genSomeNeighbors(dungeons)
 	//ai.GetNeighborhoods(dungeons)
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -94,17 +95,21 @@ func genSomeDungeons() []*model.Dungeon {
 	d1 := model.NewDungeon(model.Point{X: 20, Y: 540}, model.DimensionFactor{Width: 4, Height: 1})
 	d2 := model.NewDungeon(model.Point{X: 200, Y: 140}, model.DimensionFactor{Width: 3, Height: 2})
 	d3 := model.NewDungeon(model.Point{X: 350, Y: 90}, model.DimensionFactor{Width: 4, Height: 1})
+	return []*model.Dungeon{&d0, &d1, &d2, &d3}
+}
 
-	dungeons := []*model.Dungeon{&d0, &d1, &d2, &d3}
+func genSomeNeighbors(dungeons []*model.Dungeon) {
 	dungeons[0].AddNeighbor(dungeons[1])
 	dungeons[0].AddNeighbor(dungeons[2])
+
 	dungeons[1].AddNeighbor(dungeons[0])
 	dungeons[1].AddNeighbor(dungeons[2])
+
 	dungeons[2].AddNeighbor(dungeons[0])
 	dungeons[2].AddNeighbor(dungeons[1])
 	dungeons[2].AddNeighbor(dungeons[3])
+
 	dungeons[3].AddNeighbor(dungeons[2])
-	return dungeons
 }
 
 func testRectIntersect() {
