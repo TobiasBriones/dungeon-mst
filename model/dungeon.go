@@ -17,14 +17,14 @@ const (
 )
 
 var (
-	bgImage = getDungeonBg()
+	bgImage     = getDungeonBgImage()
+	brickImage  = getBrickImage()
+	brickYImage = getBrickYImage()
 )
 
 type Dungeon struct {
 	rect         Rect
 	factor       DimensionFactor
-	brickImage   *ebiten.Image
-	brickYImage  *ebiten.Image
 	neighborhood []*Dungeon
 }
 
@@ -86,7 +86,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 	for i := 0; i < wFactor; i++ {
-		screen.DrawImage(d.brickImage, op)
+		screen.DrawImage(brickImage, op)
 		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
@@ -94,7 +94,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Bottom-blockWidth))
 	for i := 0; i < wFactor; i++ {
-		screen.DrawImage(d.brickImage, op)
+		screen.DrawImage(brickImage, op)
 		op.GeoM.Translate(horizontalUnitWidthPx, 0)
 	}
 
@@ -102,7 +102,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 	for i := 0; i < hFactor; i++ {
-		screen.DrawImage(d.brickYImage, op)
+		screen.DrawImage(brickYImage, op)
 		op.GeoM.Translate(0, horizontalUnitWidthPx)
 	}
 
@@ -110,7 +110,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Right-blockWidth), float64(d.rect.Top))
 	for i := 0; i < hFactor; i++ {
-		screen.DrawImage(d.brickYImage, op)
+		screen.DrawImage(brickYImage, op)
 		op.GeoM.Translate(0, horizontalUnitWidthPx)
 	}
 
@@ -174,16 +174,6 @@ func (d *Dungeon) drawVerticalPath(x int, y0 int, y1 int, screen *ebiten.Image) 
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
-	brickImg, _, err := ebitenutil.NewImageFromFile("./assets/brick.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	brickYImg, _, err := ebitenutil.NewImageFromFile("./assets/brick_y.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
 	x0 := p0.X
 	y0 := p0.Y
 	w := factor.Width * horizontalUnitWidthPx
@@ -192,8 +182,6 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	return Dungeon{
 		rect,
 		factor,
-		brickImg,
-		brickYImg,
 		[]*Dungeon{},
 	}
 }
@@ -210,13 +198,31 @@ type pathTrace struct {
 	p11 Point
 }
 
-func getDungeonBg() *ebiten.Image {
+func getDungeonBgImage() *ebiten.Image {
 	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/dungeon_bg.png")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	return bgImg
+}
+
+func getBrickImage() *ebiten.Image {
+	brickImg, _, err := ebitenutil.NewImageFromFile("./assets/brick.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return brickImg
+}
+
+func getBrickYImage() *ebiten.Image {
+	brickYImg, _, err := ebitenutil.NewImageFromFile("./assets/brick_y.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return brickYImg
 }
 
 func GetDungeonHorizontalUnitSize() Dimension {
