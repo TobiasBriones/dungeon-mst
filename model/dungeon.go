@@ -14,12 +14,10 @@ const (
 	PathWidthPx            = 16
 	horizontalUnitWidthPx  = 64
 	horizontalUnitHeightPx = 12
-	verticalUnitWidthPx    = horizontalUnitHeightPx
-	verticalUnitHeightPx   = horizontalUnitWidthPx
 )
 
 var (
-	bgImage *ebiten.Image = getDungeonBg()
+	bgImage = getDungeonBg()
 )
 
 type Dungeon struct {
@@ -105,7 +103,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 	for i := 0; i < hFactor; i++ {
 		screen.DrawImage(d.brickYImage, op)
-		op.GeoM.Translate(0, verticalUnitHeightPx)
+		op.GeoM.Translate(0, horizontalUnitWidthPx)
 	}
 
 	// Draw Right
@@ -113,7 +111,7 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(float64(d.rect.Right-blockWidth), float64(d.rect.Top))
 	for i := 0; i < hFactor; i++ {
 		screen.DrawImage(d.brickYImage, op)
-		op.GeoM.Translate(0, verticalUnitHeightPx)
+		op.GeoM.Translate(0, horizontalUnitWidthPx)
 	}
 
 	// Draw the Neighborhood
@@ -189,7 +187,7 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	x0 := p0.X
 	y0 := p0.Y
 	w := factor.Width * horizontalUnitWidthPx
-	h := factor.Height * verticalUnitHeightPx
+	h := factor.Height * horizontalUnitWidthPx
 	rect := Rect{x0, y0, x0 + w, y0 + h}
 	return Dungeon{
 		rect,
@@ -225,13 +223,6 @@ func GetDungeonHorizontalUnitSize() Dimension {
 	return Dimension{
 		Width:  horizontalUnitWidthPx,
 		Height: horizontalUnitHeightPx,
-	}
-}
-
-func GetDungeonVerticalUnitSize() Dimension {
-	return Dimension{
-		Width:  verticalUnitWidthPx,
-		Height: verticalUnitHeightPx,
 	}
 }
 
