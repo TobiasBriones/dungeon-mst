@@ -3,7 +3,9 @@ package model
 import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"image"
 	"image/color"
+	_ "image/png"
 	"log"
 	"math"
 )
@@ -14,6 +16,10 @@ const (
 	horizontalUnitHeightPx = 12
 	verticalUnitWidthPx    = horizontalUnitHeightPx
 	verticalUnitHeightPx   = horizontalUnitWidthPx
+)
+
+var (
+	bgImage *ebiten.Image = getDungeonBg()
 )
 
 type Dungeon struct {
@@ -71,7 +77,15 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	hFactor := d.factor.Height
 	blockWidth := horizontalUnitHeightPx
 
+	// Draw Background
+	rect := image.Rect(0, 0, d.rect.Width(), d.rect.Height())
+
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
+	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
+
 	// Draw Top
+	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
 	for i := 0; i < wFactor; i++ {
 		screen.DrawImage(d.brickImage, op)
@@ -198,6 +212,15 @@ type pathTrace struct {
 	p11 Point
 }
 
+func getDungeonBg() *ebiten.Image {
+	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/dungeon_bg.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return bgImg
+}
+
 func GetDungeonHorizontalUnitSize() Dimension {
 	return Dimension{
 		Width:  horizontalUnitWidthPx,
@@ -211,6 +234,7 @@ func GetDungeonVerticalUnitSize() Dimension {
 		Height: verticalUnitHeightPx,
 	}
 }
+
 func min(a, b int) int {
 	if a <= b {
 		return a

@@ -62,11 +62,7 @@ func (g *Game) Layout(int, int) (int, int) {
 
 func main() {
 	game := NewGame()
-	dungeons = ai.GenerateDungeons(getSize())
-	//dungeons = genSomeDungeons()
 
-	//genSomeNeighbors(dungeons)
-	ai.GetNeighborhoods(dungeons)
 	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
@@ -84,6 +80,11 @@ func getSize() model.Dimension {
 
 func init() {
 	loadBg()
+	dungeons = ai.GenerateDungeons(getSize())
+	//dungeons = genSomeDungeons()
+
+	//genSomeNeighbors(dungeons)
+	ai.GetNeighborhoods(dungeons)
 }
 
 func loadBg() {
