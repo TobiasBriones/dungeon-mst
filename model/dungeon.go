@@ -55,16 +55,28 @@ func (d *Dungeon) Center() Point {
 	}
 }
 
-func (d *Dungeon) Collides(rect *Rect) bool {
+func (d *Dungeon) Collides(rect *Rect) int {
+	if !d.rect.Intersects(rect) {
+		return -1
+	}
 	subRect := Rect{
 		Left:   d.rect.Left + PathWidthPx,
 		Top:    d.rect.Top + PathWidthPx,
 		Right:  d.rect.Bottom - PathWidthPx,
 		Bottom: d.rect.Right - PathWidthPx,
 	}
-	wc := rect.Intersects(&d.rect) && !rect.Intersects(&subRect)
-	collides := wc
-	return collides
+	collision := -1
+
+	if rect.Left < subRect.Left {
+		collision = 0
+	} else if rect.Top < subRect.Top {
+		collision = 1
+	} else if rect.Right > subRect.Right {
+		collision = 2
+	} else if rect.Bottom > subRect.Bottom {
+		collision = 3
+	}
+	return collision
 }
 
 func (d *Dungeon) Intersects(rect *Rect) bool {
