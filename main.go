@@ -28,8 +28,17 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	g.runner.Update()
+	var currentDungeon *model.Dungeon
 
+	for _, dungeon := range dungeons {
+		if dungeon.Intersects(&g.runner.Rect) {
+			currentDungeon = dungeon
+			break
+		}
+	}
+	g.runner.Update(currentDungeon)
+
+	// Generate random dungeons
 	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 		if ebiten.IsKeyPressed(k) {
 			dungeons = ai.GenerateDungeons(getSize())
