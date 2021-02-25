@@ -43,12 +43,12 @@ func (g *Game) Update() error {
 	g.runner.Update(currentDungeon)
 
 	// Generate random dungeons
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			dungeons = ai.GenerateDungeons(getSize())
-			ai.GetNeighborhoods(dungeons)
-		}
-	}
+	//for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+	//	if ebiten.IsKeyPressed(k) {
+	//		dungeons = ai.GenerateDungeons(getSize())
+	//		ai.GetNeighborhoods(dungeons)
+	//	}
+	//}
 	return nil
 }
 

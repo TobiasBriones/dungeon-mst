@@ -85,6 +85,22 @@ func (r *Runner) normalize(dungeon *Dungeon) {
 	if pos.Y > screenHeight-int(frameHeight*r.Scale) {
 		pos.Y = screenHeight - int(frameHeight*r.Scale)
 	}
+
+	// Check for dungeon collision
+	if dungeon == nil {
+		return
+	}
+	collision := dungeon.Collides(&r.Rect)
+
+	if collision == CollisionLeft {
+		r.walkRight()
+	} else if collision == CollisionTop {
+		r.walkDown()
+	} else if collision == CollisionRight {
+		r.walkLeft()
+	} else if collision == CollisionBottom {
+		r.walkUp()
+	}
 }
 
 func (r *Runner) walkLeft() {
