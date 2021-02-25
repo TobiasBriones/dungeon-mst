@@ -51,14 +51,16 @@ func (d *Dungeon) Center() Point {
 	}
 }
 
-func (d *Dungeon) Overlaps(other *Dungeon, margin int) bool {
-	xo := (d.rect.Left-margin) <= (other.rect.Right+margin) &&
-		(d.rect.Right+margin) >= (other.rect.Left-margin)
-
-	yo := (d.rect.Top-margin) <= (other.rect.Bottom+margin) &&
-		(d.rect.Bottom+margin) >= (other.rect.Top-margin)
-
-	return xo && yo
+func (d *Dungeon) Collides(rect *Rect) bool {
+	subRect := Rect{
+		Left:   d.rect.Left + PathWidthPx,
+		Top:    d.rect.Top + PathWidthPx,
+		Right:  d.rect.Bottom - PathWidthPx,
+		Bottom: d.rect.Right - PathWidthPx,
+	}
+	wc := rect.Intersects(&d.rect) && !rect.Intersects(&subRect)
+	collides := wc
+	return collides
 }
 
 func (d *Dungeon) Intersects(rect *Rect) bool {
