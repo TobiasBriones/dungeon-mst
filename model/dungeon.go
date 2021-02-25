@@ -66,8 +66,8 @@ func (d *Dungeon) Collides(rect *Rect) int {
 	subRect := Rect{
 		Left:   d.rect.Left + PathWidthPx,
 		Top:    d.rect.Top + PathWidthPx,
-		Right:  d.rect.Bottom - PathWidthPx,
-		Bottom: d.rect.Right - PathWidthPx,
+		Right:  d.rect.Right - PathWidthPx,
+		Bottom: d.rect.Bottom - PathWidthPx,
 	}
 	collision := -1
 
