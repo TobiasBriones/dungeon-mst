@@ -123,6 +123,7 @@ func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
 	path.rect1 = rect1
 	path.rect2 = rect2
 	d.paths = append(d.paths, path)
+	dungeon.paths = append(dungeon.paths, path)
 }
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
