@@ -16,6 +16,10 @@ import (
 
 const (
 	PathWidthPx            = 16
+	CollisionLeft          = 0
+	CollisionTop           = 1
+	CollisionRight         = 2
+	CollisionBottom        = 3
 	horizontalUnitWidthPx  = 64
 	horizontalUnitHeightPx = 12
 )
