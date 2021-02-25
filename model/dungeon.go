@@ -96,6 +96,20 @@ func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
 		p10: Point{center.X - sw, dungeon.Cy() - sw},
 		p11: Point{dungeon.Cx() - sw, dungeon.Cy() - sw},
 	}
+	rect1 := Rect{
+		Left:   path.p00.X,
+		Top:    min(path.p00.Y, path.p01.Y),
+		Right:  path.p00.X + PathWidthPx,
+		Bottom: max(path.p00.Y, path.p01.Y),
+	}
+	rect2 := Rect{
+		Left:   min(path.p10.X, path.p11.X),
+		Top:    path.p10.Y,
+		Right:  max(path.p10.Y, path.p11.Y),
+		Bottom: path.p10.Y + PathWidthPx,
+	}
+	path.rect1 = rect1
+	path.rect2 = rect2
 	d.paths = append(d.paths, path)
 }
 
@@ -214,10 +228,18 @@ type DimensionFactor struct {
 }
 
 type pathTrace struct {
-	p00 Point
-	p01 Point
-	p10 Point
-	p11 Point
+	p00   Point
+	p01   Point
+	p10   Point
+	p11   Point
+	rect1 Rect
+	rect2 Rect
+}
+
+func (p *pathTrace) inBounds(rect *Rect) bool {
+	rect1 := p.rect1
+	rect2 := p.rect2
+	return rect1.InBounds(rect) || rect2.InBounds(rect)
 }
 
 func getDungeonBgImage() *ebiten.Image {
@@ -256,6 +278,13 @@ func GetDungeonHorizontalUnitSize() Dimension {
 
 func min(a, b int) int {
 	if a <= b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a >= b {
 		return a
 	}
 	return b
