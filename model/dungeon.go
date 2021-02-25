@@ -31,9 +31,9 @@ var (
 )
 
 type Dungeon struct {
-	rect         Rect
-	factor       DimensionFactor
-	neighborhood []*Dungeon
+	rect   Rect
+	factor DimensionFactor
+	paths  []*pathTrace
 }
 
 func (d *Dungeon) Width() int {
@@ -88,7 +88,15 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 }
 
 func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
-	d.neighborhood = append(d.neighborhood, dungeon)
+	center := d.Center()
+	sw := PathWidthPx / 2
+	path := &pathTrace{
+		p00: Point{center.X - sw, center.Y + sw},
+		p01: Point{center.X - sw, dungeon.Cy() + sw},
+		p10: Point{center.X - sw, dungeon.Cy() - sw},
+		p11: Point{dungeon.Cx() - sw, dungeon.Cy() - sw},
+	}
+	d.paths = append(d.paths, path)
 }
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
@@ -141,20 +149,12 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 }
 
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
-	for _, neighbor := range d.neighborhood {
-		center := d.Center()
-		sw := PathWidthPx / 2
-		path := pathTrace{
-			p00: Point{center.X - sw, center.Y + sw},
-			p01: Point{center.X - sw, neighbor.Cy() + sw},
-			p10: Point{center.X - sw, neighbor.Cy() - sw},
-			p11: Point{neighbor.Cx() - sw, neighbor.Cy() - sw},
-		}
+	for _, path := range d.paths {
 		d.drawPath(path, screen)
 	}
 }
 
-func (d *Dungeon) drawPath(path pathTrace, screen *ebiten.Image) {
+func (d *Dungeon) drawPath(path *pathTrace, screen *ebiten.Image) {
 	d.drawPathLine(path.p00, path.p01, screen)
 	d.drawPathLine(path.p10, path.p11, screen)
 }
@@ -204,7 +204,7 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	return Dungeon{
 		rect,
 		factor,
-		[]*Dungeon{},
+		[]*pathTrace{},
 	}
 }
 
