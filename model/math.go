@@ -90,6 +90,13 @@ func (r *Rect) Intersects(rect *Rect) bool {
 	return xi && yi
 }
 
+func (r *Rect) InBounds(rect *Rect) bool {
+	if !r.Intersects(rect) {
+		return false
+	}
+	return r.Right >= rect.Right && r.Bottom >= rect.Bottom
+}
+
 func Distance(p1 Point, p2 Point) int {
 	dx := p1.X - p2.X
 	dy := p1.Y - p2.Y
