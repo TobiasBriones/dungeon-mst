@@ -20,22 +20,55 @@ const (
 )
 
 type Runner struct {
-	Pos   image.Point
+	Rect  Rect
 	Scale float64
 	count int
 	image *ebiten.Image
 }
 
-func (r *Runner) Center() {
-	r.Pos.X = int(-(frameWidth * r.Scale) / 2)
-	r.Pos.Y = int(-(frameHeight * r.Scale) / 2)
-	r.Pos.X += screenWidth / 2
-	r.Pos.Y += screenHeight / 2
+func (r *Runner) Update(dungeon *Dungeon) {
+	r.count++
+
+	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+		if ebiten.IsKeyPressed(k) {
+			switch k {
+			case ebiten.KeyUp, ebiten.KeyW:
+				r.walkUp()
+			case ebiten.KeyDown, ebiten.KeyS:
+				r.walkDown()
+			case ebiten.KeyLeft, ebiten.KeyA:
+				r.walkLeft()
+			case ebiten.KeyRight, ebiten.KeyD:
+				r.walkRight()
+			}
+		}
+	}
+	r.normalize(dungeon)
 }
 
-func (r *Runner) Normalize() {
-	pos := &r.Pos
+func (r *Runner) Draw(screen *ebiten.Image) {
+	x := r.Rect.Left
+	y := r.Rect.Top
+	op := &ebiten.DrawImageOptions{}
+	i := (r.count / 5) % frameNum
+	sx, sy := frameOX+i*frameWidth, frameOY
+	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
 
+	op.GeoM.Scale(r.Scale, r.Scale)
+	op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(r.image.SubImage(rect).(*ebiten.Image), op)
+}
+
+func (r *Runner) Center() {
+	x := int(-(frameWidth*r.Scale)/2) + screenWidth/2
+	y := int(-(frameHeight*r.Scale)/2) + screenHeight/2
+	r.setPosition(x, y)
+}
+
+func (r *Runner) normalize(dungeon *Dungeon) {
+	pos := Point{r.Rect.Left, r.Rect.Top}
+
+	// Check for screen collision
 	if pos.X < 0 {
 		pos.X = 0
 	}
@@ -50,42 +83,39 @@ func (r *Runner) Normalize() {
 	}
 }
 
-func (r *Runner) Update() {
-	r.count++
-
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			switch k {
-			case ebiten.KeyUp, ebiten.KeyW:
-				r.Pos.Y--
-			case ebiten.KeyDown, ebiten.KeyS:
-				r.Pos.Y++
-			case ebiten.KeyLeft, ebiten.KeyA:
-				r.Pos.X--
-			case ebiten.KeyRight, ebiten.KeyD:
-				r.Pos.X++
-			}
-		}
-	}
-	r.Normalize()
+func (r *Runner) walkLeft() {
+	r.setPosition(r.Rect.Left-1, r.Rect.Top)
 }
 
-func (r *Runner) Draw(screen *ebiten.Image) {
-	pos := r.Pos
-	op := &ebiten.DrawImageOptions{}
-	i := (r.count / 5) % frameNum
-	sx, sy := frameOX+i*frameWidth, frameOY
-	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
+func (r *Runner) walkUp() {
+	r.setPosition(r.Rect.Left, r.Rect.Top-1)
+}
 
-	op.GeoM.Scale(r.Scale, r.Scale)
-	op.GeoM.Translate(float64(pos.X), float64(pos.Y))
-	screen.DrawImage(r.image.SubImage(rect).(*ebiten.Image), op)
+func (r *Runner) walkRight() {
+	r.setPosition(r.Rect.Left+1, r.Rect.Top)
+}
+
+func (r *Runner) walkDown() {
+	r.setPosition(r.Rect.Left, r.Rect.Top+1)
+}
+
+func (r *Runner) setPosition(x int, y int) {
+	r.Rect.Left = x
+	r.Rect.Top = y
+	r.Rect.Right = x + int(frameWidth*r.Scale)
+	r.Rect.Bottom = y + int(frameHeight*r.Scale)
 }
 
 func NewRunner() Runner {
+	scale := 1.0
 	runner := Runner{
-		Pos:   image.Point{},
-		Scale: 1,
+		Rect: Rect{
+			Left:   0,
+			Top:    0,
+			Right:  int(frameWidth * scale),
+			Bottom: int(frameHeight * scale),
+		},
+		Scale: scale,
 		count: 0,
 	}
 	runner.Center()
