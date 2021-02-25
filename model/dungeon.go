@@ -80,6 +80,18 @@ func (d *Dungeon) Collides(rect *Rect) int {
 	} else if rect.Bottom > subRect.Bottom {
 		collision = 3
 	}
+
+	// If there's a collision check whether it is on a path
+	if collision != -1 {
+		for _, path := range d.paths {
+			if path.inBounds(rect) {
+				// If it has collision on a wall but it is placed inside a path
+				// then let it go
+				collision = -1
+				break
+			}
+		}
+	}
 	return collision
 }
 
