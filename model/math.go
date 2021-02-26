@@ -11,6 +11,10 @@ type Point struct {
 	Y int
 }
 
+func (p *Point) Equals(point *Point) bool {
+	return p.X == point.X && p.Y == point.Y
+}
+
 type PointPair struct {
 	PointA Point
 	PointB Point
