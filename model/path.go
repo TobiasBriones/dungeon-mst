@@ -22,7 +22,7 @@ type Path struct {
 	vRectImage *ebiten.Image
 }
 
-func (p *Path) inBounds(rect *Rect) bool {
+func (p *Path) InBounds(rect *Rect) bool {
 	hRect := p.hRect
 	vRect := p.vRect
 	return hRect.InBounds(rect) || vRect.InBounds(rect)
