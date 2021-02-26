@@ -13,11 +13,6 @@ import (
 )
 
 const (
-	CollisionNone          = -1
-	CollisionLeft          = 0
-	CollisionTop           = 1
-	CollisionRight         = 2
-	CollisionBottom        = 3
 	horizontalUnitWidthPx  = 64
 	horizontalUnitHeightPx = 12
 	wallWidth              = horizontalUnitHeightPx
@@ -30,8 +25,8 @@ var (
 )
 
 type Dungeon struct {
-	rect   Rect
-	factor DimensionFactor
+	rect    Rect
+	barrier Barrier
 }
 
 func (d *Dungeon) Width() int {
@@ -79,30 +74,6 @@ func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
 	return &path
 }
 
-func (d *Dungeon) Collides(rect *Rect) int {
-	if !d.rect.Intersects(rect) {
-		return CollisionNone
-	}
-	subRect := Rect{
-		Left:   d.rect.Left + wallWidth,
-		Top:    d.rect.Top + wallWidth,
-		Right:  d.rect.Right - wallWidth,
-		Bottom: d.rect.Bottom - wallWidth,
-	}
-	collision := CollisionNone
-
-	if rect.Left < subRect.Left {
-		collision = CollisionLeft
-	} else if rect.Top < subRect.Top {
-		collision = CollisionTop
-	} else if rect.Right > subRect.Right {
-		collision = CollisionRight
-	} else if rect.Bottom > subRect.Bottom {
-		collision = CollisionBottom
-	}
-	return collision
-}
-
 func (d *Dungeon) Intersects(rect *Rect) bool {
 	return d.rect.Intersects(rect)
 }
@@ -121,42 +92,9 @@ func (d *Dungeon) CanMoveTowards(movement Movement, rect *Rect) bool {
 }
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
+	d.barrier.Draw(screen)
+
 	op := &ebiten.DrawImageOptions{}
-	wFactor := d.factor.Width
-	hFactor := d.factor.Height
-	blockWidth := horizontalUnitHeightPx
-
-	// Draw Top
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
-	for i := 0; i < wFactor; i++ {
-		screen.DrawImage(brickImage, op)
-		op.GeoM.Translate(horizontalUnitWidthPx, 0)
-	}
-
-	// Draw Bottom
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Bottom-blockWidth))
-	for i := 0; i < wFactor; i++ {
-		screen.DrawImage(brickImage, op)
-		op.GeoM.Translate(horizontalUnitWidthPx, 0)
-	}
-
-	// Draw Left
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
-	for i := 0; i < hFactor; i++ {
-		screen.DrawImage(brickYImage, op)
-		op.GeoM.Translate(0, horizontalUnitWidthPx)
-	}
-
-	// Draw Right
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Right-blockWidth), float64(d.rect.Top))
-	for i := 0; i < hFactor; i++ {
-		screen.DrawImage(brickYImage, op)
-		op.GeoM.Translate(0, horizontalUnitWidthPx)
-	}
 
 	// Draw Background
 	rect := image.Rect(0, 0, d.rect.Width()-2*wallWidth, d.rect.Height()-2*wallWidth)
@@ -172,15 +110,110 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	w := factor.Width * horizontalUnitWidthPx
 	h := factor.Height * horizontalUnitWidthPx
 	rect := Rect{x0, y0, x0 + w, y0 + h}
+	barrier := NewBarrier(rect, factor)
 	return Dungeon{
 		rect,
-		factor,
+		barrier,
 	}
 }
 
 type DimensionFactor struct {
 	Width  int
 	Height int
+}
+
+type Wall struct {
+	rect  Rect
+	image *ebiten.Image
+}
+
+type Barrier struct {
+	factor     DimensionFactor
+	leftWall   Wall
+	topWall    Wall
+	rightWall  Wall
+	bottomWall Wall
+}
+
+func (b *Barrier) Draw(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+	wFactor := b.factor.Width
+	hFactor := b.factor.Height
+	blockWidth := horizontalUnitHeightPx
+
+	// Draw Top
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(b.topWall.rect.Left), float64(b.topWall.rect.Top))
+	for i := 0; i < wFactor; i++ {
+		screen.DrawImage(brickImage, op)
+		op.GeoM.Translate(horizontalUnitWidthPx, 0)
+	}
+
+	// Draw Bottom
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(b.bottomWall.rect.Left), float64(b.bottomWall.rect.Bottom-blockWidth))
+	for i := 0; i < wFactor; i++ {
+		screen.DrawImage(brickImage, op)
+		op.GeoM.Translate(horizontalUnitWidthPx, 0)
+	}
+
+	// Draw Left
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(b.leftWall.rect.Left), float64(b.leftWall.rect.Top))
+	for i := 0; i < hFactor; i++ {
+		screen.DrawImage(brickYImage, op)
+		op.GeoM.Translate(0, horizontalUnitWidthPx)
+	}
+
+	// Draw Right
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(b.rightWall.rect.Right-blockWidth), float64(b.rightWall.rect.Top))
+	for i := 0; i < hFactor; i++ {
+		screen.DrawImage(brickYImage, op)
+		op.GeoM.Translate(0, horizontalUnitWidthPx)
+	}
+}
+
+func NewBarrier(rect Rect, factor DimensionFactor) Barrier {
+	return Barrier{
+		factor: factor,
+		leftWall: Wall{
+			rect: Rect{
+				Left:   rect.Left,
+				Top:    rect.Top,
+				Right:  rect.Left + wallWidth,
+				Bottom: rect.Bottom,
+			},
+			image: brickYImage,
+		},
+		topWall: Wall{
+			rect: Rect{
+				Left:   rect.Left,
+				Top:    rect.Top,
+				Right:  rect.Right,
+				Bottom: rect.Top + wallWidth,
+			},
+			image: brickImage,
+		},
+		rightWall: Wall{
+			rect: Rect{
+				Left:   rect.Right - wallWidth,
+				Top:    rect.Top,
+				Right:  rect.Right,
+				Bottom: rect.Bottom,
+			},
+			image: brickYImage,
+		},
+		bottomWall: Wall{
+			rect: Rect{
+				Left:   rect.Left,
+				Top:    rect.Bottom - wallWidth,
+				Right:  rect.Right,
+				Bottom: rect.Bottom,
+			},
+			image: brickImage,
+		},
+	}
 }
 
 func getDungeonBgImage() *ebiten.Image {
