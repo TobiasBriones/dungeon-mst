@@ -107,6 +107,19 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 	return d.rect.Intersects(rect)
 }
 
+func (d *Dungeon) CanMoveTowards(movement Movement, rect *Rect) bool {
+	if !d.Intersects(rect) {
+		return true
+	}
+	subRect := Rect{
+		Left:   d.rect.Left + wallWidth,
+		Top:    d.rect.Top + wallWidth,
+		Right:  d.rect.Right - wallWidth,
+		Bottom: d.rect.Bottom - wallWidth,
+	}
+	return CheckMovement(movement, rect, subRect)
+}
+
 func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	wFactor := d.factor.Width
@@ -151,7 +164,6 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left+wallWidth), float64(d.rect.Top+wallWidth))
 	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
-
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
