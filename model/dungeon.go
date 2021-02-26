@@ -8,14 +8,11 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"image"
-	"image/color"
 	_ "image/png"
 	"log"
-	"math"
 )
 
 const (
-	PathWidthPx            = 32
 	CollisionLeft          = 0
 	CollisionTop           = 1
 	CollisionRight         = 2
@@ -101,28 +98,7 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 }
 
 func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
-	center := d.Center()
-	sw := PathWidthPx / 2
-	path := &Path{
-		p00: Point{center.X - sw, center.Y + sw},
-		p01: Point{center.X - sw, dungeon.Cy() + sw},
-		p10: Point{center.X - sw, dungeon.Cy() - sw},
-		p11: Point{dungeon.Cx() - sw, dungeon.Cy() - sw},
-	}
-	rect1 := Rect{
-		Left:   path.p00.X + sw,
-		Top:    min(path.p00.Y, path.p01.Y),
-		Right:  path.p00.X + sw + PathWidthPx,
-		Bottom: max(path.p00.Y, path.p01.Y),
-	}
-	rect2 := Rect{
-		Left:   min(path.p10.X, path.p11.X),
-		Top:    path.p10.Y,
-		Right:  max(path.p10.X, path.p11.X),
-		Bottom: path.p10.Y + PathWidthPx,
-	}
-	path.rect1 = rect1
-	path.rect2 = rect2
+	path := d.getPathFor(dungeon)
 	d.paths = append(d.paths, path)
 	dungeon.paths = append(dungeon.paths, path)
 }
@@ -178,49 +154,30 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
 	for _, path := range d.paths {
-		d.drawPath(path, screen)
+		path.Draw(screen)
 	}
 }
 
-func (d *Dungeon) drawPath(path *Path, screen *ebiten.Image) {
-	d.drawPathLine(path.p00, path.p01, screen)
-	d.drawPathLine(path.p10, path.p11, screen)
-}
-
-func (d *Dungeon) drawPathLine(p1 Point, p2 Point, screen *ebiten.Image) {
-	if p1.X == p2.X {
-		x := p1.X
-		y0 := p1.Y
-		y1 := p2.Y
-		d.drawVerticalPath(x, y0, y1, screen)
-	} else {
-		y := p1.Y
-		x0 := p1.X
-		x1 := p2.X
-		d.drawHorizontalPath(y, x0, x1, screen)
+func (d *Dungeon) getPathFor(dungeon *Dungeon) *Path {
+	center := d.Center()
+	hp1x := min(center.X, dungeon.Cx())
+	hp2x := max(center.X, dungeon.Cx())
+	hpy := dungeon.Cy()
+	hl := Line{
+		p1: Point{hp1x, hpy},
+		p2: Point{hp2x, hpy},
 	}
-}
 
-func (d *Dungeon) drawHorizontalPath(y int, x0 int, x1 int, screen *ebiten.Image) {
-	x := min(x0, x1)
-	w := int(math.Abs(float64(x0 - x1)))
-	line := ebiten.NewImage(w, PathWidthPx)
-	op := &ebiten.DrawImageOptions{}
+	vp1x := center.X
+	vp1y := min(center.Y, dungeon.Cy())
+	vp2y := max(center.Y, dungeon.Cy())
+	vl := Line{
+		p1: Point{vp1x, vp1y},
+		p2: Point{vp1x, vp2y},
+	}
 
-	line.Fill(color.Gray{})
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(line, op)
-}
-
-func (d *Dungeon) drawVerticalPath(x int, y0 int, y1 int, screen *ebiten.Image) {
-	y := min(y0, y1)
-	h := int(math.Abs(float64(y0 - y1)))
-	line := ebiten.NewImage(PathWidthPx, h)
-	op := &ebiten.DrawImageOptions{}
-
-	line.Fill(color.Gray{})
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(line, op)
+	path := NewPath(hl, vl)
+	return &path
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
