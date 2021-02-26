@@ -45,8 +45,9 @@ func (r *Runner) SetCurrentPaths(value []*Path) {
 }
 
 func (r *Runner) SetDungeon(value *Dungeon) {
-	r.Rect.Left = value.Cx() - frameWidth/2
-	r.Rect.Top = value.Cy() - frameHeight/2
+	x := value.Cx() - frameWidth/2
+	y := value.Cy() - frameHeight/2
+	r.setPosition(x, y)
 	r.SetCurrentDungeon(value)
 }
 
