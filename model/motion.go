@@ -10,3 +10,8 @@ const (
 	MoveDirRight  = 2
 	MoveDirBottom = 3
 )
+
+type Movement struct {
+	direction int
+	length    int
+}
