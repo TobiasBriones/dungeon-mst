@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	CollisionNone          = -1
 	CollisionLeft          = 0
 	CollisionTop           = 1
 	CollisionRight         = 2
@@ -80,7 +81,7 @@ func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
 
 func (d *Dungeon) Collides(rect *Rect) int {
 	if !d.rect.Intersects(rect) {
-		return -1
+		return CollisionNone
 	}
 	subRect := Rect{
 		Left:   d.rect.Left + wallWidth,
@@ -88,16 +89,16 @@ func (d *Dungeon) Collides(rect *Rect) int {
 		Right:  d.rect.Right - wallWidth,
 		Bottom: d.rect.Bottom - wallWidth,
 	}
-	collision := -1
+	collision := CollisionNone
 
 	if rect.Left < subRect.Left {
-		collision = 0
+		collision = CollisionLeft
 	} else if rect.Top < subRect.Top {
-		collision = 1
+		collision = CollisionTop
 	} else if rect.Right > subRect.Right {
-		collision = 2
+		collision = CollisionRight
 	} else if rect.Bottom > subRect.Bottom {
-		collision = 3
+		collision = CollisionBottom
 	}
 	return collision
 }
