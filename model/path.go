@@ -23,19 +23,23 @@ type Path struct {
 }
 
 func (p *Path) InBounds(rect *Rect) bool {
-	hRect := p.hRect
-	vRect := p.vRect
-	return hRect.InBounds(rect) || vRect.InBounds(rect)
+	return p.hRect.InBounds(rect) || p.vRect.InBounds(rect)
 }
 
 func (p *Path) CanMoveTowards(movement Movement, rect *Rect) bool {
 	if !p.InBounds(rect) {
 		return true
 	}
+	mx := false
+	my := false
+
 	if p.hRect.InBounds(rect) {
-		return CheckMovement(movement, rect, p.hRect)
+		mx = CheckMovement(movement, rect, p.hRect)
 	}
-	return CheckMovement(movement, rect, p.vRect)
+	if p.vRect.InBounds(rect) {
+		my = CheckMovement(movement, rect, p.vRect)
+	}
+	return mx || my
 }
 
 func (p *Path) Draw(screen *ebiten.Image) {
@@ -82,16 +86,16 @@ func NewPath(hl Line, vl Line) Path {
 	}
 	sw := PathWidthPx / 2
 	hRect := Rect{
-		Left:   hl.p1.X,
+		Left:   hl.p1.X - sw,
 		Top:    hl.p1.Y - sw,
-		Right:  hl.p2.X,
+		Right:  hl.p2.X + sw,
 		Bottom: hl.p1.Y + sw,
 	}
 	vRect := Rect{
 		Left:   vl.p1.X - sw,
-		Top:    vl.p1.Y,
+		Top:    vl.p1.Y - sw,
 		Right:  vl.p1.X + sw,
-		Bottom: vl.p2.Y,
+		Bottom: vl.p2.Y + sw,
 	}
 
 	hImg := ebiten.NewImage(hRect.Width(), hRect.Height())
