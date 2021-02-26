@@ -15,13 +15,14 @@ import (
 )
 
 const (
-	PathWidthPx            = 16
+	PathWidthPx            = 32
 	CollisionLeft          = 0
 	CollisionTop           = 1
 	CollisionRight         = 2
 	CollisionBottom        = 3
 	horizontalUnitWidthPx  = 64
 	horizontalUnitHeightPx = 12
+	wallWidth              = horizontalUnitHeightPx
 )
 
 var (
@@ -64,10 +65,10 @@ func (d *Dungeon) Collides(rect *Rect) int {
 		return -1
 	}
 	subRect := Rect{
-		Left:   d.rect.Left + PathWidthPx,
-		Top:    d.rect.Top + PathWidthPx,
-		Right:  d.rect.Right - PathWidthPx,
-		Bottom: d.rect.Bottom - PathWidthPx,
+		Left:   d.rect.Left + wallWidth,
+		Top:    d.rect.Top + wallWidth,
+		Right:  d.rect.Right - wallWidth,
+		Bottom: d.rect.Bottom - wallWidth,
 	}
 	collision := -1
 
