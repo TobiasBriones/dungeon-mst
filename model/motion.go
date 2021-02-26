@@ -28,3 +28,33 @@ func CheckMovement(movement Movement, rect *Rect, host Rect) bool {
 	}
 	return false
 }
+
+func WillCollide(movement Movement, rect *Rect, objRect *Rect) bool {
+	dst := Move(objRect, movement)
+	return rect.Intersects(dst)
+}
+
+func Move(rect *Rect, movement Movement) *Rect {
+	length := movement.length
+	dst := &Rect{
+		Left:   rect.Left,
+		Top:    rect.Top,
+		Right:  rect.Right,
+		Bottom: rect.Bottom,
+	}
+
+	if movement.direction == MoveDirLeft {
+		dst.Left -= length
+		dst.Right -= length
+	} else if movement.direction == MoveDirTop {
+		dst.Top -= length
+		dst.Bottom -= length
+	} else if movement.direction == MoveDirRight {
+		dst.Right += length
+		dst.Left += length
+	} else if movement.direction == MoveDirBottom {
+		dst.Bottom += length
+		dst.Top += length
+	}
+	return dst
+}
