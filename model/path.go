@@ -28,6 +28,29 @@ func (p *Path) InBounds(rect *Rect) bool {
 	return hRect.InBounds(rect) || vRect.InBounds(rect)
 }
 
+func (p *Path) CanMoveTowards(movement Movement, rect *Rect) bool {
+	if !p.InBounds(rect) {
+		return true
+	}
+	if p.hRect.InBounds(rect) {
+		return CheckMovement(movement, rect, p.hRect)
+	}
+	return CheckMovement(movement, rect, p.vRect)
+}
+
+func CheckMovement(movement Movement, rect *Rect, host Rect) bool {
+	if movement.direction == MoveDirLeft {
+		return rect.Left-movement.length > host.Left
+	} else if movement.direction == MoveDirTop {
+		return rect.Top-movement.length > host.Top
+	} else if movement.direction == MoveDirRight {
+		return rect.Right+movement.length < host.Right
+	} else if movement.direction == MoveDirBottom {
+		return rect.Bottom+movement.length < host.Bottom
+	}
+	return false
+}
+
 func (p *Path) Draw(screen *ebiten.Image) {
 	p.drawHorizontalLine(screen)
 	p.drawVerticalLine(screen)
