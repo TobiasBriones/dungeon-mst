@@ -34,6 +34,7 @@ type Game struct {
 
 func (g *Game) Update() error {
 	var currentDungeon *model.Dungeon
+	var currentPath *model.Path
 
 	for _, dungeon := range dungeons {
 		if dungeon.Intersects(&g.runner.Rect) {
@@ -41,7 +42,13 @@ func (g *Game) Update() error {
 			break
 		}
 	}
-	g.runner.Update(currentDungeon)
+	for _, path := range paths {
+		if path.InBounds(&g.runner.Rect) {
+			currentPath = path
+			break
+		}
+	}
+	g.runner.Update(currentDungeon, currentPath)
 
 	// Generate random dungeons
 	//for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {

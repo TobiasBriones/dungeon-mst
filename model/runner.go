@@ -30,20 +30,20 @@ type Runner struct {
 	image *ebiten.Image
 }
 
-func (r *Runner) Update(dungeon *Dungeon) {
+func (r *Runner) Update(dungeon *Dungeon, path *Path) {
 	r.count++
 
 	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 		if ebiten.IsKeyPressed(k) {
 			switch k {
 			case ebiten.KeyUp, ebiten.KeyW:
-				r.walkUp()
+				r.move(MoveDirTop, path)
 			case ebiten.KeyDown, ebiten.KeyS:
-				r.walkDown()
+				r.move(MoveDirBottom, path)
 			case ebiten.KeyLeft, ebiten.KeyA:
-				r.walkLeft()
+				r.move(MoveDirLeft, path)
 			case ebiten.KeyRight, ebiten.KeyD:
-				r.walkRight()
+				r.move(MoveDirRight, path)
 			}
 		}
 	}
@@ -86,12 +86,18 @@ func (r *Runner) normalize(dungeon *Dungeon) {
 		pos.Y = screenHeight - int(frameHeight*r.Scale)
 	}
 
-	// Check for dungeon collision
+	r.checkForDungeonCollision(dungeon)
+}
+
+func (r *Runner) checkForDungeonCollision(dungeon *Dungeon) {
 	if dungeon == nil {
 		return
 	}
 	collision := dungeon.Collides(&r.Rect)
+	r.fixCollision(collision)
+}
 
+func (r *Runner) fixCollision(collision int) {
 	if collision == CollisionLeft {
 		r.walkRight()
 	} else if collision == CollisionTop {
@@ -103,6 +109,21 @@ func (r *Runner) normalize(dungeon *Dungeon) {
 	}
 }
 
+func (r *Runner) move(direction int, currentPath *Path) {
+	if currentPath != nil &&
+		!currentPath.CanMoveTowards(Movement{direction, 1}, &r.Rect) {
+		return
+	}
+	if direction == MoveDirLeft {
+		r.walkLeft()
+	} else if direction == MoveDirTop {
+		r.walkUp()
+	} else if direction == MoveDirRight {
+		r.walkRight()
+	} else if direction == MoveDirBottom {
+		r.walkDown()
+	}
+}
 func (r *Runner) walkLeft() {
 	r.setPosition(r.Rect.Left-1, r.Rect.Top)
 }
