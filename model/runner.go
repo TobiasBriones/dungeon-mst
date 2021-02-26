@@ -24,30 +24,40 @@ const (
 )
 
 type Runner struct {
-	Rect  Rect
-	Scale float64
-	count int
-	image *ebiten.Image
+	Rect           Rect
+	Scale          float64
+	count          int
+	image          *ebiten.Image
+	currentDungeon *Dungeon
+	currentPaths   []*Path
 }
 
-func (r *Runner) Update(dungeon *Dungeon, path *Path) {
+func (r *Runner) SetCurrentDungeon(value *Dungeon) {
+	r.currentDungeon = value
+}
+
+func (r *Runner) SetCurrentPaths(value []*Path) {
+	r.currentPaths = value
+}
+
+func (r *Runner) Update() {
 	r.count++
 
 	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 		if ebiten.IsKeyPressed(k) {
 			switch k {
 			case ebiten.KeyUp, ebiten.KeyW:
-				r.move(MoveDirTop, path)
+				r.move(MoveDirTop)
 			case ebiten.KeyDown, ebiten.KeyS:
-				r.move(MoveDirBottom, path)
+				r.move(MoveDirBottom)
 			case ebiten.KeyLeft, ebiten.KeyA:
-				r.move(MoveDirLeft, path)
+				r.move(MoveDirLeft)
 			case ebiten.KeyRight, ebiten.KeyD:
-				r.move(MoveDirRight, path)
+				r.move(MoveDirRight)
 			}
 		}
 	}
-	r.normalize(dungeon)
+	r.normalize()
 }
 
 func (r *Runner) Draw(screen *ebiten.Image) {
@@ -69,7 +79,7 @@ func (r *Runner) Center() {
 	r.setPosition(x, y)
 }
 
-func (r *Runner) normalize(dungeon *Dungeon) {
+func (r *Runner) normalize() {
 	pos := Point{r.Rect.Left, r.Rect.Top}
 
 	// Check for screen collision
@@ -85,35 +95,17 @@ func (r *Runner) normalize(dungeon *Dungeon) {
 	if pos.Y > screenHeight-int(frameHeight*r.Scale) {
 		pos.Y = screenHeight - int(frameHeight*r.Scale)
 	}
-
-	r.checkForDungeonCollision(dungeon)
 }
 
-func (r *Runner) checkForDungeonCollision(dungeon *Dungeon) {
-	if dungeon == nil {
+func (r *Runner) move(direction int) {
+	movement := Movement{direction, 1}
+	canMoveInsideDungeon := r.canMoveInsideDungeonTowards(movement)
+	canMoveInsidePaths := r.canMoveInsidePathsTowards(movement)
+
+	if !canMoveInsideDungeon && !canMoveInsidePaths && !r.isOutSide() {
 		return
 	}
-	collision := dungeon.Collides(&r.Rect)
-	r.fixCollision(collision)
-}
 
-func (r *Runner) fixCollision(collision int) {
-	if collision == CollisionLeft {
-		r.walkRight()
-	} else if collision == CollisionTop {
-		r.walkDown()
-	} else if collision == CollisionRight {
-		r.walkLeft()
-	} else if collision == CollisionBottom {
-		r.walkUp()
-	}
-}
-
-func (r *Runner) move(direction int, currentPath *Path) {
-	if currentPath != nil &&
-		!currentPath.CanMoveTowards(Movement{direction, 1}, &r.Rect) {
-		return
-	}
 	if direction == MoveDirLeft {
 		r.walkLeft()
 	} else if direction == MoveDirTop {
@@ -124,6 +116,23 @@ func (r *Runner) move(direction int, currentPath *Path) {
 		r.walkDown()
 	}
 }
+
+func (r *Runner) canMoveInsideDungeonTowards(movement Movement) bool {
+	return r.isInsideDungeon() && r.currentDungeon.CanMoveTowards(movement, &r.Rect)
+}
+
+func (r *Runner) canMoveInsidePathsTowards(movement Movement) bool {
+	canMove := false
+
+	for _, path := range r.currentPaths {
+		if path.CanMoveTowards(movement, &r.Rect) {
+			canMove = true
+			break
+		}
+	}
+	return canMove
+}
+
 func (r *Runner) walkLeft() {
 	r.setPosition(r.Rect.Left-1, r.Rect.Top)
 }
@@ -138,6 +147,14 @@ func (r *Runner) walkRight() {
 
 func (r *Runner) walkDown() {
 	r.setPosition(r.Rect.Left, r.Rect.Top+1)
+}
+
+func (r *Runner) isInsideDungeon() bool {
+	return r.currentDungeon != nil
+}
+
+func (r *Runner) isOutSide() bool {
+	return !r.isInsideDungeon() && len(r.currentPaths) == 0
 }
 
 func (r *Runner) setPosition(x int, y int) {
@@ -156,8 +173,10 @@ func NewRunner() Runner {
 			Right:  int(frameWidth * scale),
 			Bottom: int(frameHeight * scale),
 		},
-		Scale: scale,
-		count: 0,
+		Scale:          scale,
+		count:          0,
+		currentDungeon: nil,
+		currentPaths:   []*Path{},
 	}
 	runner.Center()
 
