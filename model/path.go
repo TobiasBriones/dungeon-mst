@@ -14,10 +14,12 @@ const (
 )
 
 type Path struct {
-	hLine Line
-	hRect Rect
-	vLine Line
-	vRect Rect
+	hLine      Line
+	hRect      Rect
+	hRectImage *ebiten.Image
+	vLine      Line
+	vRect      Rect
+	vRectImage *ebiten.Image
 }
 
 func (p *Path) inBounds(rect *Rect) bool {
@@ -35,26 +37,20 @@ func (p *Path) drawHorizontalLine(screen *ebiten.Image) {
 	rect := p.hRect
 	x := rect.Left
 	y := rect.Top
-	w := rect.Width()
-	line := ebiten.NewImage(w, rect.Height())
 	op := &ebiten.DrawImageOptions{}
 
-	line.Fill(color.Gray{})
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(line, op)
+	screen.DrawImage(p.hRectImage, op)
 }
 
 func (p *Path) drawVerticalLine(screen *ebiten.Image) {
 	rect := p.vRect
 	x := rect.Left
 	y := rect.Top
-	h := rect.Height()
-	line := ebiten.NewImage(rect.Width(), h)
 	op := &ebiten.DrawImageOptions{}
 
-	line.Fill(color.Gray{})
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(line, op)
+	screen.DrawImage(p.vRectImage, op)
 }
 
 func NewPath(hl Line, vl Line) Path {
@@ -87,7 +83,13 @@ func NewPath(hl Line, vl Line) Path {
 		Right:  vl.p1.X + sw,
 		Bottom: vl.p2.Y,
 	}
-	return Path{hl, hRect, vl, vRect}
+
+	hImg := ebiten.NewImage(hRect.Width(), hRect.Height())
+	vImg := ebiten.NewImage(vRect.Width(), vRect.Height())
+
+	hImg.Fill(color.Gray{})
+	vImg.Fill(color.Gray{})
+	return Path{hl, hRect, hImg, vl, vRect, vImg}
 }
 
 type Line struct {
