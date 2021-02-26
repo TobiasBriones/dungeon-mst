@@ -110,15 +110,15 @@ func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
 		p11: Point{dungeon.Cx() - sw, dungeon.Cy() - sw},
 	}
 	rect1 := Rect{
-		Left:   path.p00.X,
+		Left:   path.p00.X + sw,
 		Top:    min(path.p00.Y, path.p01.Y),
-		Right:  path.p00.X + PathWidthPx,
+		Right:  path.p00.X + sw + PathWidthPx,
 		Bottom: max(path.p00.Y, path.p01.Y),
 	}
 	rect2 := Rect{
 		Left:   min(path.p10.X, path.p11.X),
 		Top:    path.p10.Y,
-		Right:  max(path.p10.Y, path.p11.Y),
+		Right:  max(path.p10.X, path.p11.X),
 		Bottom: path.p10.Y + PathWidthPx,
 	}
 	path.rect1 = rect1
