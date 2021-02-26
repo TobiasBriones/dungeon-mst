@@ -88,7 +88,8 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 	return dungeons
 }
 
-func GetNeighborhoods(dungeons []*model.Dungeon) {
+func GetPaths(dungeons []*model.Dungeon) []*model.Path {
+	var paths []*model.Path
 	var tree []*model.Dungeon
 	done := map[*model.Dungeon]bool{}
 
@@ -126,9 +127,12 @@ func GetNeighborhoods(dungeons []*model.Dungeon) {
 			tree = append(tree, b)
 			done[b] = true
 
-			a.AddNeighbor(b)
+			path := a.GetPathFor(b)
+			//a.AddDoor(path) coming next
+			paths = append(paths, path)
 		}
 	}
+	return paths
 }
 
 func getMinSize() model.Dimension {

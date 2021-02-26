@@ -31,7 +31,6 @@ var (
 type Dungeon struct {
 	rect   Rect
 	factor DimensionFactor
-	paths  []*Path
 }
 
 func (d *Dungeon) Width() int {
@@ -57,6 +56,28 @@ func (d *Dungeon) Center() Point {
 	}
 }
 
+func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
+	center := d.Center()
+	hp1x := min(center.X, dungeon.Cx())
+	hp2x := max(center.X, dungeon.Cx())
+	hpy := dungeon.Cy()
+	hl := Line{
+		p1: Point{hp1x, hpy},
+		p2: Point{hp2x, hpy},
+	}
+
+	vp1x := center.X
+	vp1y := min(center.Y, dungeon.Cy())
+	vp2y := max(center.Y, dungeon.Cy())
+	vl := Line{
+		p1: Point{vp1x, vp1y},
+		p2: Point{vp1x, vp2y},
+	}
+
+	path := NewPath(hl, vl)
+	return &path
+}
+
 func (d *Dungeon) Collides(rect *Rect) int {
 	if !d.rect.Intersects(rect) {
 		return -1
@@ -78,29 +99,11 @@ func (d *Dungeon) Collides(rect *Rect) int {
 	} else if rect.Bottom > subRect.Bottom {
 		collision = 3
 	}
-
-	// If there's a collision check whether it is on a path
-	if collision != -1 {
-		for _, path := range d.paths {
-			if path.inBounds(rect) {
-				// If it has collision on a wall but it is placed inside a path
-				// then let it go
-				collision = -1
-				break
-			}
-		}
-	}
 	return collision
 }
 
 func (d *Dungeon) Intersects(rect *Rect) bool {
 	return d.rect.Intersects(rect)
-}
-
-func (d *Dungeon) AddNeighbor(dungeon *Dungeon) {
-	path := d.getPathFor(dungeon)
-	d.paths = append(d.paths, path)
-	dungeon.paths = append(dungeon.paths, path)
 }
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
@@ -141,9 +144,6 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(0, horizontalUnitWidthPx)
 	}
 
-	// Draw the Neighborhood
-	d.drawNeighborhood(screen)
-
 	// Draw Background
 	rect := image.Rect(0, 0, d.rect.Width()-2*wallWidth, d.rect.Height()-2*wallWidth)
 
@@ -151,34 +151,6 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(float64(d.rect.Left+wallWidth), float64(d.rect.Top+wallWidth))
 	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
 
-}
-
-func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
-	for _, path := range d.paths {
-		path.Draw(screen)
-	}
-}
-
-func (d *Dungeon) getPathFor(dungeon *Dungeon) *Path {
-	center := d.Center()
-	hp1x := min(center.X, dungeon.Cx())
-	hp2x := max(center.X, dungeon.Cx())
-	hpy := dungeon.Cy()
-	hl := Line{
-		p1: Point{hp1x, hpy},
-		p2: Point{hp2x, hpy},
-	}
-
-	vp1x := center.X
-	vp1y := min(center.Y, dungeon.Cy())
-	vp2y := max(center.Y, dungeon.Cy())
-	vl := Line{
-		p1: Point{vp1x, vp1y},
-		p2: Point{vp1x, vp2y},
-	}
-
-	path := NewPath(hl, vl)
-	return &path
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
@@ -190,7 +162,6 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	return Dungeon{
 		rect,
 		factor,
-		[]*Path{},
 	}
 }
 

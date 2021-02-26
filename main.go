@@ -25,6 +25,7 @@ const (
 var (
 	bgImage  *ebiten.Image
 	dungeons []*model.Dungeon
+	paths    []*model.Path
 )
 
 type Game struct {
@@ -46,7 +47,7 @@ func (g *Game) Update() error {
 	//for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 	//	if ebiten.IsKeyPressed(k) {
 	//		dungeons = ai.GenerateDungeons(getSize())
-	//		ai.GetNeighborhoods(dungeons)
+	//		ai.GetPaths(dungeons)
 	//	}
 	//}
 	return nil
@@ -55,6 +56,9 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bgImage, nil)
 
+	for _, path := range paths {
+		path.Draw(screen)
+	}
 	for _, dungeon := range dungeons {
 		dungeon.Draw(screen)
 	}
@@ -83,8 +87,6 @@ func main() {
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(len(dungeons))
 }
 
 func getSize() model.Dimension {
@@ -97,7 +99,7 @@ func init() {
 	//dungeons = genSomeDungeons()
 
 	//genSomeNeighbors(dungeons)
-	ai.GetNeighborhoods(dungeons)
+	paths = ai.GetPaths(dungeons)
 }
 
 func loadBg() {
@@ -120,6 +122,8 @@ func genSomeDungeons() []*model.Dungeon {
 	return []*model.Dungeon{&d0, &d1, &d2, &d3}
 }
 
+// Neighbors will be replaced by doors
+/*
 func genSomeNeighbors(dungeons []*model.Dungeon) {
 	dungeons[0].AddNeighbor(dungeons[1])
 	dungeons[0].AddNeighbor(dungeons[2])
@@ -128,6 +132,7 @@ func genSomeNeighbors(dungeons []*model.Dungeon) {
 
 	dungeons[2].AddNeighbor(dungeons[3])
 }
+*/
 
 func testRectIntersect() {
 	r1 := model.Rect{
