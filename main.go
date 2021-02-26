@@ -37,7 +37,7 @@ func (g *Game) Update() error {
 	var currentPaths []*model.Path
 
 	for _, dungeon := range dungeons {
-		if dungeon.Intersects(&g.runner.Rect) {
+		if dungeon.InBounds(&g.runner.Rect) {
 			currentDungeon = dungeon
 			break
 		}

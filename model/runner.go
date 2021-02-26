@@ -112,7 +112,7 @@ func (r *Runner) move(direction int) {
 	canMoveInsideDungeon := r.canMoveInsideDungeonTowards(movement)
 	canMoveInsidePaths := r.canMoveInsidePathsTowards(movement)
 
-	if !canMoveInsideDungeon && !canMoveInsidePaths && !r.IsOutSide() {
+	if !canMoveInsideDungeon && !canMoveInsidePaths {
 		return
 	}
 

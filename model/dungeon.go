@@ -78,17 +78,15 @@ func (d *Dungeon) Intersects(rect *Rect) bool {
 	return d.rect.Intersects(rect)
 }
 
+func (d *Dungeon) InBounds(rect *Rect) bool {
+	return d.rect.InBounds(rect)
+}
+
 func (d *Dungeon) CanMoveTowards(movement Movement, rect *Rect) bool {
-	if !d.Intersects(rect) {
+	if !d.InBounds(rect) {
 		return true
 	}
-	subRect := Rect{
-		Left:   d.rect.Left + wallWidth,
-		Top:    d.rect.Top + wallWidth,
-		Right:  d.rect.Right - wallWidth,
-		Bottom: d.rect.Bottom - wallWidth,
-	}
-	return CheckMovement(movement, rect, subRect)
+	return !d.barrier.WillCollide(movement, rect)
 }
 
 func (d *Dungeon) Draw(screen *ebiten.Image) {
@@ -133,6 +131,13 @@ type Barrier struct {
 	topWall    Wall
 	rightWall  Wall
 	bottomWall Wall
+}
+
+func (b *Barrier) WillCollide(movement Movement, objRect *Rect) bool {
+	return WillCollide(movement, &b.leftWall.rect, objRect) ||
+		WillCollide(movement, &b.topWall.rect, objRect) ||
+		WillCollide(movement, &b.rightWall.rect, objRect) ||
+		WillCollide(movement, &b.bottomWall.rect, objRect)
 }
 
 func (b *Barrier) Draw(screen *ebiten.Image) {
