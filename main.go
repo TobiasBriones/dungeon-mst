@@ -49,6 +49,11 @@ func (g *Game) Update() error {
 	}
 	g.runner.SetCurrentDungeon(currentDungeon)
 	g.runner.SetCurrentPaths(currentPaths)
+
+	if g.runner.IsOutSide() {
+		g.runner.SetDungeon(dungeons[0])
+	}
+
 	g.runner.Update()
 
 	// Generate random dungeons

@@ -32,12 +32,22 @@ type Runner struct {
 	currentPaths   []*Path
 }
 
+func (r *Runner) IsOutSide() bool {
+	return !r.isInsideDungeon() && len(r.currentPaths) == 0
+}
+
 func (r *Runner) SetCurrentDungeon(value *Dungeon) {
 	r.currentDungeon = value
 }
 
 func (r *Runner) SetCurrentPaths(value []*Path) {
 	r.currentPaths = value
+}
+
+func (r *Runner) SetDungeon(value *Dungeon) {
+	r.Rect.Left = value.Cx() - frameWidth/2
+	r.Rect.Top = value.Cy() - frameHeight/2
+	r.SetCurrentDungeon(value)
 }
 
 func (r *Runner) Update() {
@@ -102,7 +112,7 @@ func (r *Runner) move(direction int) {
 	canMoveInsideDungeon := r.canMoveInsideDungeonTowards(movement)
 	canMoveInsidePaths := r.canMoveInsidePathsTowards(movement)
 
-	if !canMoveInsideDungeon && !canMoveInsidePaths && !r.isOutSide() {
+	if !canMoveInsideDungeon && !canMoveInsidePaths && !r.IsOutSide() {
 		return
 	}
 
@@ -151,10 +161,6 @@ func (r *Runner) walkDown() {
 
 func (r *Runner) isInsideDungeon() bool {
 	return r.currentDungeon != nil
-}
-
-func (r *Runner) isOutSide() bool {
-	return !r.isInsideDungeon() && len(r.currentPaths) == 0
 }
 
 func (r *Runner) setPosition(x int, y int) {
