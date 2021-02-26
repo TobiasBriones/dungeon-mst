@@ -109,13 +109,6 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	hFactor := d.factor.Height
 	blockWidth := horizontalUnitHeightPx
 
-	// Draw Background
-	rect := image.Rect(0, 0, d.rect.Width(), d.rect.Height())
-
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
-	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
-
 	// Draw Top
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left), float64(d.rect.Top))
@@ -150,6 +143,14 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 
 	// Draw the Neighborhood
 	d.drawNeighborhood(screen)
+
+	// Draw Background
+	rect := image.Rect(0, 0, d.rect.Width()-2*wallWidth, d.rect.Height()-2*wallWidth)
+
+	op.GeoM.Reset()
+	op.GeoM.Translate(float64(d.rect.Left+wallWidth), float64(d.rect.Top+wallWidth))
+	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
+
 }
 
 func (d *Dungeon) drawNeighborhood(screen *ebiten.Image) {
