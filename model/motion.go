@@ -5,8 +5,8 @@
 package model
 
 const (
-	MoveLeft   = 0
-	MoveTop    = 1
-	MoveRight  = 2
-	MoveBottom = 3
+	MoveDirLeft   = 0
+	MoveDirTop    = 1
+	MoveDirRight  = 2
+	MoveDirBottom = 3
 )
