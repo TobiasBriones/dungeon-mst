@@ -140,10 +140,10 @@ func (r *Rect) Intersects(rect *Rect) bool {
 }
 
 func (r *Rect) InBounds(rect *Rect) bool {
-	if !r.Intersects(rect) {
-		return false
-	}
-	return r.Right() >= rect.Right() && r.Bottom() >= rect.Bottom() // Must fix for the next commit
+	return r.left <= rect.Left() &&
+		r.top <= rect.Top() &&
+		r.right >= rect.Right() &&
+		r.bottom >= rect.Bottom()
 }
 
 func (r *Rect) setPosition(x int, y int) {
