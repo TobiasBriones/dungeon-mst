@@ -69,6 +69,9 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bgImage, nil)
 
+	for _, dungeon := range dungeons {
+		dungeon.DrawBarrier(screen)
+	}
 	for _, path := range paths {
 		path.Draw(screen)
 	}

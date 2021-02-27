@@ -86,9 +86,11 @@ func (d *Dungeon) CanMoveTowards(movement Movement, rect *Rect) bool {
 	return !d.barrier.WillCollide(movement, rect)
 }
 
-func (d *Dungeon) Draw(screen *ebiten.Image) {
+func (d *Dungeon) DrawBarrier(screen *ebiten.Image) {
 	d.barrier.Draw(screen)
+}
 
+func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	// Draw Background
