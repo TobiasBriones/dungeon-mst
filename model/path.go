@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	PathWidthPx = 32
+	PathWidthPx = 36
 )
 
 type Path struct {
