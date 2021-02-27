@@ -28,8 +28,9 @@ var (
 )
 
 type Game struct {
-	runner model.Runner
-	count  int
+	runner      model.Runner
+	count       int
+	legendImage *ebiten.Image
 }
 
 func (g *Game) Update() error {
@@ -80,12 +81,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	g.runner.Draw(screen)
+
+	// Draw legend image
+	screen.DrawImage(g.legendImage, nil)
 }
 
 func NewGame() Game {
 	runner := model.NewRunner()
+	legendImage := loadLegendImage()
 	return Game{
-		runner: runner,
+		runner:      runner,
+		legendImage: legendImage,
 	}
 }
 
@@ -127,6 +133,15 @@ func loadBg() {
 		log.Fatal(err)
 	}
 	bgImage = bgImg
+}
+
+func loadLegendImage() *ebiten.Image {
+	img, _, err := ebitenutil.NewImageFromFile("./assets/keyboard_legend.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
 }
 
 func reset() {
