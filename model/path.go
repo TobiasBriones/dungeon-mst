@@ -6,20 +6,25 @@ package model
 
 import (
 	"github.com/hajimehoshi/ebiten"
-	"image/color"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"image"
+	"log"
 )
 
 const (
 	PathWidthPx = 36
 )
 
+var (
+	pathImage  = getPathImage()
+	pathYImage = getPathYImage()
+)
+
 type Path struct {
-	hLine      Line
-	hRect      Rect
-	hRectImage *ebiten.Image
-	vLine      Line
-	vRect      Rect
-	vRectImage *ebiten.Image
+	hLine Line
+	hRect Rect
+	vLine Line
+	vRect Rect
 }
 
 func (p *Path) InBounds(rect *Rect) bool {
@@ -52,9 +57,10 @@ func (p *Path) drawHorizontalLine(screen *ebiten.Image) {
 	x := rect.Left()
 	y := rect.Top()
 	op := &ebiten.DrawImageOptions{}
+	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
 
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(p.hRectImage, op)
+	screen.DrawImage(pathImage.SubImage(subRect).(*ebiten.Image), op)
 }
 
 func (p *Path) drawVerticalLine(screen *ebiten.Image) {
@@ -62,9 +68,10 @@ func (p *Path) drawVerticalLine(screen *ebiten.Image) {
 	x := rect.Left()
 	y := rect.Top()
 	op := &ebiten.DrawImageOptions{}
+	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
 
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(p.vRectImage, op)
+	screen.DrawImage(pathYImage.SubImage(subRect).(*ebiten.Image), op)
 }
 
 func NewPath(hl Line, vl Line) Path {
@@ -97,13 +104,7 @@ func NewPath(hl Line, vl Line) Path {
 		vl.p1.X()+sw,
 		vl.p2.Y()+sw,
 	)
-
-	hImg := ebiten.NewImage(hRect.Width(), hRect.Height())
-	vImg := ebiten.NewImage(vRect.Width(), vRect.Height())
-
-	hImg.Fill(color.Gray{})
-	vImg.Fill(color.Gray{})
-	return Path{hl, hRect, hImg, vl, vRect, vImg}
+	return Path{hl, hRect, vl, vRect}
 }
 
 type Line struct {
@@ -121,4 +122,22 @@ func (l *Line) IsHorizontal() bool {
 
 func (l *Line) IsVertical() bool {
 	return l.p1.X() == l.p2.X()
+}
+
+func getPathImage() *ebiten.Image {
+	img, _, err := ebitenutil.NewImageFromFile("./assets/path.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
+}
+
+func getPathYImage() *ebiten.Image {
+	img, _, err := ebitenutil.NewImageFromFile("./assets/path_y.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
 }
