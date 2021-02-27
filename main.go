@@ -7,7 +7,6 @@ package main
 import (
 	"dungeon-mst/ai"
 	"dungeon-mst/model"
-	"fmt"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 	_ "image/png"
@@ -61,7 +60,7 @@ func (g *Game) Update() error {
 	// Generate random dungeons
 	if g.count%5 == 0 {
 		if ebiten.IsKeyPressed(ebiten.KeyR) {
-			reset(g)
+			reset()
 		}
 	}
 	return nil
@@ -97,7 +96,6 @@ func (g *Game) Layout(int, int) (int, int) {
 func main() {
 	game := NewGame()
 
-	testRectIntersect()
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
@@ -131,97 +129,7 @@ func loadBg() {
 	bgImage = bgImg
 }
 
-func reset(g *Game) {
+func reset() {
 	dungeons = ai.GenerateDungeons(getSize())
 	paths = ai.GetPaths(dungeons)
-}
-
-func genSomeDungeons() []*model.Dungeon {
-	d0 := model.NewDungeon(model.Point{}, model.DimensionFactor{Width: 1, Height: 1})
-	d1 := model.NewDungeon(model.NewPoint(20, 540), model.DimensionFactor{Width: 4, Height: 1})
-	d2 := model.NewDungeon(model.NewPoint(200, 140), model.DimensionFactor{Width: 3, Height: 2})
-	d3 := model.NewDungeon(model.NewPoint(350, 90), model.DimensionFactor{Width: 4, Height: 1})
-	return []*model.Dungeon{&d0, &d1, &d2, &d3}
-}
-
-// Neighbors will be replaced by doors
-/*
-func genSomeNeighbors(dungeons []*model.Dungeon) {
-	dungeons[0].AddNeighbor(dungeons[1])
-	dungeons[0].AddNeighbor(dungeons[2])
-
-	dungeons[1].AddNeighbor(dungeons[2])
-
-	dungeons[2].AddNeighbor(dungeons[3])
-}
-*/
-
-func testRectIntersect() {
-	r1 := model.NewRect(
-		0,
-		0,
-		50,
-		40,
-	)
-	r2 := model.NewRect(
-		10,
-		20,
-		30,
-		30,
-	)
-	r3 := model.NewRect(
-		24,
-		30,
-		30,
-		70,
-	)
-	r4 := model.NewRect(
-		30,
-		20,
-		330,
-		300,
-	)
-	r5 := model.NewRect(
-		100,
-		20,
-		300,
-		30,
-	)
-	r6 := model.NewRect(
-		10,
-		200,
-		80,
-		230,
-	)
-
-	if !r1.Intersects(&r2) {
-		fmt.Println("FAILED R1-R2")
-	}
-	if !r2.Intersects(&r1) {
-		fmt.Println("FAILED R1-R2")
-	}
-	if !r1.Intersects(&r3) {
-		fmt.Println("FAILED R1-R3")
-	}
-	if !r3.Intersects(&r1) {
-		fmt.Println("FAILED R1-R3")
-	}
-	if !r1.Intersects(&r4) {
-		fmt.Println("FAILED R1-R4")
-	}
-	if !r4.Intersects(&r1) {
-		fmt.Println("FAILED R1-R4")
-	}
-	if r1.Intersects(&r5) {
-		fmt.Println("FAILED R1-R5")
-	}
-	if r5.Intersects(&r1) {
-		fmt.Println("FAILED R1-R5")
-	}
-	if r1.Intersects(&r6) {
-		fmt.Println("FAILED R1-R6")
-	}
-	if r6.Intersects(&r1) {
-		fmt.Println("FAILED R1-R6")
-	}
 }
