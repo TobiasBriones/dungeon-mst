@@ -30,11 +30,13 @@ var (
 
 type Game struct {
 	runner model.Runner
+	count  int
 }
 
 func (g *Game) Update() error {
 	var currentDungeon *model.Dungeon = nil
 	var currentPaths []*model.Path
+	g.count++
 
 	for _, dungeon := range dungeons {
 		if dungeon.InBounds(&g.runner.Rect) {
@@ -57,12 +59,11 @@ func (g *Game) Update() error {
 	g.runner.Update()
 
 	// Generate random dungeons
-	//for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-	//	if ebiten.IsKeyPressed(k) {
-	//		dungeons = ai.GenerateDungeons(getSize())
-	//		ai.GetPaths(dungeons)
-	//	}
-	//}
+	if g.count%5 == 0 {
+		if ebiten.IsKeyPressed(ebiten.KeyR) {
+			reset(g)
+		}
+	}
 	return nil
 }
 
@@ -128,6 +129,11 @@ func loadBg() {
 		log.Fatal(err)
 	}
 	bgImage = bgImg
+}
+
+func reset(g *Game) {
+	dungeons = ai.GenerateDungeons(getSize())
+	paths = ai.GetPaths(dungeons)
 }
 
 func genSomeDungeons() []*model.Dungeon {
