@@ -16,11 +16,12 @@ const (
 	screenWidth  = 1280
 	screenHeight = 720
 
-	frameOX     = 0
-	frameOY     = 32
-	frameWidth  = 32
-	frameHeight = 32
-	frameNum    = 8
+	frameOX          = 0
+	frameOY          = 32
+	frameWidth       = 32
+	frameHeight      = 32
+	frameNum         = 8
+	movementLengthPx = 1
 )
 
 type Runner struct {
@@ -72,8 +73,8 @@ func (r *Runner) Update() {
 }
 
 func (r *Runner) Draw(screen *ebiten.Image) {
-	x := r.Rect.Left
-	y := r.Rect.Top
+	x := r.Rect.Left()
+	y := r.Rect.Top()
 	op := &ebiten.DrawImageOptions{}
 	i := (r.count / 5) % frameNum
 	sx, sy := frameOX+i*frameWidth, frameOY
@@ -91,21 +92,9 @@ func (r *Runner) Center() {
 }
 
 func (r *Runner) normalize() {
-	pos := Point{r.Rect.Left, r.Rect.Top}
-
 	// Check for screen collision
-	if pos.X < 0 {
-		pos.X = 0
-	}
-	if pos.X > screenWidth-int(frameWidth*r.Scale) {
-		pos.X = screenWidth - int(frameWidth*r.Scale)
-	}
-	if pos.Y < 0 {
-		pos.Y = 0
-	}
-	if pos.Y > screenHeight-int(frameHeight*r.Scale) {
-		pos.Y = screenHeight - int(frameHeight*r.Scale)
-	}
+	// ...
+	// Not required now
 }
 
 func (r *Runner) move(direction int) {
@@ -145,19 +134,19 @@ func (r *Runner) canMoveInsidePathsTowards(movement Movement) bool {
 }
 
 func (r *Runner) walkLeft() {
-	r.setPosition(r.Rect.Left-1, r.Rect.Top)
+	r.Rect.MoveLeft(movementLengthPx)
 }
 
 func (r *Runner) walkUp() {
-	r.setPosition(r.Rect.Left, r.Rect.Top-1)
+	r.Rect.MoveTop(movementLengthPx)
 }
 
 func (r *Runner) walkRight() {
-	r.setPosition(r.Rect.Left+1, r.Rect.Top)
+	r.Rect.MoveRight(movementLengthPx)
 }
 
 func (r *Runner) walkDown() {
-	r.setPosition(r.Rect.Left, r.Rect.Top+1)
+	r.Rect.MoveBottom(movementLengthPx)
 }
 
 func (r *Runner) isInsideDungeon() bool {
@@ -165,21 +154,18 @@ func (r *Runner) isInsideDungeon() bool {
 }
 
 func (r *Runner) setPosition(x int, y int) {
-	r.Rect.Left = x
-	r.Rect.Top = y
-	r.Rect.Right = x + int(frameWidth*r.Scale)
-	r.Rect.Bottom = y + int(frameHeight*r.Scale)
+	r.Rect.setPosition(x, y)
 }
 
 func NewRunner() Runner {
 	scale := 1.0
 	runner := Runner{
-		Rect: Rect{
-			Left:   0,
-			Top:    0,
-			Right:  int(frameWidth * scale),
-			Bottom: int(frameHeight * scale),
-		},
+		Rect: NewRect(
+			0,
+			0,
+			int(frameWidth*scale),
+			int(frameHeight*scale),
+		),
 		Scale:          scale,
 		count:          0,
 		currentDungeon: nil,

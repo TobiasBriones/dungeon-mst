@@ -103,7 +103,7 @@ func main() {
 }
 
 func getSize() model.Dimension {
-	return model.Dimension{Width: screenWidth, Height: screenHeight}
+	return model.NewDimension(screenWidth, screenHeight)
 }
 
 func init() {
@@ -129,9 +129,9 @@ func loadBg() {
 
 func genSomeDungeons() []*model.Dungeon {
 	d0 := model.NewDungeon(model.Point{}, model.DimensionFactor{Width: 1, Height: 1})
-	d1 := model.NewDungeon(model.Point{X: 20, Y: 540}, model.DimensionFactor{Width: 4, Height: 1})
-	d2 := model.NewDungeon(model.Point{X: 200, Y: 140}, model.DimensionFactor{Width: 3, Height: 2})
-	d3 := model.NewDungeon(model.Point{X: 350, Y: 90}, model.DimensionFactor{Width: 4, Height: 1})
+	d1 := model.NewDungeon(model.NewPoint(20, 540), model.DimensionFactor{Width: 4, Height: 1})
+	d2 := model.NewDungeon(model.NewPoint(200, 140), model.DimensionFactor{Width: 3, Height: 2})
+	d3 := model.NewDungeon(model.NewPoint(350, 90), model.DimensionFactor{Width: 4, Height: 1})
 	return []*model.Dungeon{&d0, &d1, &d2, &d3}
 }
 
@@ -148,42 +148,42 @@ func genSomeNeighbors(dungeons []*model.Dungeon) {
 */
 
 func testRectIntersect() {
-	r1 := model.Rect{
-		Left:   0,
-		Top:    0,
-		Right:  50,
-		Bottom: 40,
-	}
-	r2 := model.Rect{
-		Left:   10,
-		Top:    20,
-		Right:  30,
-		Bottom: 30,
-	}
-	r3 := model.Rect{
-		Left:   24,
-		Top:    30,
-		Right:  30,
-		Bottom: 70,
-	}
-	r4 := model.Rect{
-		Left:   30,
-		Top:    20,
-		Right:  330,
-		Bottom: 300,
-	}
-	r5 := model.Rect{
-		Left:   100,
-		Top:    20,
-		Right:  300,
-		Bottom: 30,
-	}
-	r6 := model.Rect{
-		Left:   10,
-		Top:    200,
-		Right:  80,
-		Bottom: 230,
-	}
+	r1 := model.NewRect(
+		0,
+		0,
+		50,
+		40,
+	)
+	r2 := model.NewRect(
+		10,
+		20,
+		30,
+		30,
+	)
+	r3 := model.NewRect(
+		24,
+		30,
+		30,
+		70,
+	)
+	r4 := model.NewRect(
+		30,
+		20,
+		330,
+		300,
+	)
+	r5 := model.NewRect(
+		100,
+		20,
+		300,
+		30,
+	)
+	r6 := model.NewRect(
+		10,
+		200,
+		80,
+		230,
+	)
 
 	if !r1.Intersects(&r2) {
 		fmt.Println("FAILED R1-R2")

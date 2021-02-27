@@ -24,21 +24,16 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 	for i := 0; i < n; i++ {
 		p := getRandomPoint(dimension, maxDim)
 		factor := getRandomFactor()
-		w := factor.Width * minDim.Width
-		h := factor.Height * minDim.Width
-		l := p.X - w/2
-		t := p.Y - h/2
-		p0 := model.Point{X: l, Y: t}
-		rect := &model.Rect{
-			Left:   l,
-			Top:    t,
-			Right:  l + w,
-			Bottom: t + h,
-		}
+		w := factor.Width * minDim.Width()
+		h := factor.Height * minDim.Width()
+		l := p.X() - w/2
+		t := p.Y() - h/2
+		p0 := model.NewPoint(l, t)
+		rect := model.NewRect(l, t, l+w, t+h)
 		shouldContinue := false
 
 		for _, dungeon := range dungeons {
-			if dungeon.Intersects(rect) {
+			if dungeon.Intersects(&rect) {
 				shouldContinue = true
 				break
 			}
@@ -49,12 +44,12 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 
 		// Check if there's a dungeon aligned to this one already
 		for i := 0; i <= model.PathWidthPx; i++ {
-			if xMap[rect.Left+i] ||
+			if xMap[rect.Left()+i] ||
 				xMap[rect.Cx()-model.PathWidthPx/2+i] ||
-				xMap[rect.Right-i] ||
-				yMap[rect.Top+i] ||
+				xMap[rect.Right()-i] ||
+				yMap[rect.Top()+i] ||
 				yMap[rect.Cy()-model.PathWidthPx/2+i] ||
-				yMap[rect.Bottom-i] {
+				yMap[rect.Bottom()-i] {
 				shouldContinue = true
 				break
 			}
@@ -64,20 +59,20 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 		}
 
 		// Update corners
-		xMap[rect.Left] = true
+		xMap[rect.Left()] = true
 		xMap[rect.Cx()] = true
-		xMap[rect.Right] = true
-		yMap[rect.Top] = true
+		xMap[rect.Right()] = true
+		yMap[rect.Top()] = true
 		yMap[rect.Cy()] = true
-		yMap[rect.Bottom] = true
+		yMap[rect.Bottom()] = true
 
 		// Fill wall widths to avoid paths colliding with walls
 		for i := 1; i <= model.PathWidthPx; i++ {
-			xMap[rect.Left+i] = true
-			xMap[rect.Right-i] = true
+			xMap[rect.Left()+i] = true
+			xMap[rect.Right()-i] = true
 			xMap[rect.Cx()-model.PathWidthPx/2+i] = true
-			yMap[rect.Top+i] = true
-			yMap[rect.Bottom-i] = true
+			yMap[rect.Top()+i] = true
+			yMap[rect.Bottom()-i] = true
 			yMap[rect.Cy()-model.PathWidthPx/2+i] = true
 		}
 
@@ -136,25 +131,21 @@ func GetPaths(dungeons []*model.Dungeon) []*model.Path {
 }
 
 func getMinSize() model.Dimension {
-	baseSize := model.GetDungeonHorizontalUnitSize().Width
-	return model.Dimension{
-		Width:  baseSize,
-		Height: baseSize,
-	}
+	size := model.GetDungeonHorizontalUnitSize()
+	baseSize := size.Width()
+	return model.NewDimension(baseSize, baseSize)
 }
 
 func getMaxSize() model.Dimension {
-	baseSize := model.GetDungeonHorizontalUnitSize().Width
-	return model.Dimension{
-		Width:  maxWidthFactor * baseSize,
-		Height: maxHeightFactor * baseSize,
-	}
+	size := model.GetDungeonHorizontalUnitSize()
+	baseSize := size.Width()
+	return model.NewDimension(maxWidthFactor*baseSize, maxHeightFactor*baseSize)
 }
 
 func getRandomPoint(dimension model.Dimension, maxDim model.Dimension) model.Point {
-	cx := maxDim.SemiWidth() + int(float64(dimension.Width-maxDim.Width)*rand.Float64())
-	cy := maxDim.SemiHeight() + int(float64(dimension.Height-maxDim.Height)*rand.Float64())
-	return model.Point{X: cx, Y: cy}
+	cx := maxDim.SemiWidth() + int(float64(dimension.Width()-maxDim.Width())*rand.Float64())
+	cy := maxDim.SemiHeight() + int(float64(dimension.Height()-maxDim.Height())*rand.Float64())
+	return model.NewPoint(cx, cy)
 }
 
 func getRandomFactor() model.DimensionFactor {

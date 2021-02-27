@@ -49,8 +49,8 @@ func (p *Path) Draw(screen *ebiten.Image) {
 
 func (p *Path) drawHorizontalLine(screen *ebiten.Image) {
 	rect := p.hRect
-	x := rect.Left
-	y := rect.Top
+	x := rect.Left()
+	y := rect.Top()
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(float64(x), float64(y))
@@ -59,8 +59,8 @@ func (p *Path) drawHorizontalLine(screen *ebiten.Image) {
 
 func (p *Path) drawVerticalLine(screen *ebiten.Image) {
 	rect := p.vRect
-	x := rect.Left
-	y := rect.Top
+	x := rect.Left()
+	y := rect.Top()
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(float64(x), float64(y))
@@ -78,25 +78,25 @@ func NewPath(hl Line, vl Line) Path {
 		!hl.p2.Equals(&vl.p1) && !hl.p2.Equals(&vl.p2) {
 		panic("One of the horizontal line start/end point must be the beginning of the vertical line")
 	}
-	if hl.p1.X > hl.p2.X {
+	if hl.p1.X() > hl.p2.X() {
 		panic("The point 1 of the horizontal line must be the lowest")
 	}
-	if vl.p1.Y > vl.p2.Y {
+	if vl.p1.Y() > vl.p2.Y() {
 		panic("The point 1 of the vertical line must be the lowest")
 	}
 	sw := PathWidthPx / 2
-	hRect := Rect{
-		Left:   hl.p1.X - sw,
-		Top:    hl.p1.Y - sw,
-		Right:  hl.p2.X + sw,
-		Bottom: hl.p1.Y + sw,
-	}
-	vRect := Rect{
-		Left:   vl.p1.X - sw,
-		Top:    vl.p1.Y - sw,
-		Right:  vl.p1.X + sw,
-		Bottom: vl.p2.Y + sw,
-	}
+	hRect := NewRect(
+		hl.p1.X()-sw,
+		hl.p1.Y()-sw,
+		hl.p2.X()+sw,
+		hl.p1.Y()+sw,
+	)
+	vRect := NewRect(
+		vl.p1.X()-sw,
+		vl.p1.Y()-sw,
+		vl.p1.X()+sw,
+		vl.p2.Y()+sw,
+	)
 
 	hImg := ebiten.NewImage(hRect.Width(), hRect.Height())
 	vImg := ebiten.NewImage(vRect.Width(), vRect.Height())
@@ -116,9 +116,9 @@ func (l *Line) IsDegenerate() bool {
 }
 
 func (l *Line) IsHorizontal() bool {
-	return l.p1.Y == l.p2.Y
+	return l.p1.Y() == l.p2.Y()
 }
 
 func (l *Line) IsVertical() bool {
-	return l.p1.X == l.p2.X
+	return l.p1.X() == l.p2.X()
 }
