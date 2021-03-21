@@ -26,10 +26,13 @@ const (
 	movementLengthPx = 1
 )
 
+type MotionListener func(int)
+
 type Runner struct {
 	Rect           Rect
 	Scale          float64
 	CustomInput    string
+	MotionListener MotionListener
 	inputType      int
 	count          int
 	image          *ebiten.Image
@@ -144,6 +147,10 @@ func (r *Runner) move(direction int) {
 		r.walkRight()
 	} else if direction == MoveDirBottom {
 		r.walkDown()
+	}
+
+	if r.MotionListener != nil {
+		r.MotionListener(direction)
 	}
 }
 
