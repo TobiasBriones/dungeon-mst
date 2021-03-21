@@ -133,7 +133,7 @@ func (r *Runner) move(direction int) {
 		r.walkDown()
 	}
 
-	if r.MotionListener != nil {
+	if r.inputType == InputTypeKeyboard && r.MotionListener != nil {
 		r.MotionListener(direction)
 	}
 }
