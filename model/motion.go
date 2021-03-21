@@ -5,6 +5,7 @@
 package model
 
 const (
+	MoveNone      = -1
 	MoveDirLeft   = 0
 	MoveDirTop    = 1
 	MoveDirRight  = 2
