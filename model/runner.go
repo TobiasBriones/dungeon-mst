@@ -31,7 +31,7 @@ type MotionListener func(int)
 type Runner struct {
 	Rect           Rect
 	Scale          float64
-	CustomInput    string
+	CustomInput    int
 	MotionListener MotionListener
 	inputType      int
 	count          int
@@ -71,7 +71,6 @@ func (r *Runner) Update() {
 	} else {
 		r.readCustomInput()
 	}
-	r.normalize()
 }
 
 func (r *Runner) Draw(screen *ebiten.Image) {
@@ -93,12 +92,6 @@ func (r *Runner) Center() {
 	r.setPosition(x, y)
 }
 
-func (r *Runner) normalize() {
-	// Check for screen collision
-	// ...
-	// Not required now
-}
-
 func (r *Runner) readKeyboardInput() {
 	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 		if ebiten.IsKeyPressed(k) {
@@ -117,17 +110,8 @@ func (r *Runner) readKeyboardInput() {
 }
 
 func (r *Runner) readCustomInput() {
-	switch r.CustomInput {
-	case "W":
-		r.move(MoveDirTop)
-	case "S":
-		r.move(MoveDirBottom)
-	case "A":
-		r.move(MoveDirLeft)
-	case "D":
-		r.move(MoveDirRight)
-	}
-	r.CustomInput = ""
+	r.move(r.CustomInput)
+	r.CustomInput = -1
 }
 
 func (r *Runner) move(direction int) {
