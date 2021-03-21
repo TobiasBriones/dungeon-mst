@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	screenWidth  = 1280
-	screenHeight = 720
+	InputTypeKeyboard = 0
+	InputTypeCustom   = 1
+	screenWidth       = 1280
+	screenHeight      = 720
 
 	frameOX          = 0
 	frameOY          = 32
@@ -27,6 +29,8 @@ const (
 type Runner struct {
 	Rect           Rect
 	Scale          float64
+	CustomInput    string
+	inputType      int
 	count          int
 	image          *ebiten.Image
 	currentDungeon *Dungeon
@@ -35,6 +39,10 @@ type Runner struct {
 
 func (r *Runner) IsOutSide() bool {
 	return !r.isInsideDungeon() && len(r.currentPaths) == 0
+}
+
+func (r *Runner) SetInputType(inputType int) {
+	r.inputType = inputType
 }
 
 func (r *Runner) SetCurrentDungeon(value *Dungeon) {
@@ -55,19 +63,10 @@ func (r *Runner) SetDungeon(value *Dungeon) {
 func (r *Runner) Update() {
 	r.count++
 
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			switch k {
-			case ebiten.KeyUp, ebiten.KeyW:
-				r.move(MoveDirTop)
-			case ebiten.KeyDown, ebiten.KeyS:
-				r.move(MoveDirBottom)
-			case ebiten.KeyLeft, ebiten.KeyA:
-				r.move(MoveDirLeft)
-			case ebiten.KeyRight, ebiten.KeyD:
-				r.move(MoveDirRight)
-			}
-		}
+	if r.inputType == InputTypeKeyboard {
+		r.readKeyboardInput()
+	} else {
+		r.readCustomInput()
 	}
 	r.normalize()
 }
@@ -95,6 +94,36 @@ func (r *Runner) normalize() {
 	// Check for screen collision
 	// ...
 	// Not required now
+}
+
+func (r *Runner) readKeyboardInput() {
+	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+		if ebiten.IsKeyPressed(k) {
+			switch k {
+			case ebiten.KeyUp, ebiten.KeyW:
+				r.move(MoveDirTop)
+			case ebiten.KeyDown, ebiten.KeyS:
+				r.move(MoveDirBottom)
+			case ebiten.KeyLeft, ebiten.KeyA:
+				r.move(MoveDirLeft)
+			case ebiten.KeyRight, ebiten.KeyD:
+				r.move(MoveDirRight)
+			}
+		}
+	}
+}
+
+func (r *Runner) readCustomInput() {
+	switch r.CustomInput {
+	case "W":
+		r.move(MoveDirTop)
+	case "S":
+		r.move(MoveDirBottom)
+	case "A":
+		r.move(MoveDirLeft)
+	case "D":
+		r.move(MoveDirRight)
+	}
 }
 
 func (r *Runner) move(direction int) {
@@ -167,6 +196,7 @@ func NewRunner() Runner {
 			int(frameHeight*scale),
 		),
 		Scale:          scale,
+		inputType:      InputTypeKeyboard,
 		count:          0,
 		currentDungeon: nil,
 		currentPaths:   []*Path{},
