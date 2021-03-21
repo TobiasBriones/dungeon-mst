@@ -124,6 +124,7 @@ func (r *Runner) readCustomInput() {
 	case "D":
 		r.move(MoveDirRight)
 	}
+	r.CustomInput = ""
 }
 
 func (r *Runner) move(direction int) {
