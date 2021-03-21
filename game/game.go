@@ -24,6 +24,7 @@ var (
 	bgImage  *ebiten.Image
 	dungeons []*model.Dungeon
 	paths    []*model.Path
+	arena    Arena
 )
 
 type Game struct {
@@ -33,29 +34,9 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	var currentDungeon *model.Dungeon = nil
-	var currentPaths []*model.Path
 	g.count++
-
-	for _, dungeon := range dungeons {
-		if dungeon.InBounds(&g.runner.Rect) {
-			currentDungeon = dungeon
-			break
-		}
-	}
-	for _, path := range paths {
-		if path.InBounds(&g.runner.Rect) {
-			currentPaths = append(currentPaths, path)
-		}
-	}
-	g.runner.SetCurrentDungeon(currentDungeon)
-	g.runner.SetCurrentPaths(currentPaths)
-
-	if g.runner.IsOutSide() {
-		g.runner.SetDungeon(dungeons[0])
-	}
-
-	g.runner.Update()
+	updatePlayer(&g.runner)
+	arena.Update(updatePlayer)
 
 	// Generate random dungeons
 	if g.count%5 == 0 {
@@ -83,6 +64,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw legend image
 	screen.DrawImage(g.legendImage, nil)
+
+	// Draw remote players
+	arena.Draw(screen)
 }
 
 func (g *Game) Layout(int, int) (int, int) {
@@ -120,6 +104,7 @@ func init() {
 
 	//genSomeNeighbors(dungeons)
 	paths = ai.GetPaths(dungeons)
+	arena = NewArena()
 }
 
 func loadBg() {
@@ -141,6 +126,31 @@ func loadLegendImage() *ebiten.Image {
 		log.Fatal(err)
 	}
 	return img
+}
+
+func updatePlayer(runner *model.Runner) {
+	var currentDungeon *model.Dungeon = nil
+	var currentPaths []*model.Path
+
+	for _, dungeon := range dungeons {
+		if dungeon.InBounds(&runner.Rect) {
+			currentDungeon = dungeon
+			break
+		}
+	}
+	for _, path := range paths {
+		if path.InBounds(&runner.Rect) {
+			currentPaths = append(currentPaths, path)
+		}
+	}
+	runner.SetCurrentDungeon(currentDungeon)
+	runner.SetCurrentPaths(currentPaths)
+
+	if runner.IsOutSide() {
+		runner.SetDungeon(dungeons[0])
+	}
+
+	runner.Update()
 }
 
 func reset() {
