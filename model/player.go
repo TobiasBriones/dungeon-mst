@@ -3,3 +3,8 @@
  */
 
 package model
+
+type Player struct {
+	Character *Runner
+	Name      string
+}
