@@ -47,18 +47,6 @@ func getTempPlayers() []*model.Runner {
 	return remotePlayers
 }
 
-func randInput() string {
-	r := rand.Intn(4)
-
-	switch r {
-	case 0:
-		return "W"
-	case 1:
-		return "A"
-	case 2:
-		return "D"
-	case 3:
-		return "S"
-	}
-	return ""
+func randInput() int {
+	return rand.Intn(4)
 }
