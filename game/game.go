@@ -24,10 +24,10 @@ var (
 	bgImage  *ebiten.Image
 	dungeons []*model.Dungeon
 	paths    []*model.Path
-	arena    Arena
 )
 
 type Game struct {
+	arena       Arena
 	count       int
 	legendImage *ebiten.Image
 }
@@ -35,7 +35,7 @@ type Game struct {
 func (g *Game) Update() error {
 	g.count++
 
-	arena.Update(setCurrentDungeonAndPaths)
+	g.arena.Update(setCurrentDungeonAndPaths)
 
 	// Generate random dungeons
 	if g.count%5 == 0 {
@@ -63,7 +63,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(g.legendImage, nil)
 
 	// Draw remote players
-	arena.Draw(screen)
+	g.arena.Draw(screen)
 }
 
 func (g *Game) Layout(int, int) (int, int) {
@@ -82,8 +82,10 @@ func Run() {
 }
 
 func newGame() Game {
+	arena := NewArena()
 	legendImage := loadLegendImage()
 	return Game{
+		arena:       arena,
 		legendImage: legendImage,
 	}
 }
@@ -99,7 +101,6 @@ func init() {
 
 	//genSomeNeighbors(dungeons)
 	paths = ai.GetPaths(dungeons)
-	arena = NewArena()
 }
 
 func loadBg() {
