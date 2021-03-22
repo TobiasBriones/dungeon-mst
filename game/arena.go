@@ -86,6 +86,16 @@ func (a *Arena) updateRemotePlayers(update SetCurrentDungeonAndPaths) {
 	}
 }
 
+func (a *Arena) checkDiamondCollision(diamond *model.Diamond) bool {
+	collides := a.player.GetCharacter().CheckDiamondCollision(diamond)
+
+	if collides {
+		a.player.SetScore(a.player.GetScore() + 30)
+		return true
+	}
+	return false
+}
+
 func NewArena() Arena {
 	player := model.NewPlayer("local")
 	remotePlayers := getTempPlayers()

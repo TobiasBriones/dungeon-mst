@@ -36,6 +36,12 @@ type Game struct {
 func (g *Game) Update() error {
 	g.count++
 
+	for i, diamond := range diamonds {
+		if g.arena.checkDiamondCollision(diamond) {
+			remove(diamonds, i)
+		}
+	}
+
 	g.arena.Update(setCurrentDungeonAndPaths)
 
 	// Generate random dungeons
@@ -194,4 +200,8 @@ func sendFakeInputs(a *Arena) {
 
 func randInput() int {
 	return rand.Intn(4)
+}
+
+func remove(slice []*model.Diamond, s int) []*model.Diamond {
+	return append(slice[:s], slice[s+1:]...)
 }
