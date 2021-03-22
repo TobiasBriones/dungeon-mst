@@ -28,7 +28,6 @@ var (
 )
 
 type Game struct {
-	runner      model.Runner
 	count       int
 	legendImage *ebiten.Image
 }
@@ -36,30 +35,7 @@ type Game struct {
 func (g *Game) Update() error {
 	g.count++
 
-	// local player input
-	input := model.MoveNone
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			switch k {
-			case ebiten.KeyUp, ebiten.KeyW:
-				input = model.MoveDirTop
-				g.runner.PushInput(input)
-			case ebiten.KeyDown, ebiten.KeyS:
-				input = model.MoveDirBottom
-				g.runner.PushInput(input)
-			case ebiten.KeyLeft, ebiten.KeyA:
-				input = model.MoveDirLeft
-				g.runner.PushInput(input)
-			case ebiten.KeyRight, ebiten.KeyD:
-				input = model.MoveDirRight
-				g.runner.PushInput(input)
-			}
-		}
-	}
-	//
-
-	updatePlayer(&g.runner)
-	arena.Update(updatePlayer)
+	arena.Update(setCurrentDungeonAndPaths)
 
 	// Generate random dungeons
 	if g.count%5 == 0 {
@@ -82,8 +58,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, dungeon := range dungeons {
 		dungeon.Draw(screen)
 	}
-
-	g.runner.Draw(screen)
 
 	// Draw legend image
 	screen.DrawImage(g.legendImage, nil)
@@ -108,10 +82,8 @@ func Run() {
 }
 
 func newGame() Game {
-	runner := model.NewRunner()
 	legendImage := loadLegendImage()
 	return Game{
-		runner:      runner,
 		legendImage: legendImage,
 	}
 }
@@ -151,7 +123,7 @@ func loadLegendImage() *ebiten.Image {
 	return img
 }
 
-func updatePlayer(runner *model.Runner) {
+func setCurrentDungeonAndPaths(runner *model.Runner) {
 	var currentDungeon *model.Dungeon = nil
 	var currentPaths []*model.Path
 
@@ -172,8 +144,6 @@ func updatePlayer(runner *model.Runner) {
 	if runner.IsOutSide() {
 		runner.SetDungeon(dungeons[0])
 	}
-
-	runner.Update()
 }
 
 func reset() {

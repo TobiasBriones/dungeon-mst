@@ -11,10 +11,37 @@ import (
 )
 
 type Arena struct {
+	player        *model.Player
 	remotePlayers []*model.Player
 }
 
-func (a *Arena) Update(update UpdateRemotePlayer) {
+func (a *Arena) Update(update SetCurrentDungeonAndPaths) {
+
+	// local player input
+	input := model.MoveNone
+	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+		if ebiten.IsKeyPressed(k) {
+			switch k {
+			case ebiten.KeyUp, ebiten.KeyW:
+				input = model.MoveDirTop
+				a.player.PushInput(input)
+			case ebiten.KeyDown, ebiten.KeyS:
+				input = model.MoveDirBottom
+				a.player.PushInput(input)
+			case ebiten.KeyLeft, ebiten.KeyA:
+				input = model.MoveDirLeft
+				a.player.PushInput(input)
+			case ebiten.KeyRight, ebiten.KeyD:
+				input = model.MoveDirRight
+				a.player.PushInput(input)
+			}
+		}
+	}
+	//
+	setCurrentDungeonAndPaths(a.player.GetCharacter())
+
+	a.player.Update()
+
 	// Temporarily update remote players this way
 	for _, player := range a.remotePlayers {
 
@@ -29,17 +56,20 @@ func (a *Arena) Update(update UpdateRemotePlayer) {
 }
 
 func (a *Arena) Draw(screen *ebiten.Image) {
+	a.player.Draw(screen)
+
 	for _, player := range a.remotePlayers {
 		player.Draw(screen)
 	}
 }
 
 func NewArena() Arena {
+	player := model.NewPlayer("local")
 	remotePlayers := getTempPlayers()
-	return Arena{remotePlayers: remotePlayers}
+	return Arena{player: &player, remotePlayers: remotePlayers}
 }
 
-type UpdateRemotePlayer func(runner *model.Runner)
+type SetCurrentDungeonAndPaths func(runner *model.Runner)
 
 func getTempPlayers() []*model.Player {
 	var newPlayer = func(name string) *model.Player {
