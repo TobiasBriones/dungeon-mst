@@ -3,3 +3,13 @@
  */
 
 package main
+
+const (
+	DataTypeGameInitialization = 0
+	DataTypeUpdate             = 1
+)
+
+type ResponseData struct {
+	Type int
+	Body string
+}
