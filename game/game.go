@@ -7,8 +7,8 @@ package game
 import (
 	"dungeon-mst/ai"
 	"dungeon-mst/model"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
 	"math/rand"
 	"strconv"

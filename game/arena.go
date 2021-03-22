@@ -6,7 +6,7 @@ package game
 
 import (
 	"dungeon-mst/model"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Arena struct {
