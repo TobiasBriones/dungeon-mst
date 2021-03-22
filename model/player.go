@@ -38,11 +38,20 @@ func init() {
 type Player struct {
 	name           string
 	character      *Runner
+	score          int
 	motionListener MotionListener
 }
 
 func (p *Player) GetName() string {
 	return p.name
+}
+
+func (p *Player) GetScore() int {
+	return p.score
+}
+
+func (p *Player) SetScore(value int) {
+	p.score = value
 }
 
 func (p *Player) GetCharacter() *Runner {
@@ -85,6 +94,7 @@ func NewPlayer(name string) Player {
 	return Player{
 		name:           name,
 		character:      &character,
+		score:          0,
 		motionListener: nil,
 	}
 }
