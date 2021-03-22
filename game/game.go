@@ -81,6 +81,8 @@ func Run() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
+	sendFakeInputs(game.arena)
+
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
 	}
@@ -158,4 +160,19 @@ func setCurrentDungeonAndPaths(runner *model.Runner) {
 func reset() {
 	dungeons = ai.GenerateDungeons(getSize())
 	paths = ai.GetPaths(dungeons)
+}
+
+func sendFakeInputs(a *Arena) {
+	ticker := time.NewTicker(50 * time.Millisecond)
+
+	go func() {
+		for range ticker.C {
+			fake := randInput()
+			a.PushRemotePlayerInput("remote", fake)
+		}
+	}()
+}
+
+func randInput() int {
+	return rand.Intn(4)
 }

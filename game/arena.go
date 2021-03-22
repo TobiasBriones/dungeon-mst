@@ -7,7 +7,6 @@ package game
 import (
 	"dungeon-mst/model"
 	"github.com/hajimehoshi/ebiten"
-	"math/rand"
 )
 
 type Arena struct {
@@ -34,6 +33,15 @@ func (a *Arena) Draw(screen *ebiten.Image) {
 
 	for _, player := range a.remotePlayers {
 		player.Draw(screen)
+	}
+}
+
+func (a *Arena) PushRemotePlayerInput(name string, input int) {
+	// This structure might be a hash map later
+	for _, player := range a.remotePlayers {
+		if player.GetName() == name {
+			player.PushInput(input)
+		}
 	}
 }
 
@@ -70,12 +78,7 @@ func (a *Arena) updatePlayerInputs() {
 }
 
 func (a *Arena) updateRemotePlayers(update SetCurrentDungeonAndPaths) {
-	// Temporarily update remote players this way
 	for _, player := range a.remotePlayers {
-
-		// Make the player receive the socket input rather than keyboard
-		player.PushInput(randInput())
-
 		// Temp implementation
 		update(player.GetCharacter())
 
@@ -101,8 +104,4 @@ func getTempPlayers() []*model.Player {
 	return []*model.Player{
 		newPlayer("remote"),
 	}
-}
-
-func randInput() int {
-	return rand.Intn(4)
 }
