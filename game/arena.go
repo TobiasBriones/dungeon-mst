@@ -11,22 +11,26 @@ import (
 )
 
 type Arena struct {
-	remotePlayers []*model.Runner
+	remotePlayers []*model.Player
 }
 
 func (a *Arena) Update(update UpdateRemotePlayer) {
 	// Temporarily update remote players this way
-	for _, runner := range a.remotePlayers {
-		// Make the runner receive the socket input rather than keyboard
-		runner.CustomInput = randInput()
+	for _, player := range a.remotePlayers {
 
-		update(runner)
+		// Make the player receive the socket input rather than keyboard
+		player.SetInput(randInput())
+
+		// Temp implementation
+		update(player.GetCharacter())
+
+		player.Update()
 	}
 }
 
 func (a *Arena) Draw(screen *ebiten.Image) {
-	for _, runner := range a.remotePlayers {
-		runner.Draw(screen)
+	for _, player := range a.remotePlayers {
+		player.Draw(screen)
 	}
 }
 
@@ -37,14 +41,14 @@ func NewArena() Arena {
 
 type UpdateRemotePlayer func(runner *model.Runner)
 
-func getTempPlayers() []*model.Runner {
-	var remotePlayers []*model.Runner
-	remotePlayer := model.NewRunner()
-
-	remotePlayer.SetInputType(model.InputTypeCustom)
-
-	remotePlayers = append(remotePlayers, &remotePlayer)
-	return remotePlayers
+func getTempPlayers() []*model.Player {
+	var newPlayer = func(name string) *model.Player {
+		player := model.NewPlayer(name)
+		return &player
+	}
+	return []*model.Player{
+		newPlayer("remote"),
+	}
 }
 
 func randInput() int {

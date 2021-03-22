@@ -35,6 +35,26 @@ type Game struct {
 
 func (g *Game) Update() error {
 	g.count++
+
+	// local player input
+	input := model.MoveNone
+	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+		if ebiten.IsKeyPressed(k) {
+			switch k {
+			case ebiten.KeyUp, ebiten.KeyW:
+				input = model.MoveDirTop
+			case ebiten.KeyDown, ebiten.KeyS:
+				input = model.MoveDirBottom
+			case ebiten.KeyLeft, ebiten.KeyA:
+				input = model.MoveDirLeft
+			case ebiten.KeyRight, ebiten.KeyD:
+				input = model.MoveDirRight
+			}
+		}
+	}
+	g.runner.SetInput(input)
+	//
+
 	updatePlayer(&g.runner)
 	arena.Update(updatePlayer)
 

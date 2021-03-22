@@ -13,10 +13,8 @@ import (
 )
 
 const (
-	InputTypeKeyboard = 0
-	InputTypeCustom   = 1
-	screenWidth       = 1280
-	screenHeight      = 720
+	screenWidth  = 1280
+	screenHeight = 720
 
 	frameOX          = 0
 	frameOY          = 32
@@ -26,14 +24,10 @@ const (
 	movementLengthPx = 1
 )
 
-type MotionListener func(int)
-
 type Runner struct {
 	Rect           Rect
 	Scale          float64
-	CustomInput    int
-	MotionListener MotionListener
-	inputType      int
+	input          int
 	count          int
 	image          *ebiten.Image
 	currentDungeon *Dungeon
@@ -44,8 +38,8 @@ func (r *Runner) IsOutSide() bool {
 	return !r.isInsideDungeon() && len(r.currentPaths) == 0
 }
 
-func (r *Runner) SetInputType(inputType int) {
-	r.inputType = inputType
+func (r *Runner) SetInput(value int) {
+	r.input = value
 }
 
 func (r *Runner) SetCurrentDungeon(value *Dungeon) {
@@ -65,12 +59,7 @@ func (r *Runner) SetDungeon(value *Dungeon) {
 
 func (r *Runner) Update() {
 	r.count++
-
-	if r.inputType == InputTypeKeyboard {
-		r.readKeyboardInput()
-	} else {
-		r.readCustomInput()
-	}
+	r.move()
 }
 
 func (r *Runner) Draw(screen *ebiten.Image) {
@@ -92,29 +81,11 @@ func (r *Runner) Center() {
 	r.setPosition(x, y)
 }
 
-func (r *Runner) readKeyboardInput() {
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			switch k {
-			case ebiten.KeyUp, ebiten.KeyW:
-				r.move(MoveDirTop)
-			case ebiten.KeyDown, ebiten.KeyS:
-				r.move(MoveDirBottom)
-			case ebiten.KeyLeft, ebiten.KeyA:
-				r.move(MoveDirLeft)
-			case ebiten.KeyRight, ebiten.KeyD:
-				r.move(MoveDirRight)
-			}
-		}
+func (r *Runner) move() {
+	if r.input == MoveNone {
+		return
 	}
-}
-
-func (r *Runner) readCustomInput() {
-	r.move(r.CustomInput)
-	r.CustomInput = -1
-}
-
-func (r *Runner) move(direction int) {
+	direction := r.input
 	movement := Movement{direction, 1}
 	canMoveInsideDungeon := r.canMoveInsideDungeonTowards(movement)
 	canMoveInsidePaths := r.canMoveInsidePathsTowards(movement)
@@ -131,10 +102,6 @@ func (r *Runner) move(direction int) {
 		r.walkRight()
 	} else if direction == MoveDirBottom {
 		r.walkDown()
-	}
-
-	if r.inputType == InputTypeKeyboard && r.MotionListener != nil {
-		r.MotionListener(direction)
 	}
 }
 
@@ -188,7 +155,7 @@ func NewRunner() Runner {
 			int(frameHeight*scale),
 		),
 		Scale:          scale,
-		inputType:      InputTypeKeyboard,
+		input:          MoveNone,
 		count:          0,
 		currentDungeon: nil,
 		currentPaths:   []*Path{},
