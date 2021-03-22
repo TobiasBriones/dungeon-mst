@@ -27,7 +27,7 @@ const (
 type Runner struct {
 	Rect           Rect
 	Scale          float64
-	input          int
+	inputs         []int
 	count          int
 	image          *ebiten.Image
 	currentDungeon *Dungeon
@@ -38,8 +38,8 @@ func (r *Runner) IsOutSide() bool {
 	return !r.isInsideDungeon() && len(r.currentPaths) == 0
 }
 
-func (r *Runner) SetInput(value int) {
-	r.input = value
+func (r *Runner) PushInput(value int) {
+	r.inputs = append(r.inputs, value)
 }
 
 func (r *Runner) SetCurrentDungeon(value *Dungeon) {
@@ -60,6 +60,7 @@ func (r *Runner) SetDungeon(value *Dungeon) {
 func (r *Runner) Update() {
 	r.count++
 	r.move()
+	r.inputs = r.inputs[:0]
 }
 
 func (r *Runner) Draw(screen *ebiten.Image) {
@@ -82,10 +83,16 @@ func (r *Runner) Center() {
 }
 
 func (r *Runner) move() {
-	if r.input == MoveNone {
+	if len(r.inputs) == 0 {
 		return
 	}
-	direction := r.input
+
+	for _, direction := range r.inputs {
+		r.moveTowards(direction)
+	}
+}
+
+func (r *Runner) moveTowards(direction int) {
 	movement := Movement{direction, 1}
 	canMoveInsideDungeon := r.canMoveInsideDungeonTowards(movement)
 	canMoveInsidePaths := r.canMoveInsidePathsTowards(movement)
@@ -155,7 +162,7 @@ func NewRunner() Runner {
 			int(frameHeight*scale),
 		),
 		Scale:          scale,
-		input:          MoveNone,
+		inputs:         []int{},
 		count:          0,
 		currentDungeon: nil,
 		currentPaths:   []*Path{},

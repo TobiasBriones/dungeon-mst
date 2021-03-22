@@ -11,7 +11,6 @@ import (
 type Player struct {
 	name           string
 	character      *Runner
-	input          int
 	motionListener MotionListener
 }
 
@@ -19,8 +18,8 @@ func (p *Player) GetCharacter() *Runner {
 	return p.character
 }
 
-func (p *Player) SetInput(value int) {
-	p.input = value
+func (p *Player) PushInput(value int) {
+	p.character.PushInput(value)
 }
 
 func (p *Player) SetMotionListener(value MotionListener) {
@@ -30,13 +29,10 @@ func (p *Player) SetMotionListener(value MotionListener) {
 func (p *Player) Update() {
 	runner := p.character
 
-	runner.SetInput(p.input)
-	runner.Update()
-
-	if p.motionListener != nil {
-		p.motionListener(p.input)
+	if p.motionListener != nil && len(runner.inputs) > 0 {
+		p.motionListener(runner.inputs)
 	}
-	p.input = MoveNone
+	runner.Update()
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -49,9 +45,8 @@ func NewPlayer(name string) Player {
 	return Player{
 		name:           name,
 		character:      &character,
-		input:          MoveNone,
 		motionListener: nil,
 	}
 }
 
-type MotionListener func(int)
+type MotionListener func([]int)

@@ -19,7 +19,7 @@ func (a *Arena) Update(update UpdateRemotePlayer) {
 	for _, player := range a.remotePlayers {
 
 		// Make the player receive the socket input rather than keyboard
-		player.SetInput(randInput())
+		player.PushInput(randInput())
 
 		// Temp implementation
 		update(player.GetCharacter())

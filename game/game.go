@@ -43,16 +43,19 @@ func (g *Game) Update() error {
 			switch k {
 			case ebiten.KeyUp, ebiten.KeyW:
 				input = model.MoveDirTop
+				g.runner.PushInput(input)
 			case ebiten.KeyDown, ebiten.KeyS:
 				input = model.MoveDirBottom
+				g.runner.PushInput(input)
 			case ebiten.KeyLeft, ebiten.KeyA:
 				input = model.MoveDirLeft
+				g.runner.PushInput(input)
 			case ebiten.KeyRight, ebiten.KeyD:
 				input = model.MoveDirRight
+				g.runner.PushInput(input)
 			}
 		}
 	}
-	g.runner.SetInput(input)
 	//
 
 	updatePlayer(&g.runner)
