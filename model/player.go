@@ -14,6 +14,10 @@ type Player struct {
 	motionListener MotionListener
 }
 
+func (p *Player) GetName() string {
+	return p.name
+}
+
 func (p *Player) GetCharacter() *Runner {
 	return p.character
 }
