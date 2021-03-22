@@ -10,6 +10,7 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"math/rand"
 )
 
 const (
@@ -99,6 +100,12 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	op.GeoM.Reset()
 	op.GeoM.Translate(float64(d.rect.Left()+wallWidth), float64(d.rect.Top()+wallWidth))
 	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
+}
+
+func (d *Dungeon) RandomPoint(p int) Point {
+	x := rand.Intn(d.Width()-wallWidth-p) + d.rect.Left()
+	y := rand.Intn(d.Height()-wallWidth-p) + d.rect.Top()
+	return Point{x, y}
 }
 
 func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
