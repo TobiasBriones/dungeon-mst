@@ -27,7 +27,7 @@ var (
 )
 
 type Game struct {
-	arena       Arena
+	arena       *Arena
 	count       int
 	legendImage *ebiten.Image
 }
@@ -70,6 +70,11 @@ func (g *Game) Layout(int, int) (int, int) {
 	return screenWidth, screenHeight
 }
 
+func (g *Game) onCharacterMotion(move int) {
+	name := g.arena.GetPlayerName()
+	println(name + " " + strconv.Itoa(move))
+}
+
 func Run() {
 	game := newGame()
 
@@ -84,10 +89,13 @@ func Run() {
 func newGame() Game {
 	arena := NewArena()
 	legendImage := loadLegendImage()
-	return Game{
-		arena:       arena,
+	game := Game{
+		arena:       &arena,
 		legendImage: legendImage,
 	}
+
+	game.arena.SetOnCharacterMotion(game.onCharacterMotion)
+	return game
 }
 
 func getSize() model.Dimension {
