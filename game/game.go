@@ -24,6 +24,7 @@ var (
 	bgImage  *ebiten.Image
 	dungeons []*model.Dungeon
 	paths    []*model.Path
+	diamonds []*model.Diamond
 )
 
 type Game struct {
@@ -61,6 +62,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw legend image
 	screen.DrawImage(g.legendImage, nil)
+
+	// Draw diamonds
+	for _, diamond := range diamonds {
+		diamond.Draw(screen)
+	}
 
 	// Draw remote players
 	g.arena.Draw(screen)
@@ -111,6 +117,18 @@ func init() {
 
 	//genSomeNeighbors(dungeons)
 	paths = ai.GetPaths(dungeons)
+	diamonds = generateDiamonds()
+}
+
+func generateDiamonds() []*model.Diamond {
+	var diamonds []*model.Diamond
+
+	for _, dungeon := range dungeons {
+		point := dungeon.RandomPoint(model.DiamondWidthPx)
+		diamond := model.NewDiamond(point)
+		diamonds = append(diamonds, &diamond)
+	}
+	return diamonds
 }
 
 func loadBg() {
@@ -160,6 +178,7 @@ func setCurrentDungeonAndPaths(runner *model.Runner) {
 func reset() {
 	dungeons = ai.GenerateDungeons(getSize())
 	paths = ai.GetPaths(dungeons)
+	diamonds = generateDiamonds()
 }
 
 func sendFakeInputs(a *Arena) {
