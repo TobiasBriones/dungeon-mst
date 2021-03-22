@@ -152,6 +152,10 @@ func (r *Runner) setPosition(x int, y int) {
 	r.Rect.setPosition(x, y)
 }
 
+func (r *Runner) CheckDiamondCollision(diamond *Diamond) bool {
+	return diamond.Collides(&r.Rect)
+}
+
 func NewRunner() Runner {
 	scale := 1.0
 	runner := Runner{
