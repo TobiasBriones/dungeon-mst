@@ -103,8 +103,8 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 }
 
 func (d *Dungeon) RandomPoint(p int) Point {
-	x := rand.Intn(d.Width()-wallWidth-p) + d.rect.Left()
-	y := rand.Intn(d.Height()-wallWidth-p) + d.rect.Top()
+	x := rand.Intn(d.Width()-wallWidth*2-p) + d.rect.Left() + wallWidth
+	y := rand.Intn(d.Height()-wallWidth*2-p) + d.rect.Top() + wallWidth
 	return Point{x, y}
 }
 
