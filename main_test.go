@@ -5,7 +5,7 @@
 package main_test
 
 import (
-	"dungeon-mst/model"
+	"dungeon-mst/domain/model"
 	"testing"
 )
 

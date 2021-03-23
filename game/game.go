@@ -2,11 +2,11 @@
  * Copyright (c) 2021 Tobias Briones. All rights reserved.
  */
 
-package game
+package main
 
 import (
-	"dungeon-mst/ai"
-	"dungeon-mst/model"
+	"dungeon-mst/domain/ai"
+	"dungeon-mst/domain/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"

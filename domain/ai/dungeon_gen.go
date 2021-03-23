@@ -5,7 +5,7 @@
 package ai
 
 import (
-	"dungeon-mst/model"
+	"dungeon-mst/domain/model"
 	"math"
 	"math/rand"
 )
