@@ -12,7 +12,7 @@ import (
 type Client struct {
 	id   string
 	conn *websocket.Conn
-	ch   chan ResponseData
+	ch   chan *ResponseData
 	quit chan struct{}
 }
 
@@ -45,7 +45,7 @@ func NewClient(conn *websocket.Conn, id string) *Client {
 	return &Client{
 		id:   id,
 		conn: conn,
-		ch:   make(chan ResponseData),
+		ch:   make(chan *ResponseData),
 		quit: make(chan struct{}),
 	}
 }
