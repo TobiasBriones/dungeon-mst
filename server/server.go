@@ -5,70 +5,83 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
-type hub struct {
-	clients   map[*client]bool
-	broadcast chan []byte
-}
+const (
+	addr = "localhost:8080"
+)
 
-type client struct {
-	conn *websocket.Conn
-	send chan []byte
-	hub  *hub
-}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
+var id = 0
 
 func main() {
-	setRoutes()
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+	gin.DefaultWriter = ioutil.Discard
+	r := gin.Default()
 
-func setRoutes() {
-	http.HandleFunc("/", wsHandler)
-}
+	dataCh := make(chan *ResponseData)
+	quitCh := make(chan struct{})
+	hub := NewHub(dataCh, quitCh)
 
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+	defer close(quitCh)
+	go hub.Start()
+
+	sendFakeMessage(hub)
+
+	r.GET("/", wsHandler(getUpgrader(), quitCh, hub))
+	err := r.Run(addr)
 
 	if err != nil {
-		log.Println(err)
+		log.Fatal("Unable to run server: " + err.Error())
 	}
-
-	log.Println("Client connected...")
-
-	err = ws.WriteMessage(1, []byte("This is the server response"))
-	if err != nil {
-		log.Println(err)
-	}
-	listenConn(ws)
 }
 
-func listenConn(conn *websocket.Conn) {
-	for {
-		messageType, p, err := conn.ReadMessage()
+func wsHandler(updgrader *websocket.Upgrader, quit chan struct{}, hub *Hub) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		conn, err := updgrader.Upgrade(c.Writer, c.Request, nil)
 
 		if err != nil {
 			log.Println(err)
-			return
 		}
+		name := "remote " + strconv.Itoa(id)
+		client := NewClient(conn, name)
+		id++
 
-		log.Println(string(p))
+		go client.Handle()
 
-		err = conn.WriteMessage(messageType, p)
-
-		if err != nil {
-			log.Println(err)
-			return
+		hub.Register(client)
+		hub.broadcast <- &ResponseData{
+			Type: 0,
+			Body: "New client connected " + client.id + "...",
 		}
-
 	}
+}
+
+func getUpgrader() *websocket.Upgrader {
+	return &websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin:     func(r *http.Request) bool { return true },
+	}
+}
+
+func sendFakeMessage(hub *Hub) {
+	ticker := time.NewTicker(1500 * time.Millisecond)
+
+	go func() {
+		i := 0
+		for range ticker.C {
+			fake := i
+			hub.broadcast <- &ResponseData{
+				Type: 0,
+				Body: "message fake " + strconv.Itoa(fake),
+			}
+			i++
+		}
+	}()
 }
