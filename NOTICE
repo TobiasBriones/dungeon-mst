@@ -4,7 +4,7 @@ Copyright (c) 2021 Tobias Briones. All rights reserved.
 --------------------------------------------------------------------------------
 
 This project includes images provided by Pixabay (https://pixabay.com/),
-located at the root of the ./assets directory and available under the Pixabay
+located at the root of the ./game/assets directory and available under the Pixabay
 License (https://pixabay.com/service/license/), where some of these images have
 been modified. The complete list of images is listed next:
 
