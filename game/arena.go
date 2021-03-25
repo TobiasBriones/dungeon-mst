@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/domain/model"
+	"github.com/TobiasBriones/dungeon-mst/domain/model"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

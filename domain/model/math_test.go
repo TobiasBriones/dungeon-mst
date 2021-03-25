@@ -2,45 +2,44 @@
  * Copyright (c) 2021 Tobias Briones. All rights reserved.
  */
 
-package main_test
+package model
 
 import (
-	"dungeon-mst/domain/model"
 	"testing"
 )
 
 func TestRectIntersect(t *testing.T) {
-	r1 := model.NewRect(
+	r1 := NewRect(
 		0,
 		0,
 		50,
 		40,
 	)
-	r2 := model.NewRect(
+	r2 := NewRect(
 		10,
 		20,
 		30,
 		30,
 	)
-	r3 := model.NewRect(
+	r3 := NewRect(
 		24,
 		30,
 		30,
 		70,
 	)
-	r4 := model.NewRect(
+	r4 := NewRect(
 		30,
 		20,
 		330,
 		300,
 	)
-	r5 := model.NewRect(
+	r5 := NewRect(
 		100,
 		20,
 		300,
 		30,
 	)
-	r6 := model.NewRect(
+	r6 := NewRect(
 		10,
 		200,
 		80,

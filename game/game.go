@@ -5,8 +5,8 @@
 package main
 
 import (
-	"dungeon-mst/domain/ai"
-	"dungeon-mst/domain/model"
+	"github.com/TobiasBriones/dungeon-mst/domain/ai"
+	"github.com/TobiasBriones/dungeon-mst/domain/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
