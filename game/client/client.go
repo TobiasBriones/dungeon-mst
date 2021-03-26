@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"game/model"
 	"log"
 	"net/url"
@@ -24,12 +25,6 @@ var addr = flag.String("addr", "localhost:8080", "http service address")
 type ResponseData struct {
 	Type int
 	Body string
-}
-
-type MatchJSON struct {
-	Dungeons []*model.DungeonJSON
-	Paths    []*model.PathJSON
-	Diamonds []*model.DiamondJSON
 }
 
 func Run() {
@@ -59,13 +54,16 @@ func Run() {
 
 func readMessages(done chan struct{}, conn *websocket.Conn) {
 	init := func(body string) {
-		match := &MatchJSON{}
+		matchJSON := &model.MatchJSON{}
 
-		if err := json.Unmarshal([]byte(body), match); err != nil {
+		if err := json.Unmarshal([]byte(body), matchJSON); err != nil {
 			log.Println("Match read error:", err)
 			return
 		}
-		//fmt.Printf("%+v\n", match)
+		//fmt.Printf("%+v\n", matchJSON)
+
+		match := matchJSON.ToMatch()
+		fmt.Printf("%+v\n", match)
 	}
 
 	update := func() {

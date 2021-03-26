@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
+	"server/model"
 )
 
 type Client struct {
@@ -17,7 +18,7 @@ type Client struct {
 	quit chan struct{}
 }
 
-func (c *Client) InitGame(match *MatchJSON) {
+func (c *Client) InitGame(match *model.MatchJSON) {
 	encMatch, err := json.Marshal(match)
 
 	if err != nil {

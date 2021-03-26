@@ -7,9 +7,11 @@ package main
 import (
 	"github.com/gorilla/websocket"
 	"log"
+	"server/ai"
+	"server/model"
 )
 
-var match = NewRandomMatch()
+var match = model.NewMatchJSON(ai.NewRandomMatch())
 
 type Hub struct {
 	clients    map[string]*Client
@@ -89,7 +91,7 @@ func (h *Hub) listen(client *Client) {
 		log.Println("Message " + message + " sent from client " + id)
 
 		h.broadcast <- &ResponseData{
-			Type: 0,
+			Type: DataTypeServerMessage,
 			Body: message,
 		}
 	}
