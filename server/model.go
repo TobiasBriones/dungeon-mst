@@ -4,6 +4,11 @@
 
 package main
 
+import (
+	"server/model"
+	"time"
+)
+
 const (
 	DataTypeGameInitialization = 0
 	DataTypeUpdate             = 1
@@ -13,4 +18,9 @@ const (
 type ResponseData struct {
 	Type int
 	Body string
+}
+
+type MatchInit struct {
+	MatchJSON            *model.MatchJSON
+	RemainingTimeSeconds time.Duration
 }

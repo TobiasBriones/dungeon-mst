@@ -5,7 +5,6 @@
 package main
 
 import (
-	"fmt"
 	"game/client"
 	"game/model"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -27,12 +26,14 @@ var (
 )
 
 type Game struct {
-	match       *model.Match
-	arena       *Arena
-	count       int
-	legendImage *ebiten.Image
-	matchCh     chan *model.Match
-	updateCh    chan *client.Update
+	match         *model.Match
+	arena         *Arena
+	count         int
+	legendImage   *ebiten.Image
+	matchCh       chan *client.MatchInit
+	updateCh      chan *client.Update
+	quit          chan bool
+	remainingTime time.Duration
 }
 
 func (g *Game) SetMatch(value *model.Match) {
@@ -89,6 +90,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw remote players
 	g.arena.Draw(screen)
+
+	ebitenutil.DebugPrint(screen, strconv.FormatInt(int64(g.remainingTime/time.Second), 10))
 }
 
 func (g *Game) Layout(int, int) (int, int) {
@@ -131,6 +134,17 @@ func (g *Game) drawStartScreen(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{R: 5, G: 2, B: 2, A: 255})
 }
 
+func (g *Game) watchRemainingTime() {
+	for {
+		select {
+		case <-time.After(1 * time.Second):
+			g.remainingTime -= time.Second
+		case <-g.quit:
+			return
+		}
+	}
+}
+
 func Run() {
 	game := newGame()
 
@@ -138,16 +152,21 @@ func Run() {
 	ebiten.SetWindowTitle("Dungeon MST")
 
 	go func() {
-		m := <-game.matchCh
-		fmt.Printf("%+v\n", m)
-		println()
-		game.SetMatch(m)
+		for {
+			select {
+			case game.quit <- true:
+			default:
+			}
+			m := <-game.matchCh
+
+			game.SetMatch(m.Match)
+			game.remainingTime = m.RemainingTime
+			go game.watchRemainingTime()
+		}
 	}()
 	go func() {
 		for {
 			u := <-game.updateCh
-			fmt.Printf("%+v\n", u.M)
-
 			game.arena.PushRemotePlayerInput("remote", u.M)
 		}
 	}()
@@ -168,19 +187,13 @@ func newGame() Game {
 
 	game.arena.SetOnCharacterMotion(game.onCharacterMotion)
 
-	matchCh := make(chan *model.Match)
+	matchCh := make(chan *client.MatchInit)
 	updateCh := make(chan *client.Update)
+	quit := make(chan bool)
 
 	game.matchCh = matchCh
 	game.updateCh = updateCh
-	/*go func() {
-		for {
-			select {
-			case match := <-matchCh:
-				game.SetMatch(match)
-			}
-		}
-	}()*/
+	game.quit = quit
 
 	go client.Run(matchCh, updateCh)
 	return game

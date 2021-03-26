@@ -5,13 +5,16 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
+	"math/rand"
 	"server/ai"
 	"server/model"
+	"time"
 )
 
-var match = model.NewMatchJSON(ai.NewRandomMatch())
+const matchDuration = 5 * time.Second
 
 type Hub struct {
 	clients    map[string]*Client
@@ -19,6 +22,8 @@ type Hub struct {
 	unregister chan *Client
 	broadcast  chan *ResponseData
 	quit       chan struct{}
+	match      *model.Match
+	startTime  time.Time
 }
 
 func (h *Hub) Start() {
@@ -29,14 +34,41 @@ func (h *Hub) Start() {
 	}
 
 	var register = func(client *Client) {
+		remainingTime := matchDuration - time.Since(h.startTime)
+
 		h.push(client)
-		client.InitGame(match)
+		client.InitGame(h.match, remainingTime)
 		go h.listen(client)
 	}
 
 	var unregister = func(client *Client) {
 		h.delete(client)
 	}
+
+	h.init()
+
+	sendFakeUpdate(h)
+	go func() {
+		for {
+			time.Sleep(matchDuration)
+			h.init()
+			matchJSON := model.NewMatchJSON(h.match)
+			matchInit := &MatchInit{
+				MatchJSON:            matchJSON,
+				RemainingTimeSeconds: matchDuration,
+			}
+			enc, err := json.Marshal(matchInit)
+
+			if err != nil {
+				log.Println("New match error:", err)
+				return
+			}
+			broadcast(&ResponseData{
+				Type: DataTypeGameInitialization,
+				Body: string(enc),
+			})
+		}
+	}()
 
 	for {
 		select {
@@ -61,6 +93,11 @@ func (h *Hub) Register(c *Client) {
 func (h *Hub) Unregister(c *Client) {
 	log.Printf("Client %s disconnected.\n", c.id)
 	h.unregister <- c
+}
+
+func (h *Hub) init() {
+	h.match = ai.NewRandomMatch()
+	h.startTime = time.Now()
 }
 
 func (h *Hub) push(client *Client) {
@@ -105,4 +142,26 @@ func NewHub(ch chan *ResponseData, quit chan struct{}) *Hub {
 		broadcast:  ch,
 		quit:       quit,
 	}
+}
+
+type Update struct {
+	M int
+}
+
+func sendFakeUpdate(hub *Hub) {
+	ticker := time.NewTicker(100 * time.Millisecond)
+
+	go func() {
+		for range ticker.C {
+			u := &Update{
+				M: rand.Intn(4),
+			}
+			enc, _ := json.Marshal(u)
+
+			hub.broadcast <- &ResponseData{
+				Type: DataTypeUpdate,
+				Body: string(enc),
+			}
+		}
+	}()
 }

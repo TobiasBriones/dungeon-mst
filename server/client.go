@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"server/model"
+	"time"
 )
 
 type Client struct {
@@ -18,8 +19,13 @@ type Client struct {
 	quit chan struct{}
 }
 
-func (c *Client) InitGame(match *model.MatchJSON) {
-	encMatch, err := json.Marshal(match)
+func (c *Client) InitGame(match *model.Match, time time.Duration) {
+	matchJSON := model.NewMatchJSON(match)
+	matchInit := &MatchInit{
+		MatchJSON:            matchJSON,
+		RemainingTimeSeconds: time,
+	}
+	enc, err := json.Marshal(matchInit)
 
 	if err != nil {
 		log.Println(err)
@@ -28,7 +34,7 @@ func (c *Client) InitGame(match *model.MatchJSON) {
 
 	data := &ResponseData{
 		Type: DataTypeGameInitialization,
-		Body: string(encMatch),
+		Body: string(enc),
 	}
 	if err := c.conn.WriteJSON(data); err != nil {
 		log.Println("WS write error:", err)

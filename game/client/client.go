@@ -26,11 +26,21 @@ type ResponseData struct {
 	Body string
 }
 
+type MatchInitJSON struct {
+	MatchJSON            *model.MatchJSON
+	RemainingTimeSeconds time.Duration
+}
+
+type MatchInit struct {
+	Match         *model.Match
+	RemainingTime time.Duration
+}
+
 type Update struct {
 	M int
 }
 
-func Run(matchCh chan *model.Match, ch chan *Update) {
+func Run(matchCh chan *MatchInit, ch chan *Update) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -55,19 +65,24 @@ func Run(matchCh chan *model.Match, ch chan *Update) {
 	reader.ReadString('\n')
 }
 
-func readMessages(done chan struct{}, conn *websocket.Conn, h chan *model.Match, ch chan *Update) {
+func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, ch chan *Update) {
 	init := func(body string) {
-		matchJSON := &model.MatchJSON{}
+		matchInitJSON := &MatchInitJSON{}
 
-		if err := json.Unmarshal([]byte(body), matchJSON); err != nil {
+		if err := json.Unmarshal([]byte(body), matchInitJSON); err != nil {
 			log.Println("Match read error:", err)
 			return
 		}
 		//fmt.Printf("%+v\n", matchJSON)
 
+		matchJSON := matchInitJSON.MatchJSON
 		match := matchJSON.ToMatch()
+		matchInit := &MatchInit{
+			Match:         match,
+			RemainingTime: matchInitJSON.RemainingTimeSeconds,
+		}
 		//fmt.Printf("%+v\n", match)
-		h <- match
+		h <- matchInit
 	}
 
 	update := func(body string) {
