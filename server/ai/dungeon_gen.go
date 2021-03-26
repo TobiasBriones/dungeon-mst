@@ -14,8 +14,14 @@ const n = 100000
 const maxWidthFactor = 8
 const maxHeightFactor = 5
 
-func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
+const (
+	screenWidth  = 1280
+	screenHeight = 720
+)
+
+func GenerateDungeons() []*model.Dungeon {
 	var dungeons []*model.Dungeon
+	dimension := model.NewDimension(screenWidth, screenHeight)
 	minDim := getMinSize()
 	maxDim := getMaxSize()
 	xMap := map[int]bool{}

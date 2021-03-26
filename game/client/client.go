@@ -5,7 +5,10 @@
 package client
 
 import (
+	"bufio"
+	"encoding/json"
 	"flag"
+	"game/model"
 	"log"
 	"net/url"
 	"os"
@@ -17,6 +20,17 @@ import (
 )
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
+
+type ResponseData struct {
+	Type int
+	Body string
+}
+
+type MatchJSON struct {
+	Dungeons []*model.DungeonJSON
+	Paths    []*model.PathJSON
+	Diamonds []*model.DiamondJSON
+}
 
 func Run() {
 	flag.Parse()
@@ -38,19 +52,53 @@ func Run() {
 
 	readMessages(done, conn)
 
-	sendMessages(done, interrupt, conn)
+	//sendMessages(done, interrupt, conn)
+	reader := bufio.NewReader(os.Stdin)
+	reader.ReadString('\n')
 }
 
 func readMessages(done chan struct{}, conn *websocket.Conn) {
+	init := func(body string) {
+		match := &MatchJSON{}
+
+		if err := json.Unmarshal([]byte(body), match); err != nil {
+			log.Println("Match read error:", err)
+			return
+		}
+		//fmt.Printf("%+v\n", match)
+	}
+
+	update := func() {
+
+	}
+
+	readResponse := func(data *ResponseData) {
+		switch data.Type {
+		case 0:
+			init(data.Body)
+		case 1:
+			update()
+		}
+	}
+
 	go func() {
 		defer close(done)
 		for {
-			_, message, err := conn.ReadMessage()
+			_, p, err := conn.ReadMessage()
+
 			if err != nil {
-				log.Println("read:", err)
+				log.Println("Read error:", err)
 				return
 			}
-			log.Printf("recv: %s", message)
+			//log.Printf("recv: %s", p)
+			data := &ResponseData{}
+
+			if err := json.Unmarshal(p, data); err != nil {
+				log.Println("Read ResponseData error:", err)
+				return
+			}
+			//log.Printf("Response: %+v\n", data)
+			readResponse(data)
 		}
 	}()
 }

@@ -31,7 +31,7 @@ func main() {
 	defer close(quitCh)
 	go hub.Start()
 
-	sendFakeMessage(hub)
+	//sendFakeMessage(hub)
 
 	r.GET("/", wsHandler(getUpgrader(), quitCh, hub))
 	err := r.Run(addr)
@@ -56,7 +56,7 @@ func wsHandler(updgrader *websocket.Upgrader, quit chan struct{}, hub *Hub) gin.
 
 		hub.Register(client)
 		hub.broadcast <- &ResponseData{
-			Type: 0,
+			Type: DataTypeServerMessage,
 			Body: "New client connected " + client.id + "...",
 		}
 	}

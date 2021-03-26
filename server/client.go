@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 )
@@ -16,6 +17,24 @@ type Client struct {
 	quit chan struct{}
 }
 
+func (c *Client) InitGame(match *MatchJSON) {
+	encMatch, err := json.Marshal(match)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	data := &ResponseData{
+		Type: DataTypeGameInitialization,
+		Body: string(encMatch),
+	}
+	if err := c.conn.WriteJSON(data); err != nil {
+		log.Println("WS write error:", err)
+		return
+	}
+}
+
 func (c *Client) Handle() {
 	for {
 		select {
@@ -24,11 +43,7 @@ func (c *Client) Handle() {
 				log.Printf("Failed to close %s client connection: %v\n", c.id, err)
 			}
 			return
-		case v := <-c.ch:
-			data := map[string]interface{}{
-				"dataType": v.Type,
-				"body":     v.Body,
-			}
+		case data := <-c.ch:
 			if err := c.conn.WriteJSON(data); err != nil {
 				log.Println("WS write error:", err)
 				return

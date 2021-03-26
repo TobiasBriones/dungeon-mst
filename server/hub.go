@@ -9,6 +9,8 @@ import (
 	"log"
 )
 
+var match = NewRandomMatch()
+
 type Hub struct {
 	clients    map[string]*Client
 	register   chan *Client
@@ -26,6 +28,7 @@ func (h *Hub) Start() {
 
 	var register = func(client *Client) {
 		h.push(client)
+		client.InitGame(match)
 		go h.listen(client)
 	}
 
