@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"server/model"
+	"time"
 )
 
 const n = 100000
@@ -18,6 +19,10 @@ const (
 	screenWidth  = 1280
 	screenHeight = 720
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func GenerateDungeons() []*model.Dungeon {
 	var dungeons []*model.Dungeon
