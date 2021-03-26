@@ -121,6 +121,28 @@ func NewDungeon(p0 Point, factor DimensionFactor) Dungeon {
 	}
 }
 
+type DungeonJSON struct {
+	*RectJSON
+	*BarrierJSON
+}
+
+func (d *DungeonJSON) ToDungeon() *Dungeon {
+	dungeon := NewDungeon(
+		NewPoint(d.RectJSON.Left, d.RectJSON.Top),
+		*d.BarrierJSON.Factor,
+	)
+	return &dungeon
+}
+
+func NewDungeonJSON(d *Dungeon) *DungeonJSON {
+	rect := NewRectJSON(&d.rect)
+	barrier := NewBarrierJSON(&d.barrier)
+	return &DungeonJSON{
+		RectJSON:    rect,
+		BarrierJSON: barrier,
+	}
+}
+
 type DimensionFactor struct {
 	Width  int
 	Height int
@@ -129,6 +151,19 @@ type DimensionFactor struct {
 type Wall struct {
 	rect  Rect
 	image *ebiten.Image
+}
+
+type WallJSON struct {
+	*RectJSON
+}
+
+func (w *WallJSON) ToWall() *Wall {
+	wall := &Wall{*w.RectJSON.ToRect(), nil}
+	return wall
+}
+
+func NewWallJSON(w *Wall) *WallJSON {
+	return &WallJSON{NewRectJSON(&w.rect)}
 }
 
 type Barrier struct {
@@ -224,6 +259,36 @@ func NewBarrier(rect Rect, factor DimensionFactor) Barrier {
 			),
 			image: brickImage,
 		},
+	}
+}
+
+type BarrierJSON struct {
+	Factor         *DimensionFactor
+	LeftWallJSON   *WallJSON
+	TopWallJSON    *WallJSON
+	RightWallJSON  *WallJSON
+	BottomWallJSON *WallJSON
+}
+
+func (b *BarrierJSON) ToBarrier() *Barrier {
+	factor := b.Factor
+	rect := NewRect(
+		b.LeftWallJSON.RectJSON.Left,
+		b.TopWallJSON.RectJSON.Top,
+		b.RightWallJSON.RectJSON.Right,
+		b.BottomWallJSON.RectJSON.Bottom,
+	)
+	barrier := NewBarrier(rect, *factor)
+	return &barrier
+}
+
+func NewBarrierJSON(b *Barrier) *BarrierJSON {
+	return &BarrierJSON{
+		Factor:         &b.factor,
+		LeftWallJSON:   NewWallJSON(&b.leftWall),
+		TopWallJSON:    NewWallJSON(&b.topWall),
+		RightWallJSON:  NewWallJSON(&b.rightWall),
+		BottomWallJSON: NewWallJSON(&b.bottomWall),
 	}
 }
 

@@ -17,6 +17,15 @@ type Movement struct {
 	length    int
 }
 
+type MovementJSON struct {
+	Direction int
+	Length    int
+}
+
+func (m *MovementJSON) ToMovement() *Movement {
+	return &Movement{m.Direction, m.Length}
+}
+
 func CheckMovement(movement Movement, rect *Rect, host Rect) bool {
 	if movement.direction == MoveDirLeft {
 		return rect.Left()-movement.length > host.Left()

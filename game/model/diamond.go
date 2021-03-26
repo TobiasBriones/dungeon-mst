@@ -6,8 +6,6 @@ package model
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"log"
 )
 
 const (
@@ -42,13 +40,23 @@ func NewDiamond(point Point) Diamond {
 		right:  point.X() + DiamondWidthPx,
 		bottom: point.Y() + DiamondHeightPx,
 	}
-	image, _, err := ebitenutil.NewImageFromFile("./assets/diamond.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	image := NewImageFromAssets("diamond.png")
 	return Diamond{
 		rect:  rect,
 		image: image,
 	}
+}
+
+type DiamondJSON struct {
+	*PointJSON
+}
+
+func (d *DiamondJSON) ToDiamond() *Diamond {
+	diamond := NewDiamond(*d.PointJSON.ToPoint())
+	return &diamond
+}
+
+func NewDiamondJSON(d *Diamond) *DiamondJSON {
+	point := &Point{d.rect.left, d.rect.top}
+	return &DiamondJSON{NewPointJSON(point)}
 }
