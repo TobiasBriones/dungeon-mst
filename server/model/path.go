@@ -78,6 +78,13 @@ func (p *PathJSON) ToPath() *Path {
 	return &path
 }
 
+func NewPathJSON(p *Path) *PathJSON {
+	return &PathJSON{
+		HLineJSON: *NewLineJSON(&p.hLine),
+		VLineJSON: *NewLineJSON(&p.vLine),
+	}
+}
+
 type Line struct {
 	p1 Point
 	p2 Point
@@ -106,4 +113,11 @@ func (l *LineJSON) ToLine() *Line {
 		p2: *l.P2JSON.ToPoint(),
 	}
 	return line
+}
+
+func NewLineJSON(l *Line) *LineJSON {
+	return &LineJSON{
+		P1JSON: *NewPointJSON(&l.p1),
+		P2JSON: *NewPointJSON(&l.p2),
+	}
 }
