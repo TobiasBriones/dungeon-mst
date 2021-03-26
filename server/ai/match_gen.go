@@ -4,10 +4,10 @@
 
 package ai
 
-import "game/model"
+import "server/model"
 
-func NewRandomMatch(dimension model.Dimension) *model.Match {
-	dungeons := GenerateDungeons(dimension)
+func NewRandomMatch() *model.Match {
+	dungeons := GenerateDungeons()
 	paths := GetPaths(dungeons)
 	diamonds := generateDiamonds(dungeons)
 	return &model.Match{
