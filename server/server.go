@@ -5,10 +5,12 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,7 +33,7 @@ func main() {
 	defer close(quitCh)
 	go hub.Start()
 
-	//sendFakeMessage(hub)
+	sendFakeUpdate(hub)
 
 	r.GET("/", wsHandler(getUpgrader(), quitCh, hub))
 	err := r.Run(addr)
@@ -70,18 +72,24 @@ func getUpgrader() *websocket.Upgrader {
 	}
 }
 
-func sendFakeMessage(hub *Hub) {
-	ticker := time.NewTicker(1500 * time.Millisecond)
+type Update struct {
+	M int
+}
+
+func sendFakeUpdate(hub *Hub) {
+	ticker := time.NewTicker(100 * time.Millisecond)
 
 	go func() {
-		i := 0
 		for range ticker.C {
-			fake := i
-			hub.broadcast <- &ResponseData{
-				Type: 0,
-				Body: "message fake " + strconv.Itoa(fake),
+			u := &Update{
+				M: rand.Intn(4),
 			}
-			i++
+			enc, _ := json.Marshal(u)
+
+			hub.broadcast <- &ResponseData{
+				Type: DataTypeUpdate,
+				Body: string(enc),
+			}
 		}
 	}()
 }

@@ -5,10 +5,12 @@
 package main
 
 import (
-	"game/ai"
+	"fmt"
+	"game/client"
 	"game/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"image/color"
 	"log"
 	"math/rand"
 	"strconv"
@@ -22,45 +24,58 @@ const (
 
 var (
 	bgImage *ebiten.Image
-	match   *model.Match
 )
 
 type Game struct {
+	match       *model.Match
 	arena       *Arena
 	count       int
 	legendImage *ebiten.Image
+	matchCh     chan *model.Match
+	updateCh    chan *client.Update
+}
+
+func (g *Game) SetMatch(value *model.Match) {
+	g.match = value
 }
 
 func (g *Game) Update() error {
+	if g.match == nil {
+		return nil
+	}
 	g.count++
 
-	for i, diamond := range match.Diamonds {
+	for i, diamond := range g.match.Diamonds {
 		if g.arena.checkDiamondCollision(diamond) {
-			remove(match.Diamonds, i)
+			remove(g.match.Diamonds, i)
 		}
 	}
 
-	g.arena.Update(setCurrentDungeonAndPaths)
+	g.arena.Update(g.setCurrentDungeonAndPaths)
 
 	// Generate random dungeons
 	if g.count%5 == 0 {
 		if ebiten.IsKeyPressed(ebiten.KeyR) {
-			reset()
+			g.reset()
 		}
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	if g.match == nil {
+		g.drawStartScreen(screen)
+		return
+	}
 	screen.DrawImage(bgImage, nil)
 
-	for _, dungeon := range match.Dungeons {
+	for _, dungeon := range g.match.Dungeons {
 		dungeon.DrawBarrier(screen)
 	}
-	for _, path := range match.Paths {
+	for _, path := range g.match.Paths {
 		path.Draw(screen)
 	}
-	for _, dungeon := range match.Dungeons {
+	for _, dungeon := range g.match.Dungeons {
 		dungeon.Draw(screen)
 	}
 
@@ -68,7 +83,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(g.legendImage, nil)
 
 	// Draw diamonds
-	for _, diamond := range match.Diamonds {
+	for _, diamond := range g.match.Diamonds {
 		diamond.Draw(screen)
 	}
 
@@ -81,8 +96,39 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) onCharacterMotion(move int) {
-	name := g.arena.GetPlayerName()
-	println(name + " " + strconv.Itoa(move))
+	//name := g.arena.GetPlayerName()
+	//println(name + " " + strconv.Itoa(move))
+}
+
+func (g *Game) setCurrentDungeonAndPaths(runner *model.Runner) {
+	var currentDungeon *model.Dungeon = nil
+	var currentPaths []*model.Path
+
+	for _, dungeon := range g.match.Dungeons {
+		if dungeon.InBounds(&runner.Rect) {
+			currentDungeon = dungeon
+			break
+		}
+	}
+	for _, path := range g.match.Paths {
+		if path.InBounds(&runner.Rect) {
+			currentPaths = append(currentPaths, path)
+		}
+	}
+	runner.SetCurrentDungeon(currentDungeon)
+	runner.SetCurrentPaths(currentPaths)
+
+	if runner.IsOutSide() {
+		runner.SetDungeon(g.match.Dungeons[0])
+	}
+}
+
+func (g *Game) reset() {
+	//g.match = ai.NewRandomMatch(getSize())
+}
+
+func (g *Game) drawStartScreen(screen *ebiten.Image) {
+	screen.Fill(color.RGBA{R: 5, G: 2, B: 2, A: 255})
 }
 
 func Run() {
@@ -91,7 +137,21 @@ func Run() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
-	sendFakeInputs(game.arena)
+	go func() {
+		m := <-game.matchCh
+		fmt.Printf("%+v\n", m)
+		println()
+		game.SetMatch(m)
+	}()
+	go func() {
+		for {
+			u := <-game.updateCh
+			fmt.Printf("%+v\n", u.M)
+
+			game.arena.PushRemotePlayerInput("remote", u.M)
+		}
+	}()
+	//sendFakeInputs(game.arena)
 
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
@@ -107,6 +167,22 @@ func newGame() Game {
 	}
 
 	game.arena.SetOnCharacterMotion(game.onCharacterMotion)
+
+	matchCh := make(chan *model.Match)
+	updateCh := make(chan *client.Update)
+
+	game.matchCh = matchCh
+	game.updateCh = updateCh
+	/*go func() {
+		for {
+			select {
+			case match := <-matchCh:
+				game.SetMatch(match)
+			}
+		}
+	}()*/
+
+	go client.Run(matchCh, updateCh)
 	return game
 }
 
@@ -116,7 +192,6 @@ func getSize() model.Dimension {
 
 func init() {
 	loadBg()
-	match = ai.NewRandomMatch(getSize())
 }
 
 func loadBg() {
@@ -138,33 +213,6 @@ func loadLegendImage() *ebiten.Image {
 		log.Fatal(err)
 	}
 	return img
-}
-
-func setCurrentDungeonAndPaths(runner *model.Runner) {
-	var currentDungeon *model.Dungeon = nil
-	var currentPaths []*model.Path
-
-	for _, dungeon := range match.Dungeons {
-		if dungeon.InBounds(&runner.Rect) {
-			currentDungeon = dungeon
-			break
-		}
-	}
-	for _, path := range match.Paths {
-		if path.InBounds(&runner.Rect) {
-			currentPaths = append(currentPaths, path)
-		}
-	}
-	runner.SetCurrentDungeon(currentDungeon)
-	runner.SetCurrentPaths(currentPaths)
-
-	if runner.IsOutSide() {
-		runner.SetDungeon(match.Dungeons[0])
-	}
-}
-
-func reset() {
-	match = ai.NewRandomMatch(getSize())
 }
 
 func sendFakeInputs(a *Arena) {

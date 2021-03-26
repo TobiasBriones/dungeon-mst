@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"game/model"
 	"log"
 	"net/url"
@@ -27,7 +26,11 @@ type ResponseData struct {
 	Body string
 }
 
-func Run() {
+type Update struct {
+	M int
+}
+
+func Run(matchCh chan *model.Match, ch chan *Update) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -45,14 +48,14 @@ func Run() {
 
 	done := make(chan struct{})
 
-	readMessages(done, conn)
+	readMessages(done, conn, matchCh, ch)
 
 	//sendMessages(done, interrupt, conn)
 	reader := bufio.NewReader(os.Stdin)
 	reader.ReadString('\n')
 }
 
-func readMessages(done chan struct{}, conn *websocket.Conn) {
+func readMessages(done chan struct{}, conn *websocket.Conn, h chan *model.Match, ch chan *Update) {
 	init := func(body string) {
 		matchJSON := &model.MatchJSON{}
 
@@ -63,11 +66,18 @@ func readMessages(done chan struct{}, conn *websocket.Conn) {
 		//fmt.Printf("%+v\n", matchJSON)
 
 		match := matchJSON.ToMatch()
-		fmt.Printf("%+v\n", match)
+		//fmt.Printf("%+v\n", match)
+		h <- match
 	}
 
-	update := func() {
+	update := func(body string) {
+		update := &Update{}
 
+		if err := json.Unmarshal([]byte(body), update); err != nil {
+			log.Println("Update read error:", err)
+			return
+		}
+		ch <- update
 	}
 
 	readResponse := func(data *ResponseData) {
@@ -75,7 +85,7 @@ func readMessages(done chan struct{}, conn *websocket.Conn) {
 		case 0:
 			init(data.Body)
 		case 1:
-			update()
+			update(data.Body)
 		}
 	}
 

@@ -5,11 +5,9 @@
 package main
 
 import (
-	"game/client"
 	_ "image/png"
 )
 
 func main() {
-	//Run()
-	client.Run()
+	Run()
 }
