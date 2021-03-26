@@ -21,10 +21,8 @@ const (
 )
 
 var (
-	bgImage  *ebiten.Image
-	dungeons []*model.Dungeon
-	paths    []*model.Path
-	diamonds []*model.Diamond
+	bgImage *ebiten.Image
+	match   *model.Match
 )
 
 type Game struct {
@@ -36,9 +34,9 @@ type Game struct {
 func (g *Game) Update() error {
 	g.count++
 
-	for i, diamond := range diamonds {
+	for i, diamond := range match.Diamonds {
 		if g.arena.checkDiamondCollision(diamond) {
-			remove(diamonds, i)
+			remove(match.Diamonds, i)
 		}
 	}
 
@@ -56,13 +54,13 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bgImage, nil)
 
-	for _, dungeon := range dungeons {
+	for _, dungeon := range match.Dungeons {
 		dungeon.DrawBarrier(screen)
 	}
-	for _, path := range paths {
+	for _, path := range match.Paths {
 		path.Draw(screen)
 	}
-	for _, dungeon := range dungeons {
+	for _, dungeon := range match.Dungeons {
 		dungeon.Draw(screen)
 	}
 
@@ -70,7 +68,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(g.legendImage, nil)
 
 	// Draw diamonds
-	for _, diamond := range diamonds {
+	for _, diamond := range match.Diamonds {
 		diamond.Draw(screen)
 	}
 
@@ -118,23 +116,7 @@ func getSize() model.Dimension {
 
 func init() {
 	loadBg()
-	dungeons = ai.GenerateDungeons(getSize())
-	//dungeons = genSomeDungeons()
-
-	//genSomeNeighbors(dungeons)
-	paths = ai.GetPaths(dungeons)
-	diamonds = generateDiamonds()
-}
-
-func generateDiamonds() []*model.Diamond {
-	var diamonds []*model.Diamond
-
-	for _, dungeon := range dungeons {
-		point := dungeon.RandomPoint(model.DiamondWidthPx)
-		diamond := model.NewDiamond(point)
-		diamonds = append(diamonds, &diamond)
-	}
-	return diamonds
+	match = ai.NewRandomMatch(getSize())
 }
 
 func loadBg() {
@@ -162,13 +144,13 @@ func setCurrentDungeonAndPaths(runner *model.Runner) {
 	var currentDungeon *model.Dungeon = nil
 	var currentPaths []*model.Path
 
-	for _, dungeon := range dungeons {
+	for _, dungeon := range match.Dungeons {
 		if dungeon.InBounds(&runner.Rect) {
 			currentDungeon = dungeon
 			break
 		}
 	}
-	for _, path := range paths {
+	for _, path := range match.Paths {
 		if path.InBounds(&runner.Rect) {
 			currentPaths = append(currentPaths, path)
 		}
@@ -177,14 +159,12 @@ func setCurrentDungeonAndPaths(runner *model.Runner) {
 	runner.SetCurrentPaths(currentPaths)
 
 	if runner.IsOutSide() {
-		runner.SetDungeon(dungeons[0])
+		runner.SetDungeon(match.Dungeons[0])
 	}
 }
 
 func reset() {
-	dungeons = ai.GenerateDungeons(getSize())
-	paths = ai.GetPaths(dungeons)
-	diamonds = generateDiamonds()
+	match = ai.NewRandomMatch(getSize())
 }
 
 func sendFakeInputs(a *Arena) {
