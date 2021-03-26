@@ -28,3 +28,17 @@ func NewDiamond(point Point) Diamond {
 		rect: rect,
 	}
 }
+
+type DiamondJSON struct {
+	*PointJSON
+}
+
+func (d *DiamondJSON) ToDiamond() *Diamond {
+	diamond := NewDiamond(*d.PointJSON.ToPoint())
+	return &diamond
+}
+
+func NewDiamondJSON(d *Diamond) *DiamondJSON {
+	point := &Point{d.rect.left, d.rect.top}
+	return &DiamondJSON{NewPointJSON(point)}
+}

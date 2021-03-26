@@ -30,6 +30,23 @@ func NewPoint(x int, y int) Point {
 	return Point{x, y}
 }
 
+type PointJSON struct {
+	X int
+	Y int
+}
+
+func (p *PointJSON) ToPoint() *Point {
+	point := NewPoint(p.X, p.Y)
+	return &point
+
+}
+
+func NewPointJSON(p *Point) *PointJSON {
+	return &PointJSON{
+		p.x, p.y,
+	}
+}
+
 type PointPair struct {
 	PointA Point
 	PointB Point
@@ -223,6 +240,32 @@ func NewRect(left int, top int, right int, bottom int) Rect {
 		panic("Left must be less than right and top must be less than bottom")
 	}
 	return Rect{left, top, right, bottom}
+}
+
+type RectJSON struct {
+	Left   int
+	Top    int
+	Right  int
+	Bottom int
+}
+
+func (r *RectJSON) ToRect() *Rect {
+	rect := NewRect(
+		r.Left,
+		r.Top,
+		r.Right,
+		r.Bottom,
+	)
+	return &rect
+}
+
+func NewRectJSON(r *Rect) *RectJSON {
+	return &RectJSON{
+		r.left,
+		r.top,
+		r.right,
+		r.bottom,
+	}
 }
 
 func Distance(p1 Point, p2 Point) int {

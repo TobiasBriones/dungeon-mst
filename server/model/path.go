@@ -68,6 +68,16 @@ func NewPath(hl Line, vl Line) Path {
 	return Path{hl, hRect, vl, vRect}
 }
 
+type PathJSON struct {
+	HLineJSON LineJSON
+	VLineJSON LineJSON
+}
+
+func (p *PathJSON) ToPath() *Path {
+	path := NewPath(*p.HLineJSON.ToLine(), *p.VLineJSON.ToLine())
+	return &path
+}
+
 type Line struct {
 	p1 Point
 	p2 Point
@@ -83,4 +93,17 @@ func (l *Line) IsHorizontal() bool {
 
 func (l *Line) IsVertical() bool {
 	return l.p1.X() == l.p2.X()
+}
+
+type LineJSON struct {
+	P1JSON PointJSON
+	P2JSON PointJSON
+}
+
+func (l *LineJSON) ToLine() *Line {
+	line := &Line{
+		p1: *l.P1JSON.ToPoint(),
+		p2: *l.P2JSON.ToPoint(),
+	}
+	return line
 }
