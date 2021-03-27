@@ -16,6 +16,8 @@ const (
 	addr = "localhost:8080"
 )
 
+var globalId = -1
+
 func main() {
 	gin.DefaultWriter = ioutil.Discard
 	r := gin.Default()
@@ -42,14 +44,15 @@ func wsHandler(updgrader *websocket.Upgrader, quit chan struct{}, hub *Hub) gin.
 		if err != nil {
 			log.Println(err)
 		}
-		name := waitForId(conn)
+		id, name := waitForConfirm(conn)
 
 		if len(name) == 0 {
 			return
 		}
 
-		client := NewClient(conn, name)
+		client := NewClient(conn, id, name)
 
+		client.SendId()
 		go client.Handle()
 
 		hub.Register(client)
@@ -64,11 +67,13 @@ func getUpgrader() *websocket.Upgrader {
 	}
 }
 
-func waitForId(conn *websocket.Conn) string {
+func waitForConfirm(conn *websocket.Conn) (int, string) {
 	_, p, err := conn.ReadMessage()
+	globalId++
 
 	if err != nil {
-		return ""
+		log.Println(err)
+		return globalId, ""
 	}
-	return string(p)
+	return globalId, string(p)
 }

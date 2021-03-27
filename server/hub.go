@@ -15,13 +15,8 @@ import (
 
 const matchDuration = 5 * time.Second
 
-type Update struct {
-	Id   string
-	Move int
-}
-
 type Hub struct {
-	clients    map[string]*Client
+	clients    map[int]*Client
 	register   chan *Client
 	unregister chan *Client
 	broadcast  chan *ResponseData
@@ -89,12 +84,12 @@ func (h *Hub) Start() {
 }
 
 func (h *Hub) Register(c *Client) {
-	log.Printf("Client %s connected.\n", c.id)
+	log.Printf("Client %s (%d) connected.\n", c.name, c.id)
 	h.register <- c
 }
 
 func (h *Hub) Unregister(c *Client) {
-	log.Printf("Client %s disconnected.\n", c.id)
+	log.Printf("Client %s (%d) disconnected.\n", c.name, c.id)
 	h.unregister <- c
 }
 
@@ -149,7 +144,7 @@ func (h *Hub) listen(client *Client) {
 
 func NewHub(ch chan *ResponseData, quit chan struct{}) *Hub {
 	return &Hub{
-		clients:    make(map[string]*Client),
+		clients:    make(map[int]*Client),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		broadcast:  ch,

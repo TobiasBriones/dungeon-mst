@@ -36,10 +36,10 @@ func (a *Arena) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (a *Arena) PushRemotePlayerInput(name string, input int) {
+func (a *Arena) PushRemotePlayerInput(id int, input int) {
 	// This structure might be a hash map later
 	for _, player := range a.remotePlayers {
-		if player.GetName() == name {
+		if player.Id == id {
 			player.PushInput(input)
 		}
 	}

@@ -36,6 +36,7 @@ func init() {
 }
 
 type Player struct {
+	Id             int
 	name           string
 	character      *Runner
 	score          int

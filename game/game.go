@@ -29,6 +29,7 @@ var (
 )
 
 type User struct {
+	Id   int
 	Name string
 }
 
@@ -107,9 +108,8 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) onCharacterMotion(move int) {
-	id := g.arena.GetPlayerName()
 	update := &client.Update{
-		Id:   id,
+		Id:   user.Id,
 		Move: move,
 	}
 	g.sendUpdateCh <- update
@@ -180,9 +180,6 @@ func Run() {
 		for {
 			u := <-game.updateCh
 
-			if u.Id == user.Name {
-				continue
-			}
 			game.arena.PushRemotePlayerInput(u.Id, u.Move)
 		}
 	}()
@@ -212,7 +209,15 @@ func newGame() Game {
 	game.sendUpdateCh = sendUpdateCh
 	game.quit = quit
 
-	go client.Run(user.Name, matchCh, updateCh, sendUpdateCh)
+	acceptedCh := make(chan *client.JoinAccepted)
+
+	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh)
+
+	accepted := <-acceptedCh
+	arena.player.Id = accepted.Id
+	user.Id = accepted.Id
+
+	log.Println("Accepted", accepted.Id)
 	return game
 }
 

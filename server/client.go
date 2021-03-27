@@ -13,7 +13,8 @@ import (
 )
 
 type Client struct {
-	id   string
+	id   int
+	name string
 	conn *websocket.Conn
 	ch   chan *ResponseData
 	quit chan struct{}
@@ -34,6 +35,24 @@ func (c *Client) InitGame(match *model.Match, time time.Duration) {
 
 	data := &ResponseData{
 		Type: DataTypeGameInitialization,
+		Body: string(enc),
+	}
+	if err := c.conn.WriteJSON(data); err != nil {
+		log.Println("WS write error:", err)
+		return
+	}
+}
+
+func (c *Client) SendId() {
+	accepted := &JoinAccepted{Id: c.id}
+	enc, err := json.Marshal(accepted)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	data := &ResponseData{
+		Type: DataTypeJoinAccepted,
 		Body: string(enc),
 	}
 	if err := c.conn.WriteJSON(data); err != nil {
@@ -63,9 +82,10 @@ func (c *Client) Close() {
 	close(c.quit)
 }
 
-func NewClient(conn *websocket.Conn, id string) *Client {
+func NewClient(conn *websocket.Conn, id int, name string) *Client {
 	return &Client{
 		id:   id,
+		name: name,
 		conn: conn,
 		ch:   make(chan *ResponseData),
 		quit: make(chan struct{}),

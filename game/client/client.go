@@ -25,6 +25,10 @@ type ResponseData struct {
 	Body string
 }
 
+type JoinAccepted struct {
+	Id int
+}
+
 type MatchInitJSON struct {
 	MatchJSON            *model.MatchJSON
 	RemainingTimeSeconds time.Duration
@@ -36,11 +40,11 @@ type MatchInit struct {
 }
 
 type Update struct {
-	Id   string
+	Id   int
 	Move int
 }
 
-func Run(id string, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *Update) {
+func Run(name string, accepted chan *JoinAccepted, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *Update) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -58,13 +62,45 @@ func Run(id string, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *U
 
 	done := make(chan struct{})
 
+	waitAccepted(name, accepted, conn)
 	readMessages(done, conn, matchCh, ch)
 	writeMessages(done, conn, sendUpdate)
-	sendId([]byte(id), conn)
 
-	//sendMessages(done, interrupt, conn)
 	reader := bufio.NewReader(os.Stdin)
 	reader.ReadString('\n')
+}
+
+func waitAccepted(name string, acceptedCh chan *JoinAccepted, conn *websocket.Conn) {
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(name)); err != nil {
+		log.Println("Name write error:", err)
+		return
+	}
+
+	_, p, err := conn.ReadMessage()
+
+	if err != nil {
+		log.Println("Read error:", err)
+		return
+	}
+	data := &ResponseData{}
+
+	if err := json.Unmarshal(p, data); err != nil {
+		log.Println("Read ResponseData error:", err)
+		return
+	}
+	log.Printf("Response: %+v\n", data)
+
+	if data.Type != 3 {
+		log.Println("Failed to connect, invalid server accepted response")
+		return
+	}
+	accepted := &JoinAccepted{}
+
+	if err := json.Unmarshal([]byte(data.Body), accepted); err != nil {
+		log.Println("JoinAccepted read error:", err)
+		return
+	}
+	acceptedCh <- accepted
 }
 
 func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, ch chan *Update) {
@@ -139,15 +175,6 @@ func writeMessages(done chan struct{}, conn *websocket.Conn, ch chan *Update) {
 			}
 		}
 	}()
-}
-
-func sendId(id []byte, conn *websocket.Conn) {
-	err := conn.WriteMessage(websocket.TextMessage, id)
-
-	if err != nil {
-		log.Println("Write error:", err)
-		return
-	}
 }
 
 func sendUpdate(conn *websocket.Conn, update *Update) {
