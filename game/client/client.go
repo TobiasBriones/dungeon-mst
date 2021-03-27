@@ -40,7 +40,7 @@ type Update struct {
 	M int
 }
 
-func Run(matchCh chan *MatchInit, ch chan *Update) {
+func Run(id string, matchCh chan *MatchInit, ch chan *Update) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -52,13 +52,14 @@ func Run(matchCh chan *MatchInit, ch chan *Update) {
 
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Fatal("Dial error:", err)
 	}
 	defer conn.Close()
 
 	done := make(chan struct{})
 
 	readMessages(done, conn, matchCh, ch)
+	sendId([]byte(id), conn)
 
 	//sendMessages(done, interrupt, conn)
 	reader := bufio.NewReader(os.Stdin)
@@ -124,6 +125,15 @@ func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, c
 			readResponse(data)
 		}
 	}()
+}
+
+func sendId(id []byte, conn *websocket.Conn) {
+	err := conn.WriteMessage(websocket.TextMessage, id)
+
+	if err != nil {
+		log.Println("Write error:", err)
+		return
+	}
 }
 
 func sendMessages(done chan struct{}, interrupt chan os.Signal, conn *websocket.Conn) {

@@ -10,14 +10,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 const (
 	addr = "localhost:8080"
 )
-
-var id = 0
 
 func main() {
 	gin.DefaultWriter = ioutil.Discard
@@ -45,17 +42,17 @@ func wsHandler(updgrader *websocket.Upgrader, quit chan struct{}, hub *Hub) gin.
 		if err != nil {
 			log.Println(err)
 		}
-		name := "remote " + strconv.Itoa(id)
+		name := waitForId(conn)
+
+		if len(name) == 0 {
+			return
+		}
+
 		client := NewClient(conn, name)
-		id++
 
 		go client.Handle()
 
 		hub.Register(client)
-		hub.broadcast <- &ResponseData{
-			Type: DataTypeServerMessage,
-			Body: "New client connected " + client.id + "...",
-		}
 	}
 }
 
@@ -65,4 +62,13 @@ func getUpgrader() *websocket.Upgrader {
 		WriteBufferSize: 1024,
 		CheckOrigin:     func(r *http.Request) bool { return true },
 	}
+}
+
+func waitForId(conn *websocket.Conn) string {
+	_, p, err := conn.ReadMessage()
+
+	if err != nil {
+		return ""
+	}
+	return string(p)
 }

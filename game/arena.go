@@ -96,8 +96,8 @@ func (a *Arena) checkDiamondCollision(diamond *model.Diamond) bool {
 	return false
 }
 
-func NewArena() Arena {
-	player := model.NewPlayer("local")
+func NewArena(playerName string) Arena {
+	player := model.NewPlayer(playerName)
 	remotePlayers := getTempPlayers()
 	return Arena{player: &player, remotePlayers: remotePlayers}
 }

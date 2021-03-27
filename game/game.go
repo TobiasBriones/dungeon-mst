@@ -5,11 +5,13 @@
 package main
 
 import (
+	"encoding/json"
 	"game/client"
 	"game/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image/color"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"strconv"
@@ -23,7 +25,12 @@ const (
 
 var (
 	bgImage *ebiten.Image
+	user    User
 )
+
+type User struct {
+	Name string
+}
 
 type Game struct {
 	match         *model.Match
@@ -178,7 +185,7 @@ func Run() {
 }
 
 func newGame() Game {
-	arena := NewArena()
+	arena := NewArena(user.Name)
 	legendImage := loadLegendImage()
 	game := Game{
 		arena:       &arena,
@@ -195,7 +202,7 @@ func newGame() Game {
 	game.updateCh = updateCh
 	game.quit = quit
 
-	go client.Run(matchCh, updateCh)
+	go client.Run(user.Name, matchCh, updateCh)
 	return game
 }
 
@@ -205,6 +212,7 @@ func getSize() model.Dimension {
 
 func init() {
 	loadBg()
+	loadUser()
 }
 
 func loadBg() {
@@ -217,6 +225,18 @@ func loadBg() {
 		log.Fatal(err)
 	}
 	bgImage = bgImg
+}
+
+func loadUser() {
+	content, err := ioutil.ReadFile("../user.json")
+
+	if err != nil {
+		log.Fatal("Failed to read user")
+	}
+
+	if err := json.Unmarshal(content, &user); err != nil {
+		log.Fatal("Failed to parse user")
+	}
 }
 
 func loadLegendImage() *ebiten.Image {
