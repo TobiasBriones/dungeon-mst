@@ -96,6 +96,15 @@ func (a *Arena) checkDiamondCollision(diamond *model.Diamond) bool {
 	return false
 }
 
+func (a *Arena) SetRemotePlayerPosition(id int, point *model.Point) {
+	for _, player := range a.remotePlayers {
+		if player.Id == id {
+			player.SetPosition(point.X(), point.Y())
+			break
+		}
+	}
+}
+
 func NewArena(playerName string) Arena {
 	player := model.NewPlayer(playerName)
 	remotePlayers := getTempPlayers()

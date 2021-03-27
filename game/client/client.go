@@ -40,8 +40,9 @@ type MatchInit struct {
 }
 
 type Update struct {
-	Id   int
-	Move int
+	Id int
+	//Move int // use point for now
+	PointJSON model.PointJSON
 }
 
 func Run(name string, accepted chan *JoinAccepted, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *Update) {
@@ -88,7 +89,6 @@ func waitAccepted(name string, acceptedCh chan *JoinAccepted, conn *websocket.Co
 		log.Println("Read ResponseData error:", err)
 		return
 	}
-	log.Printf("Response: %+v\n", data)
 
 	if data.Type != 3 {
 		log.Println("Failed to connect, invalid server accepted response")

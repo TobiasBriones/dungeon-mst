@@ -13,11 +13,12 @@ import (
 )
 
 type Client struct {
-	id   int
-	name string
-	conn *websocket.Conn
-	ch   chan *ResponseData
-	quit chan struct{}
+	PointJSON model.PointJSON
+	id        int
+	name      string
+	conn      *websocket.Conn
+	ch        chan *ResponseData
+	quit      chan struct{}
 }
 
 func (c *Client) InitGame(match *model.Match, time time.Duration) {

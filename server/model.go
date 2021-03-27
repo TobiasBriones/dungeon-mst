@@ -31,6 +31,7 @@ type JoinAccepted struct {
 }
 
 type Update struct {
-	Id   int
-	Move int
+	Id int
+	//Move int // use point for now
+	PointJSON model.PointJSON
 }

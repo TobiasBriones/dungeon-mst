@@ -59,6 +59,14 @@ func (p *Player) GetCharacter() *Runner {
 	return p.character
 }
 
+func (p *Player) GetPosition() Point {
+	return NewPoint(p.character.Rect.left, p.character.Rect.top)
+}
+
+func (p *Player) SetPosition(x int, y int) {
+	p.character.setPosition(x, y)
+}
+
 func (p *Player) PushInput(value int) {
 	p.character.PushInput(value)
 }

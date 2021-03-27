@@ -108,9 +108,11 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) onCharacterMotion(move int) {
+	position := g.arena.player.GetPosition()
 	update := &client.Update{
-		Id:   user.Id,
-		Move: move,
+		Id: user.Id,
+		//Move: move,
+		PointJSON: *model.NewPointJSON(&position),
 	}
 	g.sendUpdateCh <- update
 }
@@ -180,7 +182,12 @@ func Run() {
 		for {
 			u := <-game.updateCh
 
-			game.arena.PushRemotePlayerInput(u.Id, u.Move)
+			if u.Id == user.Id {
+				continue
+			}
+			log.Println("Receiving update for player:", u.Id)
+			game.arena.SetRemotePlayerPosition(u.Id, u.PointJSON.ToPoint())
+			//game.arena.PushRemotePlayerInput(u.Id, u.Move)
 		}
 	}()
 

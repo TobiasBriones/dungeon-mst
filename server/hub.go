@@ -128,6 +128,7 @@ func (h *Hub) listen(client *Client) {
 			continue
 		}
 		update.Id = id
+		client.PointJSON = update.PointJSON
 		enc, err := json.Marshal(update)
 
 		if err != nil {
