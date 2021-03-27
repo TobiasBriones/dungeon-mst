@@ -41,6 +41,7 @@ type Game struct {
 	matchCh       chan *client.MatchInit
 	updateCh      chan *client.Update
 	sendUpdateCh  chan *client.Update
+	joinCh        chan *client.PlayerJoin
 	quit          chan bool
 	remainingTime time.Duration
 }
@@ -173,6 +174,10 @@ func Run() {
 			}
 			m := <-game.matchCh
 
+			for _, player := range m.Players {
+				game.arena.PushRemotePlayer(player.Id, player.Name)
+			}
+
 			game.SetMatch(m.Match)
 			game.remainingTime = m.RemainingTime
 			go game.watchRemainingTime()
@@ -185,9 +190,20 @@ func Run() {
 			if u.Id == user.Id {
 				continue
 			}
-			log.Println("Receiving update for player:", u.Id)
+			//log.Println("Receiving update for player:", u.Id)
 			game.arena.SetRemotePlayerPosition(u.Id, u.PointJSON.ToPoint())
 			//game.arena.PushRemotePlayerInput(u.Id, u.Move)
+		}
+	}()
+	go func() {
+		for {
+			j := <-game.joinCh
+
+			if j.Id == user.Id {
+				continue
+			}
+			log.Println("Joining player:", j.Id)
+			game.arena.PushRemotePlayer(j.Id, j.Name)
 		}
 	}()
 
@@ -209,16 +225,18 @@ func newGame() Game {
 	matchCh := make(chan *client.MatchInit)
 	updateCh := make(chan *client.Update)
 	sendUpdateCh := make(chan *client.Update)
+	joinCh := make(chan *client.PlayerJoin)
 	quit := make(chan bool)
 
 	game.matchCh = matchCh
 	game.updateCh = updateCh
 	game.sendUpdateCh = sendUpdateCh
+	game.joinCh = joinCh
 	game.quit = quit
 
 	acceptedCh := make(chan *client.JoinAccepted)
 
-	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh)
+	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh, joinCh)
 
 	accepted := <-acceptedCh
 	arena.player.Id = accepted.Id

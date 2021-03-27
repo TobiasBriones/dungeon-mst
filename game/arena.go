@@ -105,22 +105,25 @@ func (a *Arena) SetRemotePlayerPosition(id int, point *model.Point) {
 	}
 }
 
+func (a *Arena) PushRemotePlayer(id int, name string) {
+	player := buildPlayer(id, name)
+	a.remotePlayers = append(a.remotePlayers, player)
+}
+
 func NewArena(playerName string) Arena {
 	player := model.NewPlayer(playerName)
-	remotePlayers := getTempPlayers()
-	return Arena{player: &player, remotePlayers: remotePlayers}
+	return Arena{player: &player, remotePlayers: []*model.Player{}}
 }
 
 type OnCharacterMotion func(int)
 
 type SetCurrentDungeonAndPaths func(runner *model.Runner)
 
-func getTempPlayers() []*model.Player {
-	var newPlayer = func(name string) *model.Player {
+func buildPlayer(id int, name string) *model.Player {
+	var newPlayer = func() *model.Player {
 		player := model.NewPlayer(name)
+		player.Id = id
 		return &player
 	}
-	return []*model.Player{
-		newPlayer("remote"),
-	}
+	return newPlayer()
 }

@@ -35,8 +35,30 @@ func (h *Hub) Start() {
 	var register = func(client *Client) {
 		remainingTime := matchDuration - time.Since(h.startTime)
 
+		var players []*PlayerJoin
+
+		for _, client := range h.clients {
+			players = append(players, &PlayerJoin{
+				Id:        client.id,
+				Name:      client.name,
+				PointJSON: client.PointJSON,
+			})
+		}
+
+		client.InitGame(h.match, remainingTime, players)
+
 		h.push(client)
-		client.InitGame(h.match, remainingTime)
+
+		join := &PlayerJoin{
+			Id:        client.id,
+			Name:      client.name,
+			PointJSON: client.PointJSON,
+		}
+		enc, _ := json.Marshal(join)
+		broadcast(&ResponseData{
+			Type: DataTypePlayerJoin,
+			Body: string(enc),
+		})
 		go h.listen(client)
 	}
 
@@ -52,8 +74,8 @@ func (h *Hub) Start() {
 			h.init()
 			matchJSON := model.NewMatchJSON(h.match)
 			matchInit := &MatchInit{
-				MatchJSON:            matchJSON,
-				RemainingTimeSeconds: matchDuration,
+				MatchJSON:     matchJSON,
+				RemainingTime: matchDuration,
 			}
 			enc, err := json.Marshal(matchInit)
 

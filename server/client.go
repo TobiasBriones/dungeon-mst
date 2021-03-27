@@ -21,11 +21,12 @@ type Client struct {
 	quit      chan struct{}
 }
 
-func (c *Client) InitGame(match *model.Match, time time.Duration) {
+func (c *Client) InitGame(match *model.Match, time time.Duration, players []*PlayerJoin) {
 	matchJSON := model.NewMatchJSON(match)
 	matchInit := &MatchInit{
-		MatchJSON:            matchJSON,
-		RemainingTimeSeconds: time,
+		MatchJSON:     matchJSON,
+		RemainingTime: time,
+		Players:       players,
 	}
 	enc, err := json.Marshal(matchInit)
 

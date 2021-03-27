@@ -14,6 +14,7 @@ const (
 	DataTypeUpdate             = 1
 	DataTypeServerMessage      = 2
 	DataTypeJoinAccepted       = 3
+	DataTypePlayerJoin         = 4
 )
 
 type ResponseData struct {
@@ -22,12 +23,19 @@ type ResponseData struct {
 }
 
 type MatchInit struct {
-	MatchJSON            *model.MatchJSON
-	RemainingTimeSeconds time.Duration
+	MatchJSON     *model.MatchJSON
+	RemainingTime time.Duration
+	Players       []*PlayerJoin
 }
 
 type JoinAccepted struct {
 	Id int
+}
+
+type PlayerJoin struct {
+	Id        int
+	Name      string
+	PointJSON model.PointJSON
 }
 
 type Update struct {

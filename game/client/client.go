@@ -29,14 +29,17 @@ type JoinAccepted struct {
 	Id int
 }
 
-type MatchInitJSON struct {
-	MatchJSON            *model.MatchJSON
-	RemainingTimeSeconds time.Duration
+type PlayerJoin struct {
+	Id        int
+	Name      string
+	PointJSON model.PointJSON
 }
 
 type MatchInit struct {
+	MatchJSON     *model.MatchJSON
 	Match         *model.Match
 	RemainingTime time.Duration
+	Players       []*PlayerJoin
 }
 
 type Update struct {
@@ -45,7 +48,14 @@ type Update struct {
 	PointJSON model.PointJSON
 }
 
-func Run(name string, accepted chan *JoinAccepted, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *Update) {
+func Run(
+	name string,
+	accepted chan *JoinAccepted,
+	matchCh chan *MatchInit,
+	ch chan *Update,
+	sendUpdate chan *Update,
+	joinCh chan *PlayerJoin,
+) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -64,7 +74,7 @@ func Run(name string, accepted chan *JoinAccepted, matchCh chan *MatchInit, ch c
 	done := make(chan struct{})
 
 	waitAccepted(name, accepted, conn)
-	readMessages(done, conn, matchCh, ch)
+	readMessages(done, conn, matchCh, ch, joinCh)
 	writeMessages(done, conn, sendUpdate)
 
 	reader := bufio.NewReader(os.Stdin)
@@ -103,23 +113,22 @@ func waitAccepted(name string, acceptedCh chan *JoinAccepted, conn *websocket.Co
 	acceptedCh <- accepted
 }
 
-func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, ch chan *Update) {
+func readMessages(
+	done chan struct{},
+	conn *websocket.Conn,
+	h chan *MatchInit,
+	ch chan *Update,
+	joinCh chan *PlayerJoin,
+) {
 	init := func(body string) {
-		matchInitJSON := &MatchInitJSON{}
+		matchInit := &MatchInit{}
 
-		if err := json.Unmarshal([]byte(body), matchInitJSON); err != nil {
+		if err := json.Unmarshal([]byte(body), matchInit); err != nil {
 			log.Println("Match read error:", err)
 			return
 		}
-		//fmt.Printf("%+v\n", matchJSON)
-
-		matchJSON := matchInitJSON.MatchJSON
-		match := matchJSON.ToMatch()
-		matchInit := &MatchInit{
-			Match:         match,
-			RemainingTime: matchInitJSON.RemainingTimeSeconds,
-		}
 		//fmt.Printf("%+v\n", match)
+		matchInit.Match = matchInit.MatchJSON.ToMatch()
 		h <- matchInit
 	}
 
@@ -133,12 +142,24 @@ func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, c
 		ch <- update
 	}
 
+	join := func(body string) {
+		join := &PlayerJoin{}
+
+		if err := json.Unmarshal([]byte(body), join); err != nil {
+			log.Println("Join read error:", err)
+			return
+		}
+		joinCh <- join
+	}
+
 	readResponse := func(data *ResponseData) {
 		switch data.Type {
 		case 0:
 			init(data.Body)
 		case 1:
 			update(data.Body)
+		case 4:
+			join(data.Body)
 		}
 	}
 
