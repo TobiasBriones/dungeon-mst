@@ -13,7 +13,6 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -37,10 +36,11 @@ type MatchInit struct {
 }
 
 type Update struct {
-	M int
+	Id   string
+	Move int
 }
 
-func Run(id string, matchCh chan *MatchInit, ch chan *Update) {
+func Run(id string, matchCh chan *MatchInit, ch chan *Update, sendUpdate chan *Update) {
 	flag.Parse()
 	log.SetFlags(0)
 
@@ -59,6 +59,7 @@ func Run(id string, matchCh chan *MatchInit, ch chan *Update) {
 	done := make(chan struct{})
 
 	readMessages(done, conn, matchCh, ch)
+	writeMessages(done, conn, sendUpdate)
 	sendId([]byte(id), conn)
 
 	//sendMessages(done, interrupt, conn)
@@ -127,6 +128,19 @@ func readMessages(done chan struct{}, conn *websocket.Conn, h chan *MatchInit, c
 	}()
 }
 
+func writeMessages(done chan struct{}, conn *websocket.Conn, ch chan *Update) {
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case u := <-ch:
+				sendUpdate(conn, u)
+			}
+		}
+	}()
+}
+
 func sendId(id []byte, conn *websocket.Conn) {
 	err := conn.WriteMessage(websocket.TextMessage, id)
 
@@ -136,36 +150,16 @@ func sendId(id []byte, conn *websocket.Conn) {
 	}
 }
 
-func sendMessages(done chan struct{}, interrupt chan os.Signal, conn *websocket.Conn) {
-	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
+func sendUpdate(conn *websocket.Conn, update *Update) {
+	enc, err := json.Marshal(update)
 
-	for {
-		select {
-		case <-done:
-			return
-		case t := <-ticker.C:
-			message := []byte(strconv.Itoa(t.Second()))
-			log.Println("Sending message " + string(message))
+	if err != nil {
+		log.Println("Update encoding error:", err)
+		return
+	}
 
-			err := conn.WriteMessage(websocket.TextMessage, message)
-			if err != nil {
-				log.Println("write:", err)
-				return
-			}
-		case <-interrupt:
-			log.Println("interrupt")
-
-			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Println("write close:", err)
-				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-			return
-		}
+	if err := conn.WriteMessage(websocket.TextMessage, enc); err != nil {
+		log.Println("Update write error:", err)
+		return
 	}
 }

@@ -8,13 +8,17 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
-	"math/rand"
 	"server/ai"
 	"server/model"
 	"time"
 )
 
 const matchDuration = 5 * time.Second
+
+type Update struct {
+	Id   string
+	Move int
+}
 
 type Hub struct {
 	clients    map[string]*Client
@@ -47,7 +51,6 @@ func (h *Hub) Start() {
 
 	h.init()
 
-	sendFakeUpdate(h)
 	go func() {
 		for {
 			time.Sleep(matchDuration)
@@ -110,6 +113,7 @@ func (h *Hub) delete(client *Client) {
 
 func (h *Hub) listen(client *Client) {
 	conn := client.conn
+	id := client.id
 
 	for {
 		_, p, err := conn.ReadMessage()
@@ -122,14 +126,23 @@ func (h *Hub) listen(client *Client) {
 			h.Unregister(client)
 			return
 		}
-		message := string(p)
-		id := client.id
+		update := &Update{}
 
-		log.Println("Message " + message + " sent from client " + id)
+		if err := json.Unmarshal(p, update); err != nil {
+			log.Println("Parse update error:", err)
+			continue
+		}
+		update.Id = id
+		enc, err := json.Marshal(update)
+
+		if err != nil {
+			log.Println("Encode update error:", err)
+			continue
+		}
 
 		h.broadcast <- &ResponseData{
-			Type: DataTypeServerMessage,
-			Body: message,
+			Type: DataTypeUpdate,
+			Body: string(enc),
 		}
 	}
 }
@@ -142,26 +155,4 @@ func NewHub(ch chan *ResponseData, quit chan struct{}) *Hub {
 		broadcast:  ch,
 		quit:       quit,
 	}
-}
-
-type Update struct {
-	M int
-}
-
-func sendFakeUpdate(hub *Hub) {
-	ticker := time.NewTicker(100 * time.Millisecond)
-
-	go func() {
-		for range ticker.C {
-			u := &Update{
-				M: rand.Intn(4),
-			}
-			enc, _ := json.Marshal(u)
-
-			hub.broadcast <- &ResponseData{
-				Type: DataTypeUpdate,
-				Body: string(enc),
-			}
-		}
-	}()
 }

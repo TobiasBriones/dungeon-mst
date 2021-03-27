@@ -39,6 +39,7 @@ type Game struct {
 	legendImage   *ebiten.Image
 	matchCh       chan *client.MatchInit
 	updateCh      chan *client.Update
+	sendUpdateCh  chan *client.Update
 	quit          chan bool
 	remainingTime time.Duration
 }
@@ -106,8 +107,12 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) onCharacterMotion(move int) {
-	//name := g.arena.GetPlayerName()
-	//println(name + " " + strconv.Itoa(move))
+	id := g.arena.GetPlayerName()
+	update := &client.Update{
+		Id:   id,
+		Move: move,
+	}
+	g.sendUpdateCh <- update
 }
 
 func (g *Game) setCurrentDungeonAndPaths(runner *model.Runner) {
@@ -174,10 +179,13 @@ func Run() {
 	go func() {
 		for {
 			u := <-game.updateCh
-			game.arena.PushRemotePlayerInput("remote", u.M)
+
+			if u.Id == user.Name {
+				continue
+			}
+			game.arena.PushRemotePlayerInput(u.Id, u.Move)
 		}
 	}()
-	//sendFakeInputs(game.arena)
 
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
@@ -196,13 +204,15 @@ func newGame() Game {
 
 	matchCh := make(chan *client.MatchInit)
 	updateCh := make(chan *client.Update)
+	sendUpdateCh := make(chan *client.Update)
 	quit := make(chan bool)
 
 	game.matchCh = matchCh
 	game.updateCh = updateCh
+	game.sendUpdateCh = sendUpdateCh
 	game.quit = quit
 
-	go client.Run(user.Name, matchCh, updateCh)
+	go client.Run(user.Name, matchCh, updateCh, sendUpdateCh)
 	return game
 }
 
@@ -246,21 +256,6 @@ func loadLegendImage() *ebiten.Image {
 		log.Fatal(err)
 	}
 	return img
-}
-
-func sendFakeInputs(a *Arena) {
-	ticker := time.NewTicker(50 * time.Millisecond)
-
-	go func() {
-		for range ticker.C {
-			fake := randInput()
-			a.PushRemotePlayerInput("remote", fake)
-		}
-	}()
-}
-
-func randInput() int {
-	return rand.Intn(4)
 }
 
 func remove(slice []*model.Diamond, s int) []*model.Diamond {
