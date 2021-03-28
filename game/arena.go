@@ -127,6 +127,15 @@ func (a *Arena) RemoveRemotePlayer(lid int) {
 	}
 }
 
+func (a *Arena) SetRemotePlayerScore(id int) {
+	for _, player := range a.remotePlayers {
+		if player.Id == id {
+			player.SetScore(player.GetScore() + 30)
+			break
+		}
+	}
+}
+
 func NewArena(playerName string) Arena {
 	player := model.NewPlayer(playerName)
 	return Arena{player: &player, remotePlayers: []*model.Player{}}

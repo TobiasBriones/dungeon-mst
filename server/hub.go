@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const matchDuration = 5 * time.Second
+const matchDuration = 45 * time.Second
 
 type Hub struct {
 	clients    map[int]*Client
@@ -134,6 +134,9 @@ func (h *Hub) delete(client *Client) {
 }
 
 func (h *Hub) listen(client *Client) {
+	remove := func(slice []*model.Diamond, s int) []*model.Diamond {
+		return append(slice[:s], slice[s+1:]...)
+	}
 	conn := client.conn
 	id := client.id
 
@@ -161,6 +164,12 @@ func (h *Hub) listen(client *Client) {
 		if err != nil {
 			log.Println("Encode update error:", err)
 			continue
+		}
+
+		if update.DiamondIndex != -1 && update.DiamondIndex < len(h.match.Diamonds) {
+			h.match.Diamonds = remove(h.match.Diamonds, update.DiamondIndex)
+		} else {
+			update.DiamondIndex = -1
 		}
 
 		h.broadcast <- &ResponseData{

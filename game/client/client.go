@@ -46,7 +46,8 @@ type MatchInit struct {
 type Update struct {
 	Id int
 	//Move int // use point for now
-	PointJSON model.PointJSON
+	PointJSON    model.PointJSON
+	DiamondIndex int
 }
 
 func Run(

@@ -56,21 +56,38 @@ func (g *Game) Update() error {
 		return nil
 	}
 	g.count++
+	diamondIndex := -1
 
 	for i, diamond := range g.match.Diamonds {
 		if g.arena.checkDiamondCollision(diamond) {
-			remove(g.match.Diamonds, i)
+			log.Println("Diamond collision", i, "len:", len(g.match.Diamonds))
+			diamondIndex = i
+			break
 		}
+	}
+
+	if diamondIndex != -1 {
+		g.match.Diamonds = remove(g.match.Diamonds, diamondIndex)
 	}
 
 	g.arena.Update(g.setCurrentDungeonAndPaths)
 
-	// Generate random dungeons
-	if g.count%5 == 0 {
-		if ebiten.IsKeyPressed(ebiten.KeyR) {
-			g.reset()
-		}
+	position := g.arena.player.GetPosition()
+	update := &client.Update{
+		Id: user.Id,
+		//Move: move,
+		PointJSON:    *model.NewPointJSON(&position),
+		DiamondIndex: diamondIndex,
 	}
+	g.sendUpdateCh <- update
+
+	/*
+		// Generate random dungeons
+		if g.count%5 == 0 {
+			if ebiten.IsKeyPressed(ebiten.KeyR) {
+				g.reset()
+			}
+		}*/
 	return nil
 }
 
@@ -110,13 +127,7 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) onCharacterMotion(move int) {
-	position := g.arena.player.GetPosition()
-	update := &client.Update{
-		Id: user.Id,
-		//Move: move,
-		PointJSON: *model.NewPointJSON(&position),
-	}
-	g.sendUpdateCh <- update
+
 }
 
 func (g *Game) setCurrentDungeonAndPaths(runner *model.Runner) {
@@ -193,6 +204,13 @@ func Run() {
 			}
 			//log.Println("Receiving update for player:", u.Id)
 			game.arena.SetRemotePlayerPosition(u.Id, u.PointJSON.ToPoint())
+
+			if u.DiamondIndex != -1 {
+				game.match.Diamonds = remove(game.match.Diamonds, u.DiamondIndex)
+
+				game.arena.SetRemotePlayerScore(u.Id)
+			}
+
 			//game.arena.PushRemotePlayerInput(u.Id, u.Move)
 		}
 	}()
