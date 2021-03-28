@@ -218,12 +218,12 @@ func Run() {
 			}
 			m := <-game.matchCh
 
-			for _, player := range m.Players {
-				game.arena.PushRemotePlayer(player.Id, player.Name)
-			}
-
 			game.SetMatch(m.Match)
 			game.remainingTime = m.RemainingTime
+
+			for _, player := range m.Players {
+				game.arena.PushRemotePlayer(player.Id, player.Name, player.Score)
+			}
 			go game.watchRemainingTime()
 		}
 	}()
@@ -254,7 +254,7 @@ func Run() {
 				continue
 			}
 			log.Println("Joining player:", j.Id)
-			game.arena.PushRemotePlayer(j.Id, j.Name)
+			game.arena.PushRemotePlayer(j.Id, j.Name, 0)
 		}
 	}()
 

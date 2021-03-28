@@ -37,6 +37,7 @@ type PlayerJoin struct {
 	Id        int
 	Name      string
 	PointJSON model.PointJSON
+	Score     int
 }
 
 type Update struct {

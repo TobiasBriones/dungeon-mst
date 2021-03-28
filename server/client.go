@@ -14,6 +14,7 @@ import (
 
 type Client struct {
 	PointJSON model.PointJSON
+	Score     int
 	id        int
 	name      string
 	conn      *websocket.Conn

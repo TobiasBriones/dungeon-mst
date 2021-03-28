@@ -105,8 +105,9 @@ func (a *Arena) SetRemotePlayerPosition(id int, point *model.Point) {
 	}
 }
 
-func (a *Arena) PushRemotePlayer(id int, name string) {
+func (a *Arena) PushRemotePlayer(id int, name string, score int) {
 	player := buildPlayer(id, name)
+	player.SetScore(score)
 	a.remotePlayers = append(a.remotePlayers, player)
 }
 

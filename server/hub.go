@@ -43,6 +43,7 @@ func (h *Hub) Start() {
 				Id:        client.id,
 				Name:      client.name,
 				PointJSON: client.PointJSON,
+				Score:     client.Score, // Send the other player score the first time
 			})
 		}
 
@@ -88,6 +89,11 @@ func (h *Hub) Start() {
 				log.Println("New match error:", err)
 				return
 			}
+
+			for _, client := range h.clients {
+				client.Score = 0
+			}
+
 			broadcast(&ResponseData{
 				Type: DataTypeGameInitialization,
 				Body: string(enc),
@@ -168,6 +174,7 @@ func (h *Hub) listen(client *Client) {
 
 		if update.DiamondIndex != -1 && update.DiamondIndex < len(h.match.Diamonds) {
 			h.match.Diamonds = remove(h.match.Diamonds, update.DiamondIndex)
+			client.Score += 30
 		} else {
 			update.DiamondIndex = -1
 		}
