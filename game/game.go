@@ -136,7 +136,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Draw remote players
 	g.arena.Draw(screen)
 
-	ebitenutil.DebugPrint(screen, strconv.FormatInt(int64(g.remainingTime/time.Second), 10))
+	timeLeft := strconv.FormatInt(int64(g.remainingTime/time.Second), 10)
+	text.Draw(screen, timeLeft, mplusNormalFont, screenWidth-200, 96, color.White)
 
 	if g.IsPaused() {
 		g.drawPauseScreen(screen)
@@ -185,11 +186,11 @@ func (g *Game) drawStartScreen(screen *ebiten.Image) {
 func (g *Game) drawPauseScreen(screen *ebiten.Image) {
 	player := g.arena.player
 	str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
-	text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64, color.Black)
+	text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 96, color.Black)
 
 	for i, player := range g.arena.remotePlayers {
 		str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
-		text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64+(i+1)*64, color.Black)
+		text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64+(i+1)*96, color.Black)
 	}
 }
 
@@ -366,7 +367,7 @@ func init() {
 
 	const dpi = 72
 	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    36,
+		Size:    72,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
