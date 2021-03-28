@@ -77,7 +77,6 @@ func (g *Game) Update() error {
 
 	for i, diamond := range g.match.Diamonds {
 		if g.arena.checkDiamondCollision(diamond) {
-			log.Println("Diamond collision", i, "len:", len(g.match.Diamonds))
 			diamondIndex = i
 			break
 		}
