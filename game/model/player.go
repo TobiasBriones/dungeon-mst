@@ -12,6 +12,7 @@ import (
 	"golang.org/x/image/font/opentype"
 	"image/color"
 	"log"
+	"strconv"
 )
 
 var (
@@ -91,10 +92,11 @@ func (p *Player) Draw(screen *ebiten.Image) {
 
 func (p *Player) drawName(screen *ebiten.Image) {
 	name := p.name
+	str := name + "(" + strconv.Itoa(p.score) + ")"
 	character := p.character
 	x := character.Rect.Left()
 	y := character.Rect.Top()
-	text.Draw(screen, name, mplusNormalFont, x, y, color.Black)
+	text.Draw(screen, str, mplusNormalFont, x, y, color.Black)
 }
 
 func NewPlayer(name string) Player {
