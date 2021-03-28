@@ -10,6 +10,7 @@ import (
 	"log"
 	"server/ai"
 	"server/model"
+	"strconv"
 	"time"
 )
 
@@ -64,6 +65,10 @@ func (h *Hub) Start() {
 
 	var unregister = func(client *Client) {
 		h.delete(client)
+		broadcast(&ResponseData{
+			Type: DataTypePlayerLeft,
+			Body: strconv.Itoa(client.id),
+		})
 	}
 
 	h.init()

@@ -110,6 +110,23 @@ func (a *Arena) PushRemotePlayer(id int, name string) {
 	a.remotePlayers = append(a.remotePlayers, player)
 }
 
+func (a *Arena) RemoveRemotePlayer(lid int) {
+	index := -1
+
+	for i, player := range a.remotePlayers {
+		if player.Id == lid {
+			index = i
+			break
+		}
+	}
+
+	if index != -1 {
+		a.remotePlayers[index] = a.remotePlayers[len(a.remotePlayers)-1]
+		a.remotePlayers[len(a.remotePlayers)-1] = nil
+		a.remotePlayers = a.remotePlayers[:len(a.remotePlayers)-1]
+	}
+}
+
 func NewArena(playerName string) Arena {
 	player := model.NewPlayer(playerName)
 	return Arena{player: &player, remotePlayers: []*model.Player{}}

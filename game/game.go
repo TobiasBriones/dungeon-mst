@@ -42,6 +42,7 @@ type Game struct {
 	updateCh      chan *client.Update
 	sendUpdateCh  chan *client.Update
 	joinCh        chan *client.PlayerJoin
+	leaveCh       chan int
 	quit          chan bool
 	remainingTime time.Duration
 }
@@ -207,6 +208,14 @@ func Run() {
 		}
 	}()
 
+	go func() {
+		for {
+			lid := <-game.leaveCh
+
+			game.arena.RemoveRemotePlayer(lid)
+		}
+	}()
+
 	if err := ebiten.RunGame(&game); err != nil {
 		log.Fatal(err)
 	}
@@ -226,17 +235,19 @@ func newGame() Game {
 	updateCh := make(chan *client.Update)
 	sendUpdateCh := make(chan *client.Update)
 	joinCh := make(chan *client.PlayerJoin)
+	leaveCh := make(chan int)
 	quit := make(chan bool)
 
 	game.matchCh = matchCh
 	game.updateCh = updateCh
 	game.sendUpdateCh = sendUpdateCh
 	game.joinCh = joinCh
+	game.leaveCh = leaveCh
 	game.quit = quit
 
 	acceptedCh := make(chan *client.JoinAccepted)
 
-	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh, joinCh)
+	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh, joinCh, leaveCh)
 
 	accepted := <-acceptedCh
 	arena.player.Id = accepted.Id

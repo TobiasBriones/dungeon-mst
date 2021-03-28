@@ -15,6 +15,7 @@ const (
 	DataTypeServerMessage      = 2
 	DataTypeJoinAccepted       = 3
 	DataTypePlayerJoin         = 4
+	DataTypePlayerLeft         = 5
 )
 
 type ResponseData struct {

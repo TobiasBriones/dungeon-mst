@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -55,6 +56,7 @@ func Run(
 	ch chan *Update,
 	sendUpdate chan *Update,
 	joinCh chan *PlayerJoin,
+	leaveCh chan int,
 ) {
 	flag.Parse()
 	log.SetFlags(0)
@@ -74,7 +76,7 @@ func Run(
 	done := make(chan struct{})
 
 	waitAccepted(name, accepted, conn)
-	readMessages(done, conn, matchCh, ch, joinCh)
+	readMessages(done, conn, matchCh, ch, joinCh, leaveCh)
 	writeMessages(done, conn, sendUpdate)
 
 	reader := bufio.NewReader(os.Stdin)
@@ -119,6 +121,7 @@ func readMessages(
 	h chan *MatchInit,
 	ch chan *Update,
 	joinCh chan *PlayerJoin,
+	leaveCh chan int,
 ) {
 	init := func(body string) {
 		matchInit := &MatchInit{}
@@ -152,6 +155,16 @@ func readMessages(
 		joinCh <- join
 	}
 
+	leave := func(body string) {
+		id, err := strconv.Atoi(body)
+
+		if err != nil {
+			log.Println("Player leave error:", err)
+			return
+		}
+		leaveCh <- id
+	}
+
 	readResponse := func(data *ResponseData) {
 		switch data.Type {
 		case 0:
@@ -160,6 +173,8 @@ func readMessages(
 			update(data.Body)
 		case 4:
 			join(data.Body)
+		case 5:
+			leave(data.Body)
 		}
 	}
 
