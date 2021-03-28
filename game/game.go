@@ -10,6 +10,10 @@ import (
 	"game/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
+	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 	"image/color"
 	"io/ioutil"
 	"log"
@@ -47,12 +51,19 @@ type Game struct {
 	remainingTime time.Duration
 }
 
+func (g *Game) IsPaused() bool {
+	return len(g.match.Diamonds) == 0
+}
+
 func (g *Game) SetMatch(value *model.Match) {
 	g.match = value
 }
 
 func (g *Game) Update() error {
 	if g.match == nil {
+		return nil
+	}
+	if g.IsPaused() {
 		return nil
 	}
 	g.count++
@@ -120,6 +131,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.arena.Draw(screen)
 
 	ebitenutil.DebugPrint(screen, strconv.FormatInt(int64(g.remainingTime/time.Second), 10))
+
+	if g.IsPaused() {
+		g.drawPauseScreen(screen)
+	}
 }
 
 func (g *Game) Layout(int, int) (int, int) {
@@ -159,6 +174,17 @@ func (g *Game) reset() {
 
 func (g *Game) drawStartScreen(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{R: 5, G: 2, B: 2, A: 255})
+}
+
+func (g *Game) drawPauseScreen(screen *ebiten.Image) {
+	player := g.arena.player
+	str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
+	text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64, color.Black)
+
+	for i, player := range g.arena.remotePlayers {
+		str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
+		text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64+(i+1)*64, color.Black)
+	}
 }
 
 func (g *Game) watchRemainingTime() {
@@ -319,4 +345,26 @@ func loadLegendImage() *ebiten.Image {
 
 func remove(slice []*model.Diamond, s int) []*model.Diamond {
 	return append(slice[:s], slice[s+1:]...)
+}
+
+// Place this here for now
+var (
+	mplusNormalFont font.Face
+)
+
+func init() {
+	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	const dpi = 72
+	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    36,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
