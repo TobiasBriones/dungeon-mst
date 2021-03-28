@@ -57,6 +57,12 @@ func (g *Game) IsPaused() bool {
 
 func (g *Game) SetMatch(value *model.Match) {
 	g.match = value
+
+	g.arena.player.SetScore(0)
+
+	for _, player := range g.arena.remotePlayers {
+		player.SetScore(0)
+	}
 }
 
 func (g *Game) Update() error {
