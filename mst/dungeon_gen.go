@@ -9,11 +9,16 @@ import (
 	"dungeon-mst/geo"
 	"math"
 	"math/rand"
+	"time"
 )
 
 const n = 100000
 const maxWidthFactor = 8
 const maxHeightFactor = 5
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func GenerateDungeons(dimension geo.Dimension) []*model.Dungeon {
 	var dungeons []*model.Dungeon
