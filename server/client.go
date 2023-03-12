@@ -69,7 +69,11 @@ func (c *Client) Handle() {
 		select {
 		case <-c.quit:
 			if err := c.conn.Close(); err != nil {
-				log.Printf("Failed to close %s client connection: %v\n", c.id, err)
+				log.Printf(
+					"Failed to close %d client connection: %v\n",
+					c.id,
+					err,
+				)
 			}
 			return
 		case data := <-c.ch:
