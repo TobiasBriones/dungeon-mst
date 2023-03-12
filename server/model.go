@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/server/model"
+	"dungeon-mst/game/model"
 	"time"
 )
 

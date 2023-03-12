@@ -315,6 +315,7 @@ func getSize() geo.Dimension {
 func init() {
 	loadBg()
 	loadUser()
+	model.InitAssets()
 }
 
 func loadBg() {

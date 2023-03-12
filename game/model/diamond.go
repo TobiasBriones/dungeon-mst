@@ -14,9 +14,12 @@ const (
 	DiamondHeightPx = 26
 )
 
+var (
+	diamondImage *ebiten.Image
+)
+
 type Diamond struct {
-	rect  geo.Rect
-	image *ebiten.Image
+	rect geo.Rect
 }
 
 func (d *Diamond) Collides(rect *geo.Rect) bool {
@@ -31,7 +34,7 @@ func (d *Diamond) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(float64(d.rect.Left()), float64(d.rect.Top()))
-	screen.DrawImage(d.image, op)
+	screen.DrawImage(diamondImage, op)
 }
 
 func NewDiamond(point geo.Point) Diamond {
@@ -41,10 +44,8 @@ func NewDiamond(point geo.Point) Diamond {
 		point.X()+DiamondWidthPx,
 		point.Y()+DiamondHeightPx,
 	)
-	image := NewImageFromAssets("diamond.png")
 	return Diamond{
-		rect:  rect,
-		image: image,
+		rect: rect,
 	}
 }
 

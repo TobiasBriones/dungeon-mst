@@ -7,9 +7,7 @@ package model
 import (
 	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image"
-	"log"
 )
 
 const (
@@ -17,8 +15,8 @@ const (
 )
 
 var (
-	pathImage  = getPathImage()
-	pathYImage = getPathYImage()
+	pathImage  *ebiten.Image
+	pathYImage *ebiten.Image
 )
 
 type Path struct {
@@ -160,22 +158,4 @@ func NewLineJSON(l *Line) *LineJSON {
 		P1JSON: *NewPointJSON(&l.p1),
 		P2JSON: *NewPointJSON(&l.p2),
 	}
-}
-
-func getPathImage() *ebiten.Image {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/path.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
-}
-
-func getPathYImage() *ebiten.Image {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/path_y.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
 }

@@ -5,8 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/server/ai"
-	"dungeon-mst/server/model"
+	"dungeon-mst/game/model"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
@@ -127,7 +126,7 @@ func (h *Hub) Unregister(c *Client) {
 }
 
 func (h *Hub) init() {
-	h.match = ai.NewRandomMatch()
+	h.match = NewRandomMatch()
 	h.startTime = time.Now()
 }
 

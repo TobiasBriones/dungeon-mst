@@ -21,9 +21,9 @@ const (
 )
 
 var (
-	bgImage     = getDungeonBgImage()
-	brickImage  = getBrickImage()
-	brickYImage = getBrickYImage()
+	bgImage     *ebiten.Image
+	brickImage  *ebiten.Image
+	brickYImage *ebiten.Image
 )
 
 type Dungeon struct {
@@ -368,6 +368,38 @@ func GetDungeonHorizontalUnitSize() geo.Dimension {
 		horizontalUnitWidthPx,
 		horizontalUnitHeightPx,
 	)
+}
+
+// InitAssets TODO Temporal workaround
+func InitAssets() {
+	bgImage = getDungeonBgImage()
+	brickImage = getBrickImage()
+	brickYImage = getBrickYImage()
+
+	// path.go
+	pathImage = getPathImage()
+	pathYImage = getPathYImage()
+
+	// diamond.go
+	diamondImage = NewImageFromAssets("diamond.png")
+}
+
+func getPathImage() *ebiten.Image {
+	img, _, err := ebitenutil.NewImageFromFile("./assets/path.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
+}
+
+func getPathYImage() *ebiten.Image {
+	img, _, err := ebitenutil.NewImageFromFile("./assets/path_y.png")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
 }
 
 func min(a, b int) int {
