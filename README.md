@@ -12,7 +12,7 @@ Dungeon game implementing a MST algorithm to generate the random dungeons.
 
 Dungeon game implementing a MST algorithm to generate the random dungeons.
 
-Copyright © 2021-2022 Tobias Briones. All rights reserved.
+Copyright © 2021-2023 Tobias Briones. All rights reserved.
 
 ### License
 
