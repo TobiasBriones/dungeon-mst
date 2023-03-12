@@ -6,6 +6,7 @@ package main
 
 import (
 	"dungeon-mst/game/model"
+	"dungeon-mst/math"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -96,7 +97,7 @@ func (a *Arena) checkDiamondCollision(diamond *model.Diamond) bool {
 	return false
 }
 
-func (a *Arena) SetRemotePlayerPosition(id int, point *model.Point) {
+func (a *Arena) SetRemotePlayerPosition(id int, point *math.Point) {
 	for _, player := range a.remotePlayers {
 		if player.Id == id {
 			player.SetPosition(point.X(), point.Y())

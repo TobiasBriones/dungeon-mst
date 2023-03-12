@@ -4,9 +4,12 @@
 
 package ai
 
-import "dungeon-mst/game/model"
+import (
+	"dungeon-mst/game/model"
+	"dungeon-mst/math"
+)
 
-func NewRandomMatch(dimension model.Dimension) *model.Match {
+func NewRandomMatch(dimension math.Dimension) *model.Match {
 	dungeons := GenerateDungeons(dimension)
 	paths := GetPaths(dungeons)
 	diamonds := generateDiamonds(dungeons)

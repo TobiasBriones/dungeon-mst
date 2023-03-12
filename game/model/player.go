@@ -5,6 +5,7 @@
 package model
 
 import (
+	"dungeon-mst/math"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -60,8 +61,8 @@ func (p *Player) GetCharacter() *Runner {
 	return p.character
 }
 
-func (p *Player) GetPosition() Point {
-	return NewPoint(p.character.Rect.left, p.character.Rect.top)
+func (p *Player) GetPosition() math.Point {
+	return math.NewPoint(p.character.Rect.Left(), p.character.Rect.Top())
 }
 
 func (p *Player) SetPosition(x int, y int) {

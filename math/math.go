@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Tobias Briones. All rights reserved.
  */
 
-package model
+package math
 
 import (
 	"math"
@@ -166,7 +166,7 @@ func (r *Rect) InBounds(rect *Rect) bool {
 		r.bottom >= rect.Bottom()
 }
 
-func (r *Rect) setPosition(x int, y int) {
+func (r *Rect) SetPosition(x int, y int) {
 	if x < 0 || y < 0 {
 		panic("X and Y must be non-negative integer numbers")
 	}

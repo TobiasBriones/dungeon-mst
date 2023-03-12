@@ -6,6 +6,7 @@ package model
 
 import (
 	"bytes"
+	"dungeon-mst/math"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"image"
@@ -25,7 +26,7 @@ const (
 )
 
 type Runner struct {
-	Rect           Rect
+	Rect           math.Rect
 	Scale          float64
 	inputs         []int
 	count          int
@@ -149,7 +150,7 @@ func (r *Runner) isInsideDungeon() bool {
 }
 
 func (r *Runner) setPosition(x int, y int) {
-	r.Rect.setPosition(x, y)
+	r.Rect.SetPosition(x, y)
 }
 
 func (r *Runner) CheckDiamondCollision(diamond *Diamond) bool {
@@ -159,7 +160,7 @@ func (r *Runner) CheckDiamondCollision(diamond *Diamond) bool {
 func NewRunner() Runner {
 	scale := 1.0
 	runner := Runner{
-		Rect: NewRect(
+		Rect: math.NewRect(
 			0,
 			0,
 			int(frameWidth*scale),

@@ -6,6 +6,7 @@ package ai
 
 import (
 	"dungeon-mst/game/model"
+	math2 "dungeon-mst/math"
 	"math"
 	"math/rand"
 )
@@ -14,7 +15,7 @@ const n = 100000
 const maxWidthFactor = 8
 const maxHeightFactor = 5
 
-func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
+func GenerateDungeons(dimension math2.Dimension) []*model.Dungeon {
 	var dungeons []*model.Dungeon
 	minDim := getMinSize()
 	maxDim := getMaxSize()
@@ -28,8 +29,8 @@ func GenerateDungeons(dimension model.Dimension) []*model.Dungeon {
 		h := factor.Height * minDim.Width()
 		l := p.X() - w/2
 		t := p.Y() - h/2
-		p0 := model.NewPoint(l, t)
-		rect := model.NewRect(l, t, l+w, t+h)
+		p0 := math2.NewPoint(l, t)
+		rect := math2.NewRect(l, t, l+w, t+h)
 		shouldContinue := false
 
 		for _, dungeon := range dungeons {
@@ -108,7 +109,7 @@ func GetPaths(dungeons []*model.Dungeon) []*model.Path {
 				}
 
 				p2 := d2.Center()
-				distance := model.Distance(p1, p2)
+				distance := math2.Distance(p1, p2)
 
 				if distance < minDistance {
 					minDistance = distance
@@ -130,22 +131,22 @@ func GetPaths(dungeons []*model.Dungeon) []*model.Path {
 	return paths
 }
 
-func getMinSize() model.Dimension {
+func getMinSize() math2.Dimension {
 	size := model.GetDungeonHorizontalUnitSize()
 	baseSize := size.Width()
-	return model.NewDimension(baseSize, baseSize)
+	return math2.NewDimension(baseSize, baseSize)
 }
 
-func getMaxSize() model.Dimension {
+func getMaxSize() math2.Dimension {
 	size := model.GetDungeonHorizontalUnitSize()
 	baseSize := size.Width()
-	return model.NewDimension(maxWidthFactor*baseSize, maxHeightFactor*baseSize)
+	return math2.NewDimension(maxWidthFactor*baseSize, maxHeightFactor*baseSize)
 }
 
-func getRandomPoint(dimension model.Dimension, maxDim model.Dimension) model.Point {
+func getRandomPoint(dimension math2.Dimension, maxDim math2.Dimension) math2.Point {
 	cx := maxDim.SemiWidth() + int(float64(dimension.Width()-maxDim.Width())*rand.Float64())
 	cy := maxDim.SemiHeight() + int(float64(dimension.Height()-maxDim.Height())*rand.Float64())
-	return model.NewPoint(cx, cy)
+	return math2.NewPoint(cx, cy)
 }
 
 func getRandomFactor() model.DimensionFactor {
