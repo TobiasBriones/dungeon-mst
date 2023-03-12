@@ -20,4 +20,5 @@ This project is licensed under the [BSD 3-Clause License](LICENSE).
 
 ---
 
-- This project contains third-party resources. See [NOTICE](NOTICE) for more details.
+- This project contains third-party resources. See [NOTICE](NOTICE) for more
+  details.

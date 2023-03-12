@@ -4,7 +4,7 @@
 
 package ai
 
-import "game/model"
+import "dungeon-mst/game/model"
 
 func NewRandomMatch(dimension model.Dimension) *model.Match {
 	dungeons := GenerateDungeons(dimension)

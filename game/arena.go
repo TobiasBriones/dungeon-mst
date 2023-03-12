@@ -5,7 +5,7 @@
 package main
 
 import (
-	"game/model"
+	"dungeon-mst/game/model"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

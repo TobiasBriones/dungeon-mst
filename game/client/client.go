@@ -6,9 +6,9 @@ package client
 
 import (
 	"bufio"
+	"dungeon-mst/game/model"
 	"encoding/json"
 	"flag"
-	"game/model"
 	"log"
 	"net/url"
 	"os"

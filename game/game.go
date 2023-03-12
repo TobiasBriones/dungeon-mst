@@ -5,9 +5,9 @@
 package main
 
 import (
+	"dungeon-mst/game/client"
+	"dungeon-mst/game/model"
 	"encoding/json"
-	"game/client"
-	"game/model"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"

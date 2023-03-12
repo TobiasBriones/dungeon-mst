@@ -5,11 +5,11 @@
 package main
 
 import (
+	"dungeon-mst/server/ai"
+	"dungeon-mst/server/model"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
-	"server/ai"
-	"server/model"
 	"strconv"
 	"time"
 )

@@ -5,9 +5,9 @@
 package ai
 
 import (
+	"dungeon-mst/server/model"
 	"math"
 	"math/rand"
-	"server/model"
 	"time"
 )
 
