@@ -5,7 +5,7 @@
 package model
 
 import (
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -15,11 +15,11 @@ const (
 )
 
 type Diamond struct {
-	rect  math.Rect
+	rect  geo.Rect
 	image *ebiten.Image
 }
 
-func (d *Diamond) Collides(rect *math.Rect) bool {
+func (d *Diamond) Collides(rect *geo.Rect) bool {
 	return d.rect.Intersects(rect)
 }
 
@@ -34,8 +34,8 @@ func (d *Diamond) Draw(screen *ebiten.Image) {
 	screen.DrawImage(d.image, op)
 }
 
-func NewDiamond(point math.Point) Diamond {
-	rect := math.NewRect(
+func NewDiamond(point geo.Point) Diamond {
+	rect := geo.NewRect(
 		point.X(),
 		point.Y(),
 		point.X()+DiamondWidthPx,
@@ -49,7 +49,7 @@ func NewDiamond(point math.Point) Diamond {
 }
 
 type DiamondJSON struct {
-	*math.PointJSON
+	*geo.PointJSON
 }
 
 func (d *DiamondJSON) ToDiamond() *Diamond {
@@ -58,6 +58,6 @@ func (d *DiamondJSON) ToDiamond() *Diamond {
 }
 
 func NewDiamondJSON(d *Diamond) *DiamondJSON {
-	point := math.NewPoint(d.rect.Left(), d.rect.Top())
-	return &DiamondJSON{math.NewPointJSON(&point)}
+	point := geo.NewPoint(d.rect.Left(), d.rect.Top())
+	return &DiamondJSON{geo.NewPointJSON(&point)}
 }

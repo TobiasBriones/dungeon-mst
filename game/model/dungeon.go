@@ -5,7 +5,7 @@
 package model
 
 import (
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image"
@@ -27,7 +27,7 @@ var (
 )
 
 type Dungeon struct {
-	rect    math.Rect
+	rect    geo.Rect
 	barrier Barrier
 }
 
@@ -47,8 +47,8 @@ func (d *Dungeon) Cy() int {
 	return d.rect.Cy()
 }
 
-func (d *Dungeon) Center() math.Point {
-	return math.NewPoint(d.Cx(), d.Cy())
+func (d *Dungeon) Center() geo.Point {
+	return geo.NewPoint(d.Cx(), d.Cy())
 }
 
 func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
@@ -57,31 +57,31 @@ func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
 	hp2x := max(center.X(), dungeon.Cx())
 	hpy := dungeon.Cy()
 	hl := Line{
-		math.NewPoint(hp1x, hpy),
-		math.NewPoint(hp2x, hpy),
+		geo.NewPoint(hp1x, hpy),
+		geo.NewPoint(hp2x, hpy),
 	}
 
 	vp1x := center.X()
 	vp1y := min(center.Y(), dungeon.Cy())
 	vp2y := max(center.Y(), dungeon.Cy())
 	vl := Line{
-		math.NewPoint(vp1x, vp1y),
-		math.NewPoint(vp1x, vp2y),
+		geo.NewPoint(vp1x, vp1y),
+		geo.NewPoint(vp1x, vp2y),
 	}
 
 	path := NewPath(hl, vl)
 	return &path
 }
 
-func (d *Dungeon) Intersects(rect *math.Rect) bool {
+func (d *Dungeon) Intersects(rect *geo.Rect) bool {
 	return d.rect.Intersects(rect)
 }
 
-func (d *Dungeon) InBounds(rect *math.Rect) bool {
+func (d *Dungeon) InBounds(rect *geo.Rect) bool {
 	return d.rect.InBounds(rect)
 }
 
-func (d *Dungeon) CanMoveTowards(movement Movement, rect *math.Rect) bool {
+func (d *Dungeon) CanMoveTowards(movement Movement, rect *geo.Rect) bool {
 	if !d.InBounds(rect) {
 		return true
 	}
@@ -103,18 +103,18 @@ func (d *Dungeon) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bgImage.SubImage(rect).(*ebiten.Image), op)
 }
 
-func (d *Dungeon) RandomPoint(p int) math.Point {
+func (d *Dungeon) RandomPoint(p int) geo.Point {
 	x := rand.Intn(d.Width()-wallWidth*2-p) + d.rect.Left() + wallWidth
 	y := rand.Intn(d.Height()-wallWidth*2-p) + d.rect.Top() + wallWidth
-	return math.NewPoint(x, y)
+	return geo.NewPoint(x, y)
 }
 
-func NewDungeon(p0 math.Point, factor DimensionFactor) Dungeon {
+func NewDungeon(p0 geo.Point, factor DimensionFactor) Dungeon {
 	x0 := p0.X()
 	y0 := p0.Y()
 	w := factor.Width * horizontalUnitWidthPx
 	h := factor.Height * horizontalUnitWidthPx
-	rect := math.NewRect(x0, y0, x0+w, y0+h)
+	rect := geo.NewRect(x0, y0, x0+w, y0+h)
 	barrier := NewBarrier(rect, factor)
 	return Dungeon{
 		rect,
@@ -129,7 +129,7 @@ type DungeonJSON struct {
 
 func (d *DungeonJSON) ToDungeon() *Dungeon {
 	dungeon := NewDungeon(
-		math.NewPoint(d.RectJSON.Left, d.RectJSON.Top),
+		geo.NewPoint(d.RectJSON.Left, d.RectJSON.Top),
 		*d.BarrierJSON.Factor,
 	)
 	return &dungeon
@@ -151,8 +151,8 @@ type RectJSON struct {
 	Bottom int
 }
 
-func (r *RectJSON) ToRect() *math.Rect {
-	rect := math.NewRect(
+func (r *RectJSON) ToRect() *geo.Rect {
+	rect := geo.NewRect(
 		r.Left,
 		r.Top,
 		r.Right,
@@ -161,7 +161,7 @@ func (r *RectJSON) ToRect() *math.Rect {
 	return &rect
 }
 
-func NewRectJSON(r *math.Rect) *RectJSON {
+func NewRectJSON(r *geo.Rect) *RectJSON {
 	return &RectJSON{
 		r.Left(),
 		r.Top(),
@@ -176,7 +176,7 @@ type DimensionFactor struct {
 }
 
 type Wall struct {
-	rect  math.Rect
+	rect  geo.Rect
 	image *ebiten.Image
 }
 
@@ -201,7 +201,7 @@ type Barrier struct {
 	bottomWall Wall
 }
 
-func (b *Barrier) WillCollide(movement Movement, objRect *math.Rect) bool {
+func (b *Barrier) WillCollide(movement Movement, objRect *geo.Rect) bool {
 	return WillCollide(movement, &b.leftWall.rect, objRect) ||
 		WillCollide(movement, &b.topWall.rect, objRect) ||
 		WillCollide(movement, &b.rightWall.rect, objRect) ||
@@ -247,11 +247,11 @@ func (b *Barrier) Draw(screen *ebiten.Image) {
 	}
 }
 
-func NewBarrier(rect math.Rect, factor DimensionFactor) Barrier {
+func NewBarrier(rect geo.Rect, factor DimensionFactor) Barrier {
 	return Barrier{
 		factor: factor,
 		leftWall: Wall{
-			rect: math.NewRect(
+			rect: geo.NewRect(
 				rect.Left(),
 				rect.Top(),
 				rect.Left()+wallWidth,
@@ -260,7 +260,7 @@ func NewBarrier(rect math.Rect, factor DimensionFactor) Barrier {
 			image: brickYImage,
 		},
 		topWall: Wall{
-			rect: math.NewRect(
+			rect: geo.NewRect(
 				rect.Left(),
 				rect.Top(),
 				rect.Right(),
@@ -269,7 +269,7 @@ func NewBarrier(rect math.Rect, factor DimensionFactor) Barrier {
 			image: brickImage,
 		},
 		rightWall: Wall{
-			rect: math.NewRect(
+			rect: geo.NewRect(
 				rect.Right()-wallWidth,
 				rect.Top(),
 				rect.Right(),
@@ -278,7 +278,7 @@ func NewBarrier(rect math.Rect, factor DimensionFactor) Barrier {
 			image: brickYImage,
 		},
 		bottomWall: Wall{
-			rect: math.NewRect(
+			rect: geo.NewRect(
 				rect.Left(),
 				rect.Bottom()-wallWidth,
 				rect.Right(),
@@ -299,7 +299,7 @@ type BarrierJSON struct {
 
 func (b *BarrierJSON) ToBarrier() *Barrier {
 	factor := b.Factor
-	rect := math.NewRect(
+	rect := geo.NewRect(
 		b.LeftWallJSON.RectJSON.Left,
 		b.TopWallJSON.RectJSON.Top,
 		b.RightWallJSON.RectJSON.Right,
@@ -346,8 +346,8 @@ func getBrickYImage() *ebiten.Image {
 	return brickYImg
 }
 
-func GetDungeonHorizontalUnitSize() math.Dimension {
-	return math.NewDimension(
+func GetDungeonHorizontalUnitSize() geo.Dimension {
+	return geo.NewDimension(
 		horizontalUnitWidthPx,
 		horizontalUnitHeightPx,
 	)

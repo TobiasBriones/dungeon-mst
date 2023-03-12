@@ -6,7 +6,7 @@ package mst
 
 import (
 	"dungeon-mst/game/model"
-	geo "dungeon-mst/math"
+	"dungeon-mst/geo"
 	"math"
 	"math/rand"
 )

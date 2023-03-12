@@ -4,7 +4,7 @@
 
 package model
 
-import "dungeon-mst/math"
+import "dungeon-mst/geo"
 
 const (
 	MoveNone      = -1
@@ -28,7 +28,7 @@ func (m *MovementJSON) ToMovement() *Movement {
 	return &Movement{m.Direction, m.Length}
 }
 
-func CheckMovement(movement Movement, rect *math.Rect, host math.Rect) bool {
+func CheckMovement(movement Movement, rect *geo.Rect, host geo.Rect) bool {
 	if movement.direction == MoveDirLeft {
 		return rect.Left()-movement.length > host.Left()
 	} else if movement.direction == MoveDirTop {
@@ -41,12 +41,12 @@ func CheckMovement(movement Movement, rect *math.Rect, host math.Rect) bool {
 	return false
 }
 
-func WillCollide(movement Movement, rect *math.Rect, objRect *math.Rect) bool {
+func WillCollide(movement Movement, rect *geo.Rect, objRect *geo.Rect) bool {
 	dst := Move(objRect, movement)
 	return rect.Intersects(dst)
 }
 
-func Move(rect *math.Rect, movement Movement) *math.Rect {
+func Move(rect *geo.Rect, movement Movement) *geo.Rect {
 	length := movement.length
 	dst := rect.Clone()
 

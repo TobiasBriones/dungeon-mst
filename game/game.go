@@ -7,7 +7,7 @@ package main
 import (
 	"dungeon-mst/game/client"
 	"dungeon-mst/game/model"
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -93,7 +93,7 @@ func (g *Game) Update() error {
 	update := &client.Update{
 		Id: user.Id,
 		//Move: move,
-		PointJSON:    *math.NewPointJSON(&position),
+		PointJSON:    *geo.NewPointJSON(&position),
 		DiamondIndex: diamondIndex,
 	}
 	g.sendUpdateCh <- update
@@ -308,8 +308,8 @@ func newGame() Game {
 	return game
 }
 
-func getSize() math.Dimension {
-	return math.NewDimension(screenWidth, screenHeight)
+func getSize() geo.Dimension {
+	return geo.NewDimension(screenWidth, screenHeight)
 }
 
 func init() {

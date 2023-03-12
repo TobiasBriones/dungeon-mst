@@ -6,10 +6,10 @@ package mst
 
 import (
 	"dungeon-mst/game/model"
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 )
 
-func NewRandomMatch(dimension math.Dimension) *model.Match {
+func NewRandomMatch(dimension geo.Dimension) *model.Match {
 	dungeons := GenerateDungeons(dimension)
 	paths := GetPaths(dungeons)
 	diamonds := generateDiamonds(dungeons)

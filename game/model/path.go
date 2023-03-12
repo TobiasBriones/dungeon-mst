@@ -5,7 +5,7 @@
 package model
 
 import (
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image"
@@ -23,16 +23,16 @@ var (
 
 type Path struct {
 	hLine Line
-	hRect math.Rect
+	hRect geo.Rect
 	vLine Line
-	vRect math.Rect
+	vRect geo.Rect
 }
 
-func (p *Path) InBounds(rect *math.Rect) bool {
+func (p *Path) InBounds(rect *geo.Rect) bool {
 	return p.hRect.InBounds(rect) || p.vRect.InBounds(rect)
 }
 
-func (p *Path) CanMoveTowards(movement Movement, rect *math.Rect) bool {
+func (p *Path) CanMoveTowards(movement Movement, rect *geo.Rect) bool {
 	if !p.InBounds(rect) {
 		return true
 	}
@@ -93,13 +93,13 @@ func NewPath(hl Line, vl Line) Path {
 		panic("The point 1 of the vertical line must be the lowest")
 	}
 	sw := PathWidthPx / 2
-	hRect := math.NewRect(
+	hRect := geo.NewRect(
 		hl.p1.X()-sw,
 		hl.p1.Y()-sw,
 		hl.p2.X()+sw,
 		hl.p1.Y()+sw,
 	)
-	vRect := math.NewRect(
+	vRect := geo.NewRect(
 		vl.p1.X()-sw,
 		vl.p1.Y()-sw,
 		vl.p1.X()+sw,
@@ -126,12 +126,12 @@ func NewPathJSON(p *Path) *PathJSON {
 }
 
 type Line struct {
-	p1 math.Point
-	p2 math.Point
+	p1 geo.Point
+	p2 geo.Point
 }
 
 func (l *Line) IsDegenerate() bool {
-	return math.Distance(l.p1, l.p2) == 0
+	return geo.Distance(l.p1, l.p2) == 0
 }
 
 func (l *Line) IsHorizontal() bool {
@@ -143,8 +143,8 @@ func (l *Line) IsVertical() bool {
 }
 
 type LineJSON struct {
-	P1JSON math.PointJSON
-	P2JSON math.PointJSON
+	P1JSON geo.PointJSON
+	P2JSON geo.PointJSON
 }
 
 func (l *LineJSON) ToLine() *Line {
@@ -157,8 +157,8 @@ func (l *LineJSON) ToLine() *Line {
 
 func NewLineJSON(l *Line) *LineJSON {
 	return &LineJSON{
-		P1JSON: *math.NewPointJSON(&l.p1),
-		P2JSON: *math.NewPointJSON(&l.p2),
+		P1JSON: *geo.NewPointJSON(&l.p1),
+		P2JSON: *geo.NewPointJSON(&l.p2),
 	}
 }
 

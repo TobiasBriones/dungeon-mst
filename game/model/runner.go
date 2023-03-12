@@ -6,7 +6,7 @@ package model
 
 import (
 	"bytes"
-	"dungeon-mst/math"
+	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"image"
@@ -26,7 +26,7 @@ const (
 )
 
 type Runner struct {
-	Rect           math.Rect
+	Rect           geo.Rect
 	Scale          float64
 	inputs         []int
 	count          int
@@ -160,7 +160,7 @@ func (r *Runner) CheckDiamondCollision(diamond *Diamond) bool {
 func NewRunner() Runner {
 	scale := 1.0
 	runner := Runner{
-		Rect: math.NewRect(
+		Rect: geo.NewRect(
 			0,
 			0,
 			int(frameWidth*scale),
