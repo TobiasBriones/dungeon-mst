@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // This file is part of https://github.com/tobiasbriones/dungeon-mst
 
-package model
+package dungeon
 
 import (
+	"dungeon-mst/game/model"
 	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -381,7 +382,7 @@ func InitAssets() {
 	pathYImage = getPathYImage()
 
 	// diamond.go
-	diamondImage = NewImageFromAssets("diamond.png")
+	diamondImage = model.NewImageFromAssets("diamond.png")
 }
 
 func getPathImage() *ebiten.Image {

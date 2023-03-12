@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"time"
 )
 
@@ -24,7 +24,7 @@ type ResponseData struct {
 }
 
 type MatchInit struct {
-	MatchJSON     *model.MatchJSON
+	MatchJSON     *dungeon.MatchJSON
 	RemainingTime time.Duration
 	Players       []*PlayerJoin
 }
@@ -36,13 +36,13 @@ type JoinAccepted struct {
 type PlayerJoin struct {
 	Id        int
 	Name      string
-	PointJSON model.PointJSON
+	PointJSON dungeon.PointJSON
 	Score     int
 }
 
 type Update struct {
 	Id int
 	//Move int // use point for now
-	PointJSON    model.PointJSON
+	PointJSON    dungeon.PointJSON
 	DiamondIndex int
 }

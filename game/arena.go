@@ -5,14 +5,14 @@
 package main
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Arena struct {
-	player            *model.Player
-	remotePlayers     []*model.Player
+	player            *dungeon.Player
+	remotePlayers     []*dungeon.Player
 	onCharacterMotion OnCharacterMotion
 }
 
@@ -66,13 +66,13 @@ func (a *Arena) updatePlayerInputs() {
 		if ebiten.IsKeyPressed(k) {
 			switch k {
 			case ebiten.KeyUp, ebiten.KeyW:
-				pushInput(model.MoveDirTop)
+				pushInput(dungeon.MoveDirTop)
 			case ebiten.KeyDown, ebiten.KeyS:
-				pushInput(model.MoveDirBottom)
+				pushInput(dungeon.MoveDirBottom)
 			case ebiten.KeyLeft, ebiten.KeyA:
-				pushInput(model.MoveDirLeft)
+				pushInput(dungeon.MoveDirLeft)
 			case ebiten.KeyRight, ebiten.KeyD:
-				pushInput(model.MoveDirRight)
+				pushInput(dungeon.MoveDirRight)
 			}
 		}
 	}
@@ -87,7 +87,7 @@ func (a *Arena) updateRemotePlayers(update SetCurrentDungeonAndPaths) {
 	}
 }
 
-func (a *Arena) checkDiamondCollision(diamond *model.Diamond) bool {
+func (a *Arena) checkDiamondCollision(diamond *dungeon.Diamond) bool {
 	collides := a.player.GetCharacter().CheckDiamondCollision(diamond)
 
 	if collides {
@@ -139,17 +139,17 @@ func (a *Arena) SetRemotePlayerScore(id int) {
 }
 
 func NewArena(playerName string) Arena {
-	player := model.NewPlayer(playerName)
-	return Arena{player: &player, remotePlayers: []*model.Player{}}
+	player := dungeon.NewPlayer(playerName)
+	return Arena{player: &player, remotePlayers: []*dungeon.Player{}}
 }
 
 type OnCharacterMotion func(int)
 
-type SetCurrentDungeonAndPaths func(runner *model.Runner)
+type SetCurrentDungeonAndPaths func(runner *dungeon.Runner)
 
-func buildPlayer(id int, name string) *model.Player {
-	var newPlayer = func() *model.Player {
-		player := model.NewPlayer(name)
+func buildPlayer(id int, name string) *dungeon.Player {
+	var newPlayer = func() *dungeon.Player {
+		player := dungeon.NewPlayer(name)
 		player.Id = id
 		return &player
 	}

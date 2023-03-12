@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
@@ -13,7 +13,7 @@ import (
 )
 
 type Client struct {
-	PointJSON model.PointJSON
+	PointJSON dungeon.PointJSON
 	Score     int
 	id        int
 	name      string
@@ -22,8 +22,8 @@ type Client struct {
 	quit      chan struct{}
 }
 
-func (c *Client) InitGame(match *model.Match, time time.Duration, players []*PlayerJoin) {
-	matchJSON := model.NewMatchJSON(match)
+func (c *Client) InitGame(match *dungeon.Match, time time.Duration, players []*PlayerJoin) {
+	matchJSON := dungeon.NewMatchJSON(match)
 	matchInit := &MatchInit{
 		MatchJSON:     matchJSON,
 		RemainingTime: time,

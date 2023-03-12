@@ -5,7 +5,7 @@
 package mst
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"dungeon-mst/geo"
 	"math"
 	"math/rand"
@@ -20,8 +20,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func GenerateDungeons(dimension geo.Dimension) []*model.Dungeon {
-	var dungeons []*model.Dungeon
+func GenerateDungeons(dimension geo.Dimension) []*dungeon.Dungeon {
+	var dungeons []*dungeon.Dungeon
 	minDim := getMinSize()
 	maxDim := getMaxSize()
 	xMap := map[int]bool{}
@@ -49,12 +49,12 @@ func GenerateDungeons(dimension geo.Dimension) []*model.Dungeon {
 		}
 
 		// Check if there's a dungeon aligned to this one already
-		for i := 0; i <= model.PathWidthPx; i++ {
+		for i := 0; i <= dungeon.PathWidthPx; i++ {
 			if xMap[rect.Left()+i] ||
-				xMap[rect.Cx()-model.PathWidthPx/2+i] ||
+				xMap[rect.Cx()-dungeon.PathWidthPx/2+i] ||
 				xMap[rect.Right()-i] ||
 				yMap[rect.Top()+i] ||
-				yMap[rect.Cy()-model.PathWidthPx/2+i] ||
+				yMap[rect.Cy()-dungeon.PathWidthPx/2+i] ||
 				yMap[rect.Bottom()-i] {
 				shouldContinue = true
 				break
@@ -73,26 +73,26 @@ func GenerateDungeons(dimension geo.Dimension) []*model.Dungeon {
 		yMap[rect.Bottom()] = true
 
 		// Fill wall widths to avoid paths colliding with walls
-		for i := 1; i <= model.PathWidthPx; i++ {
+		for i := 1; i <= dungeon.PathWidthPx; i++ {
 			xMap[rect.Left()+i] = true
 			xMap[rect.Right()-i] = true
-			xMap[rect.Cx()-model.PathWidthPx/2+i] = true
+			xMap[rect.Cx()-dungeon.PathWidthPx/2+i] = true
 			yMap[rect.Top()+i] = true
 			yMap[rect.Bottom()-i] = true
-			yMap[rect.Cy()-model.PathWidthPx/2+i] = true
+			yMap[rect.Cy()-dungeon.PathWidthPx/2+i] = true
 		}
 
 		// Add the dungeon
-		dungeon := model.NewDungeon(p0, factor)
+		dungeon := dungeon.NewDungeon(p0, factor)
 		dungeons = append(dungeons, &dungeon)
 	}
 	return dungeons
 }
 
-func GetPaths(dungeons []*model.Dungeon) []*model.Path {
-	var paths []*model.Path
-	var tree []*model.Dungeon
-	done := map[*model.Dungeon]bool{}
+func GetPaths(dungeons []*dungeon.Dungeon) []*dungeon.Path {
+	var paths []*dungeon.Path
+	var tree []*dungeon.Dungeon
+	done := map[*dungeon.Dungeon]bool{}
 
 	tree = append(tree, dungeons[0])
 	done[dungeons[0]] = true
@@ -101,8 +101,8 @@ func GetPaths(dungeons []*model.Dungeon) []*model.Path {
 		if len(tree) == len(dungeons) {
 			break
 		}
-		var a *model.Dungeon
-		var b *model.Dungeon
+		var a *dungeon.Dungeon
+		var b *dungeon.Dungeon
 		minDistance := 100000
 
 		for _, d1 := range tree {
@@ -137,13 +137,13 @@ func GetPaths(dungeons []*model.Dungeon) []*model.Path {
 }
 
 func getMinSize() geo.Dimension {
-	size := model.GetDungeonHorizontalUnitSize()
+	size := dungeon.GetDungeonHorizontalUnitSize()
 	baseSize := size.Width()
 	return geo.NewDimension(baseSize, baseSize)
 }
 
 func getMaxSize() geo.Dimension {
-	size := model.GetDungeonHorizontalUnitSize()
+	size := dungeon.GetDungeonHorizontalUnitSize()
 	baseSize := size.Width()
 	return geo.NewDimension(maxWidthFactor*baseSize, maxHeightFactor*baseSize)
 }
@@ -154,8 +154,8 @@ func getRandomPoint(dimension geo.Dimension, maxDim geo.Dimension) geo.Point {
 	return geo.NewPoint(cx, cy)
 }
 
-func getRandomFactor() model.DimensionFactor {
+func getRandomFactor() dungeon.DimensionFactor {
 	wFactor := 1 + int(math.Floor(float64(maxWidthFactor)*rand.Float64()))
 	hFactor := 1 + int(math.Floor(float64(maxHeightFactor)*rand.Float64()))
-	return model.DimensionFactor{Width: wFactor, Height: hFactor}
+	return dungeon.DimensionFactor{Width: wFactor, Height: hFactor}
 }

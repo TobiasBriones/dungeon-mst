@@ -5,8 +5,8 @@
 package main
 
 import (
+	"dungeon-mst/dungeon"
 	"dungeon-mst/game/client"
-	"dungeon-mst/game/model"
 	"dungeon-mst/geo"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -39,7 +39,7 @@ type User struct {
 }
 
 type Game struct {
-	match         *model.Match
+	match         *dungeon.Match
 	arena         *Arena
 	count         int
 	legendImage   *ebiten.Image
@@ -56,7 +56,7 @@ func (g *Game) IsPaused() bool {
 	return len(g.match.Diamonds) == 0
 }
 
-func (g *Game) SetMatch(value *model.Match) {
+func (g *Game) SetMatch(value *dungeon.Match) {
 	g.match = value
 
 	g.arena.player.SetScore(0)
@@ -93,7 +93,7 @@ func (g *Game) Update() error {
 	update := &client.Update{
 		Id: user.Id,
 		//Move: move,
-		PointJSON:    *model.NewPointJSON(&position),
+		PointJSON:    *dungeon.NewPointJSON(&position),
 		DiamondIndex: diamondIndex,
 	}
 	g.sendUpdateCh <- update
@@ -152,9 +152,9 @@ func (g *Game) onCharacterMotion(move int) {
 
 }
 
-func (g *Game) setCurrentDungeonAndPaths(runner *model.Runner) {
-	var currentDungeon *model.Dungeon = nil
-	var currentPaths []*model.Path
+func (g *Game) setCurrentDungeonAndPaths(runner *dungeon.Runner) {
+	var currentDungeon *dungeon.Dungeon = nil
+	var currentPaths []*dungeon.Path
 
 	for _, dungeon := range g.match.Dungeons {
 		if dungeon.InBounds(&runner.Rect) {
@@ -315,7 +315,7 @@ func getSize() geo.Dimension {
 func init() {
 	loadBg()
 	loadUser()
-	model.InitAssets()
+	dungeon.InitAssets()
 }
 
 func loadBg() {
@@ -351,7 +351,7 @@ func loadLegendImage() *ebiten.Image {
 	return img
 }
 
-func remove(slice []*model.Diamond, s int) []*model.Diamond {
+func remove(slice []*dungeon.Diamond, s int) []*dungeon.Diamond {
 	return append(slice[:s], slice[s+1:]...)
 }
 

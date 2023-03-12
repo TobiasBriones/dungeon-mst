@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"dungeon-mst/geo"
 	"dungeon-mst/mst"
 )
@@ -15,7 +15,7 @@ const (
 	screenHeight = 720
 )
 
-func NewRandomMatch() *model.Match {
+func NewRandomMatch() *dungeon.Match {
 	dimension := geo.NewDimension(screenWidth, screenHeight)
 	return mst.NewRandomMatch(dimension)
 }

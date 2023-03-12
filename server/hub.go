@@ -5,7 +5,7 @@
 package main
 
 import (
-	"dungeon-mst/game/model"
+	"dungeon-mst/dungeon"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
@@ -21,7 +21,7 @@ type Hub struct {
 	unregister chan *Client
 	broadcast  chan *ResponseData
 	quit       chan struct{}
-	match      *model.Match
+	match      *dungeon.Match
 	startTime  time.Time
 }
 
@@ -77,7 +77,7 @@ func (h *Hub) Start() {
 		for {
 			time.Sleep(matchDuration)
 			h.init()
-			matchJSON := model.NewMatchJSON(h.match)
+			matchJSON := dungeon.NewMatchJSON(h.match)
 			matchInit := &MatchInit{
 				MatchJSON:     matchJSON,
 				RemainingTime: matchDuration,
@@ -139,7 +139,7 @@ func (h *Hub) delete(client *Client) {
 }
 
 func (h *Hub) listen(client *Client) {
-	remove := func(slice []*model.Diamond, s int) []*model.Diamond {
+	remove := func(slice []*dungeon.Diamond, s int) []*dungeon.Diamond {
 		return append(slice[:s], slice[s+1:]...)
 	}
 	conn := client.conn
