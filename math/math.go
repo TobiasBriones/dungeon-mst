@@ -245,32 +245,6 @@ func NewRect(left int, top int, right int, bottom int) Rect {
 	return Rect{left, top, right, bottom}
 }
 
-type RectJSON struct {
-	Left   int
-	Top    int
-	Right  int
-	Bottom int
-}
-
-func (r *RectJSON) ToRect() *Rect {
-	rect := NewRect(
-		r.Left,
-		r.Top,
-		r.Right,
-		r.Bottom,
-	)
-	return &rect
-}
-
-func NewRectJSON(r *Rect) *RectJSON {
-	return &RectJSON{
-		r.left,
-		r.top,
-		r.right,
-		r.bottom,
-	}
-}
-
 func Distance(p1 Point, p2 Point) int {
 	dx := p1.X() - p2.X()
 	dy := p1.Y() - p2.Y()

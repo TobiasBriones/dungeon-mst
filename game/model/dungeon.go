@@ -123,7 +123,7 @@ func NewDungeon(p0 math.Point, factor DimensionFactor) Dungeon {
 }
 
 type DungeonJSON struct {
-	*math.RectJSON
+	*RectJSON
 	*BarrierJSON
 }
 
@@ -136,11 +136,37 @@ func (d *DungeonJSON) ToDungeon() *Dungeon {
 }
 
 func NewDungeonJSON(d *Dungeon) *DungeonJSON {
-	rect := math.NewRectJSON(&d.rect)
+	rect := NewRectJSON(&d.rect)
 	barrier := NewBarrierJSON(&d.barrier)
 	return &DungeonJSON{
 		RectJSON:    rect,
 		BarrierJSON: barrier,
+	}
+}
+
+type RectJSON struct {
+	Left   int
+	Top    int
+	Right  int
+	Bottom int
+}
+
+func (r *RectJSON) ToRect() *math.Rect {
+	rect := math.NewRect(
+		r.Left,
+		r.Top,
+		r.Right,
+		r.Bottom,
+	)
+	return &rect
+}
+
+func NewRectJSON(r *math.Rect) *RectJSON {
+	return &RectJSON{
+		r.Left(),
+		r.Top(),
+		r.Right(),
+		r.Bottom(),
 	}
 }
 
@@ -155,7 +181,7 @@ type Wall struct {
 }
 
 type WallJSON struct {
-	*math.RectJSON
+	*RectJSON
 }
 
 func (w *WallJSON) ToWall() *Wall {
@@ -164,7 +190,7 @@ func (w *WallJSON) ToWall() *Wall {
 }
 
 func NewWallJSON(w *Wall) *WallJSON {
-	return &WallJSON{math.NewRectJSON(&w.rect)}
+	return &WallJSON{NewRectJSON(&w.rect)}
 }
 
 type Barrier struct {
