@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Tobias Briones. All rights reserved.
  */
 
-package ai
+package mst
 
 import (
 	"dungeon-mst/game/model"
