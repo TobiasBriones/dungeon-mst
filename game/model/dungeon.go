@@ -144,6 +144,23 @@ func NewDungeonJSON(d *Dungeon) *DungeonJSON {
 	}
 }
 
+type PointJSON struct {
+	X int
+	Y int
+}
+
+func (p *PointJSON) ToPoint() *geo.Point {
+	point := geo.NewPoint(p.X, p.Y)
+	return &point
+
+}
+
+func NewPointJSON(p *geo.Point) *PointJSON {
+	return &PointJSON{
+		p.X(), p.Y(),
+	}
+}
+
 type RectJSON struct {
 	Left   int
 	Top    int

@@ -143,8 +143,8 @@ func (l *Line) IsVertical() bool {
 }
 
 type LineJSON struct {
-	P1JSON geo.PointJSON
-	P2JSON geo.PointJSON
+	P1JSON PointJSON
+	P2JSON PointJSON
 }
 
 func (l *LineJSON) ToLine() *Line {
@@ -157,8 +157,8 @@ func (l *LineJSON) ToLine() *Line {
 
 func NewLineJSON(l *Line) *LineJSON {
 	return &LineJSON{
-		P1JSON: *geo.NewPointJSON(&l.p1),
-		P2JSON: *geo.NewPointJSON(&l.p2),
+		P1JSON: *NewPointJSON(&l.p1),
+		P2JSON: *NewPointJSON(&l.p2),
 	}
 }
 

@@ -7,7 +7,6 @@ package client
 import (
 	"bufio"
 	"dungeon-mst/game/model"
-	"dungeon-mst/geo"
 	"encoding/json"
 	"flag"
 	"log"
@@ -34,7 +33,7 @@ type JoinAccepted struct {
 type PlayerJoin struct {
 	Id        int
 	Name      string
-	PointJSON geo.PointJSON
+	PointJSON model.PointJSON
 	Score     int
 }
 
@@ -48,7 +47,7 @@ type MatchInit struct {
 type Update struct {
 	Id int
 	//Move int // use point for now
-	PointJSON    geo.PointJSON
+	PointJSON    model.PointJSON
 	DiamondIndex int
 }
 

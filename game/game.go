@@ -93,7 +93,7 @@ func (g *Game) Update() error {
 	update := &client.Update{
 		Id: user.Id,
 		//Move: move,
-		PointJSON:    *geo.NewPointJSON(&position),
+		PointJSON:    *model.NewPointJSON(&position),
 		DiamondIndex: diamondIndex,
 	}
 	g.sendUpdateCh <- update

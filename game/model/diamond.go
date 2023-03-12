@@ -49,7 +49,7 @@ func NewDiamond(point geo.Point) Diamond {
 }
 
 type DiamondJSON struct {
-	*geo.PointJSON
+	*PointJSON
 }
 
 func (d *DiamondJSON) ToDiamond() *Diamond {
@@ -59,5 +59,5 @@ func (d *DiamondJSON) ToDiamond() *Diamond {
 
 func NewDiamondJSON(d *Diamond) *DiamondJSON {
 	point := geo.NewPoint(d.rect.Left(), d.rect.Top())
-	return &DiamondJSON{geo.NewPointJSON(&point)}
+	return &DiamondJSON{NewPointJSON(&point)}
 }

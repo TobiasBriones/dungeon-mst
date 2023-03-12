@@ -32,23 +32,6 @@ func NewPoint(x int, y int) Point {
 	return Point{x, y}
 }
 
-type PointJSON struct {
-	X int
-	Y int
-}
-
-func (p *PointJSON) ToPoint() *Point {
-	point := NewPoint(p.X, p.Y)
-	return &point
-
-}
-
-func NewPointJSON(p *Point) *PointJSON {
-	return &PointJSON{
-		p.x, p.y,
-	}
-}
-
 type PointPair struct {
 	PointA Point
 	PointB Point
