@@ -27,6 +27,17 @@ var (
 	brickYImage *ebiten.Image
 )
 
+type Entity uint8
+
+const (
+	DungeonEntity Entity = iota
+	DiamondEntity
+	MatchEntity
+	PathEntity
+	PlayerEntity
+	RunnerEntity
+)
+
 type Dungeon struct {
 	rect    geo.Rect
 	barrier Barrier
