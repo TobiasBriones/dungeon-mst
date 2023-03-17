@@ -5,6 +5,7 @@
 package graphic
 
 import (
+	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
@@ -21,4 +22,23 @@ func NewGraphicFromAssets(name string) *Graphic {
 		log.Fatal(err)
 	}
 	return &Graphic{image}
+}
+
+type Drawing struct {
+	*Graphic
+	*geo.Rect
+}
+
+func NewDrawing(graphic *Graphic, rect *geo.Rect) Drawing {
+	return Drawing{
+		Graphic: graphic,
+		Rect:    rect,
+	}
+}
+
+func (d *Drawing) Draw(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+
+	op.GeoM.Translate(float64(d.Left()), float64(d.Top()))
+	screen.DrawImage(d.Image, op)
 }
