@@ -7,6 +7,7 @@ package main
 import (
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/client"
+	game "dungeon-mst/game/dungeon"
 	"dungeon-mst/geo"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -39,7 +40,7 @@ type User struct {
 }
 
 type Game struct {
-	match         *dungeon.Match
+	match         *game.Match
 	arena         *Arena
 	count         int
 	legendImage   *ebiten.Image
@@ -56,7 +57,7 @@ func (g *Game) IsPaused() bool {
 	return len(g.match.Diamonds) == 0
 }
 
-func (g *Game) SetMatch(value *dungeon.Match) {
+func (g *Game) SetMatch(value *game.Match) {
 	g.match = value
 
 	g.arena.player.SetScore(0)
@@ -77,7 +78,7 @@ func (g *Game) Update() error {
 	diamondIndex := -1
 
 	for i, diamond := range g.match.Diamonds {
-		if g.arena.checkDiamondCollision(diamond) {
+		if g.arena.checkDiamondCollision(&diamond.Diamond) {
 			diamondIndex = i
 			break
 		}
@@ -115,14 +116,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	screen.DrawImage(bgImage, nil)
 
-	for _, dungeon := range g.match.Dungeons {
-		dungeon.DrawBarrier(screen)
+	for _, d := range g.match.Dungeons {
+		d.DrawBarrier(screen)
 	}
 	for _, path := range g.match.Paths {
 		path.Draw(screen)
 	}
-	for _, dungeon := range g.match.Dungeons {
-		dungeon.Draw(screen)
+	for _, d := range g.match.Dungeons {
+		d.Draw(screen)
 	}
 
 	// Draw legend image
@@ -206,7 +207,7 @@ func (g *Game) watchRemainingTime() {
 }
 
 func Run() {
-	game := newGame()
+	g := newGame()
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
@@ -214,34 +215,36 @@ func Run() {
 	go func() {
 		for {
 			select {
-			case game.quit <- true:
+			case g.quit <- true:
 			default:
 			}
-			m := <-game.matchCh
+			m := <-g.matchCh
 
-			game.SetMatch(m.Match)
-			game.remainingTime = m.RemainingTime
+			gameMatch := game.NewMatch(m.Match)
+
+			g.SetMatch(gameMatch)
+			g.remainingTime = m.RemainingTime
 
 			for _, player := range m.Players {
-				game.arena.PushRemotePlayer(player.Id, player.Name, player.Score)
+				g.arena.PushRemotePlayer(player.Id, player.Name, player.Score)
 			}
-			go game.watchRemainingTime()
+			go g.watchRemainingTime()
 		}
 	}()
 	go func() {
 		for {
-			u := <-game.updateCh
+			u := <-g.updateCh
 
 			if u.Id == user.Id {
 				continue
 			}
 			//log.Println("Receiving update for player:", u.Id)
-			game.arena.SetRemotePlayerPosition(u.Id, u.PointJSON.ToPoint())
+			g.arena.SetRemotePlayerPosition(u.Id, u.PointJSON.ToPoint())
 
 			if u.DiamondIndex != -1 {
-				game.match.Diamonds = remove(game.match.Diamonds, u.DiamondIndex)
+				g.match.Diamonds = remove(g.match.Diamonds, u.DiamondIndex)
 
-				game.arena.SetRemotePlayerScore(u.Id)
+				g.arena.SetRemotePlayerScore(u.Id)
 			}
 
 			//game.arena.PushRemotePlayerInput(u.Id, u.Move)
@@ -249,25 +252,25 @@ func Run() {
 	}()
 	go func() {
 		for {
-			j := <-game.joinCh
+			j := <-g.joinCh
 
 			if j.Id == user.Id {
 				continue
 			}
 			log.Println("Joining player:", j.Id)
-			game.arena.PushRemotePlayer(j.Id, j.Name, 0)
+			g.arena.PushRemotePlayer(j.Id, j.Name, 0)
 		}
 	}()
 
 	go func() {
 		for {
-			lid := <-game.leaveCh
+			lid := <-g.leaveCh
 
-			game.arena.RemoveRemotePlayer(lid)
+			g.arena.RemoveRemotePlayer(lid)
 		}
 	}()
 
-	if err := ebiten.RunGame(&game); err != nil {
+	if err := ebiten.RunGame(&g); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -351,7 +354,7 @@ func loadLegendImage() *ebiten.Image {
 	return img
 }
 
-func remove(slice []*dungeon.Diamond, s int) []*dungeon.Diamond {
+func remove(slice []*game.Diamond, s int) []*game.Diamond {
 	return append(slice[:s], slice[s+1:]...)
 }
 

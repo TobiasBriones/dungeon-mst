@@ -5,7 +5,6 @@
 package dungeon
 
 import (
-	"dungeon-mst/game/model"
 	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -391,9 +390,6 @@ func InitAssets() {
 	// path.go
 	pathImage = getPathImage()
 	pathYImage = getPathYImage()
-
-	// diamond.go
-	diamondImage = model.NewImageFromAssets("diamond.png")
 }
 
 func getPathImage() *ebiten.Image {

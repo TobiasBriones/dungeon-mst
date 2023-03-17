@@ -6,6 +6,7 @@ package mst
 
 import (
 	"dungeon-mst/dungeon"
+	"dungeon-mst/game/graphic"
 	"dungeon-mst/geo"
 )
 
@@ -24,8 +25,8 @@ func generateDiamonds(dungeons []*dungeon.Dungeon) []*dungeon.Diamond {
 	var diamonds []*dungeon.Diamond
 
 	for _, d := range dungeons {
-		point := d.RandomPoint(dungeon.DiamondWidthPx)
-		diamond := dungeon.NewDiamond(point)
+		point := d.RandomPoint(graphic.DiamondWidthPx)
+		diamond := dungeon.NewDiamond(point, graphic.DiamondWidthPx, graphic.DiamondHeightPx)
 		diamonds = append(diamonds, &diamond)
 	}
 	return diamonds
