@@ -26,6 +26,10 @@ func NewGraphicFromAssets(name string) *Graphic {
 
 type Name string
 
+type NamedGraphic interface {
+	Name() Name
+}
+
 type Drawing struct {
 	*Graphic
 	*geo.Rect
