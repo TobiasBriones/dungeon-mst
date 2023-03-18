@@ -22,16 +22,22 @@ func (d *Diamond) Collides(rect *geo.Rect) bool {
 
 func (d *Diamond) Update() {}
 
-func NewDiamond(point geo.Point, width, height int) Diamond {
+type DiamondDimension struct {
+	geo.Dimension
+}
+
+func NewDiamondDimension(width, height int) DiamondDimension {
+	return DiamondDimension{geo.NewDimension(width, height)}
+}
+
+func NewDiamond(point geo.Point, dim DiamondDimension) Diamond {
 	rect := geo.NewRect(
 		point.X(),
 		point.Y(),
-		point.X()+width,
-		point.Y()+height,
+		point.X()+dim.Width(),
+		point.Y()+dim.Height(),
 	)
-	return Diamond{
-		rect: rect,
-	}
+	return Diamond{rect}
 }
 
 type DiamondJSON struct {
