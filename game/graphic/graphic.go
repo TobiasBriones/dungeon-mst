@@ -30,6 +30,8 @@ type NamedGraphic interface {
 	Name() Name
 }
 
+type Load func(g NamedGraphic) *Graphic
+
 type Drawing struct {
 	*Graphic
 	*geo.Rect
