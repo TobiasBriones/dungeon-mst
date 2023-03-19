@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/graphic"
-	"dungeon-mst/geo"
+	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 )
 
 type Diamond struct {
@@ -15,19 +15,9 @@ type Diamond struct {
 	graphic.Drawing
 }
 
-// NewDiamond Creates a new game Diamond with the given initial position.
-func NewDiamond(pos geo.Point, gs *graphic.Graphics) *Diamond {
-	d := dungeon.NewDiamond(pos, graphic.DiamondWidthPx, graphic.DiamondHeightPx)
-	g := gs.Get(dungeon.DiamondEntity)
-	return &Diamond{
-		d,
-		graphic.NewDrawing(g, d.Rect()),
-	}
-}
-
 // NewDiamondFrom Creates a new game Diamond from the given state.
-func NewDiamondFrom(diamond dungeon.Diamond, gs *graphic.Graphics) *Diamond {
-	g := gs.Get(dungeon.DiamondEntity)
+func NewDiamondFrom(diamond dungeon.Diamond, gs *graphicdungeon.Graphics) *Diamond {
+	g := gs.DiamondGraphics.Get(graphicdungeon.Diamond)
 	return &Diamond{
 		diamond,
 		graphic.NewDrawing(g, diamond.Rect()),

@@ -6,6 +6,7 @@ package main
 
 import (
 	"dungeon-mst/dungeon"
+	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 	"dungeon-mst/geo"
 	"dungeon-mst/mst"
 )
@@ -17,5 +18,5 @@ const (
 
 func NewRandomMatch() *dungeon.Match {
 	dimension := geo.NewDimension(screenWidth, screenHeight)
-	return mst.NewRandomMatch(dimension)
+	return mst.NewRandomMatch(dimension, graphicdungeon.DiamondSize())
 }

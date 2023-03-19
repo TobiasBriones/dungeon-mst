@@ -6,14 +6,16 @@ package mst
 
 import (
 	"dungeon-mst/dungeon"
-	"dungeon-mst/game/graphic"
 	"dungeon-mst/geo"
 )
 
-func NewRandomMatch(dimension geo.Dimension) *dungeon.Match {
+func NewRandomMatch(
+	dimension geo.Dimension,
+	diamondDimension dungeon.DiamondDimension,
+) *dungeon.Match {
 	dungeons := GenerateDungeons(dimension)
 	paths := GetPaths(dungeons)
-	diamonds := generateDiamonds(dungeons)
+	diamonds := generateDiamonds(dungeons, diamondDimension)
 	return &dungeon.Match{
 		Dungeons: dungeons,
 		Paths:    paths,
@@ -21,12 +23,12 @@ func NewRandomMatch(dimension geo.Dimension) *dungeon.Match {
 	}
 }
 
-func generateDiamonds(dungeons []*dungeon.Dungeon) []*dungeon.Diamond {
+func generateDiamonds(dungeons []*dungeon.Dungeon, dim dungeon.DiamondDimension) []*dungeon.Diamond {
 	var diamonds []*dungeon.Diamond
 
 	for _, d := range dungeons {
-		point := d.RandomPoint(graphic.DiamondWidthPx)
-		diamond := dungeon.NewDiamond(point, graphic.DiamondWidthPx, graphic.DiamondHeightPx)
+		point := d.RandomPoint(dim.Width())
+		diamond := dungeon.NewDiamond(point, dim)
 		diamonds = append(diamonds, &diamond)
 	}
 	return diamonds

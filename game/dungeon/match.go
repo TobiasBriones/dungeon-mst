@@ -6,11 +6,11 @@ package dungeon
 
 import (
 	"dungeon-mst/dungeon"
-	"dungeon-mst/game/graphic"
+	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 )
 
 type Match struct {
-	Graphics graphic.Graphics
+	Graphics graphicdungeon.Graphics
 	Dungeons []*dungeon.Dungeon
 	Paths    []*dungeon.Path
 	Diamonds []*Diamond
@@ -41,7 +41,7 @@ func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
 }
 
 func NewMatch(m *dungeon.Match) *Match {
-	graphics := graphic.LoadGraphics()
+	graphics := graphicdungeon.LoadGraphics()
 	var dungeons []*dungeon.Dungeon
 	var paths []*dungeon.Path
 	var diamonds []*Diamond
