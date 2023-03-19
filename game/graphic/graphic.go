@@ -32,6 +32,16 @@ type NamedGraphic interface {
 
 type Load func(g NamedGraphic) *Graphic
 
+// Draw defines an object that draws itself on a given canvas like the game
+// screen.
+type Draw interface {
+	Draw(screen *ebiten.Image)
+}
+
+// Drawing Defines a simple drawable object that has one Graphic and a geo.Rect
+// as position model.
+//
+// See Draw.
 type Drawing struct {
 	*Graphic
 	*geo.Rect
@@ -44,7 +54,7 @@ func NewDrawing(graphic *Graphic, rect *geo.Rect) Drawing {
 	}
 }
 
-func (d *Drawing) Draw(screen *ebiten.Image) {
+func (d Drawing) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(float64(d.Left()), float64(d.Top()))

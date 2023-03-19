@@ -12,14 +12,13 @@ import (
 
 type Diamond struct {
 	dungeon.Diamond
-	graphic.Drawing
+	graphic.Draw
 }
 
 // NewDiamondFrom Creates a new game Diamond from the given state.
 func NewDiamondFrom(diamond dungeon.Diamond, gs *graphicdungeon.Graphics) *Diamond {
-	g := gs.DiamondGraphics.Get(graphicdungeon.Diamond)
 	return &Diamond{
 		diamond,
-		graphic.NewDrawing(g, diamond.Rect()),
+		graphicdungeon.NewDiamondDrawing(*gs.DiamondGraphics, diamond.Rect()),
 	}
 }

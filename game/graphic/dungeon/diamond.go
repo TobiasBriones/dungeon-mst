@@ -7,6 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/graphic"
+	"dungeon-mst/geo"
 )
 
 type DiamondGraphic uint8
@@ -23,6 +24,13 @@ type DiamondGraphics map[DiamondGraphic]*graphic.Graphic
 
 func LoadDiamondGraphics(load graphic.Load) DiamondGraphics {
 	return DiamondGraphics{Diamond: load(Diamond)}
+}
+
+func NewDiamondDrawing(
+	graphics EntityGraphics[DiamondGraphic],
+	rect *geo.Rect,
+) graphic.Draw {
+	return graphic.NewDrawing(graphics.Get(Diamond), rect)
 }
 
 func DiamondSize() dungeon.DiamondDimension {
