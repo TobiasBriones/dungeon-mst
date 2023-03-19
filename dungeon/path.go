@@ -73,6 +73,8 @@ func (p *Path) drawVerticalLine(screen *ebiten.Image) {
 	screen.DrawImage(pathYImage.SubImage(subRect).(*ebiten.Image), op)
 }
 
+type PathDimension = uint
+
 func NewPath(hl Line, vl Line) Path {
 	if hl.IsDegenerate() || vl.IsDegenerate() {
 		panic("Lines cannot be degenerate")
