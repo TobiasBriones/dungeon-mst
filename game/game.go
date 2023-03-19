@@ -120,7 +120,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		d.DrawBarrier(screen)
 	}
 	for _, path := range g.match.Paths {
-		path.Draw(screen)
+		path.Draw.Draw(screen)
 	}
 	for _, d := range g.match.Dungeons {
 		d.Draw(screen)
@@ -131,7 +131,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw diamonds
 	for _, diamond := range g.match.Diamonds {
-		diamond.Draw(screen)
+		diamond.Draw.Draw(screen)
 	}
 
 	// Draw remote players
@@ -165,7 +165,7 @@ func (g *Game) setCurrentDungeonAndPaths(runner *dungeon.Runner) {
 	}
 	for _, path := range g.match.Paths {
 		if path.InBounds(&runner.Rect) {
-			currentPaths = append(currentPaths, path)
+			currentPaths = append(currentPaths, &path.Path)
 		}
 	}
 	runner.SetCurrentDungeon(currentDungeon)

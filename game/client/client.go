@@ -7,6 +7,7 @@ package client
 import (
 	"bufio"
 	"dungeon-mst/dungeon"
+	dungeon2 "dungeon-mst/game/graphic/dungeon"
 	"encoding/json"
 	"flag"
 	"log"
@@ -133,7 +134,7 @@ func readMessages(
 			return
 		}
 		//fmt.Printf("%+v\n", match)
-		matchInit.Match = matchInit.MatchJSON.ToMatch()
+		matchInit.Match = matchInit.MatchJSON.ToMatch(dungeon2.PathSize())
 		h <- matchInit
 	}
 

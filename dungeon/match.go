@@ -16,7 +16,7 @@ type MatchJSON struct {
 	DiamondsJSON []*DiamondJSON
 }
 
-func (m *MatchJSON) ToMatch() *Match {
+func (m *MatchJSON) ToMatch(pathSize PathDimension) *Match {
 	var dungeons []*Dungeon
 	var paths []*Path
 	var diamonds []*Diamond
@@ -26,7 +26,7 @@ func (m *MatchJSON) ToMatch() *Match {
 	}
 
 	for _, pathJSON := range m.PathsJSON {
-		paths = append(paths, pathJSON.ToPath())
+		paths = append(paths, pathJSON.ToPath(pathSize))
 	}
 
 	for _, diamondJSON := range m.DiamondsJSON {

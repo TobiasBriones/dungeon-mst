@@ -6,6 +6,7 @@ package mst
 
 import (
 	"dungeon-mst/dungeon"
+	dungeon2 "dungeon-mst/game/graphic/dungeon"
 	"dungeon-mst/geo"
 	"math"
 	"math/rand"
@@ -26,6 +27,7 @@ func GenerateDungeons(dimension geo.Dimension) []*dungeon.Dungeon {
 	maxDim := getMaxSize()
 	xMap := map[int]bool{}
 	yMap := map[int]bool{}
+	pathWidthPx := int(dungeon2.PathSize())
 
 	for i := 0; i < n; i++ {
 		p := getRandomPoint(dimension, maxDim)
@@ -49,12 +51,12 @@ func GenerateDungeons(dimension geo.Dimension) []*dungeon.Dungeon {
 		}
 
 		// Check if there's a dungeon aligned to this one already
-		for i := 0; i <= dungeon.PathWidthPx; i++ {
+		for i := 0; i <= pathWidthPx; i++ {
 			if xMap[rect.Left()+i] ||
-				xMap[rect.Cx()-dungeon.PathWidthPx/2+i] ||
+				xMap[rect.Cx()-pathWidthPx/2+i] ||
 				xMap[rect.Right()-i] ||
 				yMap[rect.Top()+i] ||
-				yMap[rect.Cy()-dungeon.PathWidthPx/2+i] ||
+				yMap[rect.Cy()-pathWidthPx/2+i] ||
 				yMap[rect.Bottom()-i] {
 				shouldContinue = true
 				break
@@ -73,13 +75,13 @@ func GenerateDungeons(dimension geo.Dimension) []*dungeon.Dungeon {
 		yMap[rect.Bottom()] = true
 
 		// Fill wall widths to avoid paths colliding with walls
-		for i := 1; i <= dungeon.PathWidthPx; i++ {
+		for i := 1; i <= pathWidthPx; i++ {
 			xMap[rect.Left()+i] = true
 			xMap[rect.Right()-i] = true
-			xMap[rect.Cx()-dungeon.PathWidthPx/2+i] = true
+			xMap[rect.Cx()-pathWidthPx/2+i] = true
 			yMap[rect.Top()+i] = true
 			yMap[rect.Bottom()-i] = true
-			yMap[rect.Cy()-dungeon.PathWidthPx/2+i] = true
+			yMap[rect.Cy()-pathWidthPx/2+i] = true
 		}
 
 		// Add the dungeon
@@ -128,7 +130,7 @@ func GetPaths(dungeons []*dungeon.Dungeon) []*dungeon.Path {
 			tree = append(tree, b)
 			done[b] = true
 
-			path := a.GetPathFor(b)
+			path := a.GetPathFor(b, dungeon2.PathSize())
 			//a.AddDoor(path) coming next
 			paths = append(paths, path)
 		}

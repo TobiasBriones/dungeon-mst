@@ -12,7 +12,7 @@ import (
 type Match struct {
 	Graphics graphicdungeon.Graphics
 	Dungeons []*dungeon.Dungeon
-	Paths    []*dungeon.Path
+	Paths    []*Path
 	Diamonds []*Diamond
 }
 
@@ -26,7 +26,7 @@ func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
 	}
 
 	for _, path := range m.Paths {
-		paths = append(paths, path)
+		paths = append(paths, &path.Path)
 	}
 
 	for _, diamond := range m.Diamonds {
@@ -43,7 +43,7 @@ func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
 func NewMatch(m *dungeon.Match) *Match {
 	graphics := graphicdungeon.LoadGraphics()
 	var dungeons []*dungeon.Dungeon
-	var paths []*dungeon.Path
+	var paths []*Path
 	var diamonds []*Diamond
 
 	for _, d := range m.Dungeons {
@@ -51,7 +51,7 @@ func NewMatch(m *dungeon.Match) *Match {
 	}
 
 	for _, path := range m.Paths {
-		paths = append(paths, path)
+		paths = append(paths, NewPathFrom(*path, graphics))
 	}
 
 	for _, diamond := range m.Diamonds {

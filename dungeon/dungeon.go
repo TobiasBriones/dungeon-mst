@@ -62,7 +62,7 @@ func (d *Dungeon) Center() geo.Point {
 	return geo.NewPoint(d.Cx(), d.Cy())
 }
 
-func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
+func (d *Dungeon) GetPathFor(dungeon *Dungeon, pathSize PathDimension) *Path {
 	center := d.Center()
 	hp1x := min(center.X(), dungeon.Cx())
 	hp2x := max(center.X(), dungeon.Cx())
@@ -80,7 +80,7 @@ func (d *Dungeon) GetPathFor(dungeon *Dungeon) *Path {
 		geo.NewPoint(vp1x, vp2y),
 	}
 
-	path := NewPath(hl, vl)
+	path := NewPath(hl, vl, pathSize)
 	return &path
 }
 
@@ -386,28 +386,6 @@ func InitAssets() {
 	bgImage = getDungeonBgImage()
 	brickImage = getBrickImage()
 	brickYImage = getBrickYImage()
-
-	// path.go
-	pathImage = getPathImage()
-	pathYImage = getPathYImage()
-}
-
-func getPathImage() *ebiten.Image {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/path.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
-}
-
-func getPathYImage() *ebiten.Image {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/path_y.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
 }
 
 func min(a, b int) int {

@@ -6,17 +6,6 @@ package dungeon
 
 import (
 	"dungeon-mst/geo"
-	"github.com/hajimehoshi/ebiten/v2"
-	"image"
-)
-
-const (
-	PathWidthPx = 36
-)
-
-var (
-	pathImage  *ebiten.Image
-	pathYImage *ebiten.Image
 )
 
 type Path struct {
@@ -24,6 +13,14 @@ type Path struct {
 	hRect geo.Rect
 	vLine Line
 	vRect geo.Rect
+}
+
+func (p *Path) HRect() *geo.Rect {
+	return &p.hRect
+}
+
+func (p *Path) VRect() *geo.Rect {
+	return &p.vRect
 }
 
 func (p *Path) InBounds(rect *geo.Rect) bool {
@@ -46,36 +43,9 @@ func (p *Path) CanMoveTowards(movement Movement, rect *geo.Rect) bool {
 	return mx || my
 }
 
-func (p *Path) Draw(screen *ebiten.Image) {
-	p.drawHorizontalLine(screen)
-	p.drawVerticalLine(screen)
-}
-
-func (p *Path) drawHorizontalLine(screen *ebiten.Image) {
-	rect := p.hRect
-	x := rect.Left()
-	y := rect.Top()
-	op := &ebiten.DrawImageOptions{}
-	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
-
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(pathImage.SubImage(subRect).(*ebiten.Image), op)
-}
-
-func (p *Path) drawVerticalLine(screen *ebiten.Image) {
-	rect := p.vRect
-	x := rect.Left()
-	y := rect.Top()
-	op := &ebiten.DrawImageOptions{}
-	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
-
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(pathYImage.SubImage(subRect).(*ebiten.Image), op)
-}
-
 type PathDimension = uint
 
-func NewPath(hl Line, vl Line) Path {
+func NewPath(hl Line, vl Line, dim PathDimension) Path {
 	if hl.IsDegenerate() || vl.IsDegenerate() {
 		panic("Lines cannot be degenerate")
 	}
@@ -92,7 +62,7 @@ func NewPath(hl Line, vl Line) Path {
 	if vl.p1.Y() > vl.p2.Y() {
 		panic("The point 1 of the vertical line must be the lowest")
 	}
-	sw := PathWidthPx / 2
+	sw := int(dim) / 2
 	hRect := geo.NewRect(
 		hl.p1.X()-sw,
 		hl.p1.Y()-sw,
@@ -113,8 +83,8 @@ type PathJSON struct {
 	VLineJSON LineJSON
 }
 
-func (p *PathJSON) ToPath() *Path {
-	path := NewPath(*p.HLineJSON.ToLine(), *p.VLineJSON.ToLine())
+func (p *PathJSON) ToPath(dim PathDimension) *Path {
+	path := NewPath(*p.HLineJSON.ToLine(), *p.VLineJSON.ToLine(), dim)
 	return &path
 }
 
