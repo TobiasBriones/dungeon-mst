@@ -6,36 +6,7 @@ package dungeon
 
 import (
 	"dungeon-mst/geo"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
-	"image/color"
-	"log"
-	"strconv"
 )
-
-var (
-	mplusNormalFont font.Face
-)
-
-func init() {
-	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	const dpi = 72
-	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    12,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 type Player struct {
 	Id             int
@@ -62,7 +33,7 @@ func (p *Player) GetCharacter() *Runner {
 }
 
 func (p *Player) GetPosition() geo.Point {
-	return geo.NewPoint(p.character.Rect.Left(), p.character.Rect.Top())
+	return geo.NewPoint(p.character.Rect().Left(), p.character.Rect().Top())
 }
 
 func (p *Player) SetPosition(x int, y int) {
@@ -84,20 +55,6 @@ func (p *Player) Update() {
 		p.motionListener(runner.inputs)
 	}
 	runner.Update()
-}
-
-func (p *Player) Draw(screen *ebiten.Image) {
-	p.character.Draw(screen)
-	p.drawName(screen)
-}
-
-func (p *Player) drawName(screen *ebiten.Image) {
-	name := p.name
-	str := name + "(" + strconv.Itoa(p.score) + ")"
-	character := p.character
-	x := character.Rect.Left()
-	y := character.Rect.Top()
-	text.Draw(screen, str, mplusNormalFont, x, y, color.Black)
 }
 
 func NewPlayer(name string) Player {

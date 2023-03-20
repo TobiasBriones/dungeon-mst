@@ -6,13 +6,15 @@ package main
 
 import (
 	"dungeon-mst/dungeon"
+	gamedungeon "dungeon-mst/game/dungeon"
 	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Arena struct {
-	player            *dungeon.Player
-	remotePlayers     []*dungeon.Player
+	newPlayer         gamedungeon.NewPlayer
+	player            *gamedungeon.Player
+	remotePlayers     []*gamedungeon.Player
 	onCharacterMotion OnCharacterMotion
 }
 
@@ -107,7 +109,7 @@ func (a *Arena) SetRemotePlayerPosition(id int, point *geo.Point) {
 }
 
 func (a *Arena) PushRemotePlayer(id int, name string, score int) {
-	player := buildPlayer(id, name)
+	player := a.buildPlayer(id, name)
 	player.SetScore(score)
 	a.remotePlayers = append(a.remotePlayers, player)
 }
@@ -138,20 +140,33 @@ func (a *Arena) SetRemotePlayerScore(id int) {
 	}
 }
 
-func NewArena(playerName string) Arena {
-	player := dungeon.NewPlayer(playerName)
-	return Arena{player: &player, remotePlayers: []*dungeon.Player{}}
+func (a *Arena) init(user User, newPlayer gamedungeon.NewPlayer) {
+	if a.isInitialized() {
+		return
+	}
+	a.newPlayer = newPlayer
+	a.player = newPlayer.NewPlayer(user.Name)
+	a.player.Id = user.Id
+}
+
+func (a *Arena) isInitialized() bool {
+	return a.player != nil
+}
+
+func NewArena() Arena {
+	return Arena{
+		newPlayer:     nil,
+		player:        nil,
+		remotePlayers: []*gamedungeon.Player{},
+	}
 }
 
 type OnCharacterMotion func(int)
 
 type SetCurrentDungeonAndPaths func(runner *dungeon.Runner)
 
-func buildPlayer(id int, name string) *dungeon.Player {
-	var newPlayer = func() *dungeon.Player {
-		player := dungeon.NewPlayer(name)
-		player.Id = id
-		return &player
-	}
-	return newPlayer()
+func (a *Arena) buildPlayer(id int, name string) *gamedungeon.Player {
+	player := a.newPlayer.NewPlayer(name)
+	player.Id = id
+	return player
 }

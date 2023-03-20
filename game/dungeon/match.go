@@ -9,6 +9,10 @@ import (
 	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 )
 
+type NewPlayer interface {
+	NewPlayer(string) *Player
+}
+
 type Match struct {
 	Graphics graphicdungeon.Graphics
 	Dungeons []*dungeon.Dungeon
@@ -40,6 +44,11 @@ func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
 	return dungeon.NewMatchJSON(&match)
 }
 
+func (m *Match) NewPlayer(name string) *Player {
+	player := dungeon.NewPlayer(name)
+	return NewPlayerFrom(&player, &m.Graphics)
+}
+
 func NewMatch(m *dungeon.Match) *Match {
 	graphics := graphicdungeon.LoadGraphics()
 	var dungeons []*dungeon.Dungeon
@@ -58,6 +67,7 @@ func NewMatch(m *dungeon.Match) *Match {
 		diamonds = append(diamonds, NewDiamondFrom(*diamond, graphics))
 	}
 	return &Match{
+		Graphics: *graphics,
 		Dungeons: dungeons,
 		Paths:    paths,
 		Diamonds: diamonds,

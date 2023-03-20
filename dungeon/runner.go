@@ -5,34 +5,40 @@
 package dungeon
 
 import (
-	"bytes"
 	"dungeon-mst/geo"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
-	"image"
-	"log"
 )
+
+// TODO these constants are duplicated with the graphic impl and should be
+// avoided due to coupling reasons
 
 const (
 	screenWidth  = 1280
 	screenHeight = 720
 
-	frameOX          = 0
-	frameOY          = 32
 	frameWidth       = 32
 	frameHeight      = 32
-	frameNum         = 8
 	movementLengthPx = 1
 )
 
 type Runner struct {
-	Rect           geo.Rect
-	Scale          float64
+	rect           *geo.Rect
+	scale          float64
 	inputs         []int
 	count          int
-	image          *ebiten.Image
 	currentDungeon *Dungeon
 	currentPaths   []*Path
+}
+
+func (r *Runner) Rect() *geo.Rect {
+	return r.rect
+}
+
+func (r *Runner) Scale() float64 {
+	return r.scale
+}
+
+func (r *Runner) Count() int {
+	return r.count
 }
 
 func (r *Runner) IsOutSide() bool {
@@ -64,22 +70,9 @@ func (r *Runner) Update() {
 	r.inputs = r.inputs[:0]
 }
 
-func (r *Runner) Draw(screen *ebiten.Image) {
-	x := r.Rect.Left()
-	y := r.Rect.Top()
-	op := &ebiten.DrawImageOptions{}
-	i := (r.count / 5) % frameNum
-	sx, sy := frameOX+i*frameWidth, frameOY
-	rect := image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)
-
-	op.GeoM.Scale(r.Scale, r.Scale)
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(r.image.SubImage(rect).(*ebiten.Image), op)
-}
-
 func (r *Runner) Center() {
-	x := int(-(frameWidth*r.Scale)/2) + screenWidth/2
-	y := int(-(frameHeight*r.Scale)/2) + screenHeight/2
+	x := int(-(frameWidth*r.scale)/2) + screenWidth/2
+	y := int(-(frameHeight*r.scale)/2) + screenHeight/2
 	r.setPosition(x, y)
 }
 
@@ -114,14 +107,14 @@ func (r *Runner) moveTowards(direction int) {
 }
 
 func (r *Runner) canMoveInsideDungeonTowards(movement Movement) bool {
-	return r.isInsideDungeon() && r.currentDungeon.CanMoveTowards(movement, &r.Rect)
+	return r.isInsideDungeon() && r.currentDungeon.CanMoveTowards(movement, r.rect)
 }
 
 func (r *Runner) canMoveInsidePathsTowards(movement Movement) bool {
 	canMove := false
 
 	for _, path := range r.currentPaths {
-		if path.CanMoveTowards(movement, &r.Rect) {
+		if path.CanMoveTowards(movement, r.rect) {
 			canMove = true
 			break
 		}
@@ -130,19 +123,19 @@ func (r *Runner) canMoveInsidePathsTowards(movement Movement) bool {
 }
 
 func (r *Runner) walkLeft() {
-	r.Rect.MoveLeft(movementLengthPx)
+	r.rect.MoveLeft(movementLengthPx)
 }
 
 func (r *Runner) walkUp() {
-	r.Rect.MoveTop(movementLengthPx)
+	r.rect.MoveTop(movementLengthPx)
 }
 
 func (r *Runner) walkRight() {
-	r.Rect.MoveRight(movementLengthPx)
+	r.rect.MoveRight(movementLengthPx)
 }
 
 func (r *Runner) walkDown() {
-	r.Rect.MoveBottom(movementLengthPx)
+	r.rect.MoveBottom(movementLengthPx)
 }
 
 func (r *Runner) isInsideDungeon() bool {
@@ -150,35 +143,29 @@ func (r *Runner) isInsideDungeon() bool {
 }
 
 func (r *Runner) setPosition(x int, y int) {
-	r.Rect.SetPosition(x, y)
+	r.rect.SetPosition(x, y)
 }
 
 func (r *Runner) CheckDiamondCollision(diamond *Diamond) bool {
-	return diamond.Collides(&r.Rect)
+	return diamond.Collides(r.rect)
 }
 
 func NewRunner() Runner {
 	scale := 1.0
+	rect := geo.NewRect(
+		0,
+		0,
+		int(frameWidth*scale),
+		int(frameHeight*scale),
+	)
 	runner := Runner{
-		Rect: geo.NewRect(
-			0,
-			0,
-			int(frameWidth*scale),
-			int(frameHeight*scale),
-		),
-		Scale:          scale,
+		rect:           &rect,
+		scale:          scale,
 		inputs:         []int{},
 		count:          0,
 		currentDungeon: nil,
 		currentPaths:   []*Path{},
 	}
 	runner.Center()
-
-	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	runner.image = ebiten.NewImageFromImage(img)
 	return runner
 }

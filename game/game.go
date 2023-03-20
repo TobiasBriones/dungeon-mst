@@ -60,6 +60,7 @@ func (g *Game) IsPaused() bool {
 func (g *Game) SetMatch(value *game.Match) {
 	g.match = value
 
+	g.arena.init(user, g.match)
 	g.arena.player.SetScore(0)
 
 	for _, player := range g.arena.remotePlayers {
@@ -158,13 +159,13 @@ func (g *Game) setCurrentDungeonAndPaths(runner *dungeon.Runner) {
 	var currentPaths []*dungeon.Path
 
 	for _, dungeon := range g.match.Dungeons {
-		if dungeon.InBounds(&runner.Rect) {
+		if dungeon.InBounds(runner.Rect()) {
 			currentDungeon = dungeon
 			break
 		}
 	}
 	for _, path := range g.match.Paths {
-		if path.InBounds(&runner.Rect) {
+		if path.InBounds(runner.Rect()) {
 			currentPaths = append(currentPaths, &path.Path)
 		}
 	}
@@ -276,14 +277,12 @@ func Run() {
 }
 
 func newGame() Game {
-	arena := NewArena(user.Name)
 	legendImage := loadLegendImage()
+	arena := NewArena()
 	game := Game{
 		arena:       &arena,
 		legendImage: legendImage,
 	}
-
-	game.arena.SetOnCharacterMotion(game.onCharacterMotion)
 
 	matchCh := make(chan *client.MatchInit)
 	updateCh := make(chan *client.Update)
@@ -304,7 +303,9 @@ func newGame() Game {
 	go client.Run(user.Name, acceptedCh, matchCh, updateCh, sendUpdateCh, joinCh, leaveCh)
 
 	accepted := <-acceptedCh
-	arena.player.Id = accepted.Id
+
+	arena.SetOnCharacterMotion(game.onCharacterMotion)
+
 	user.Id = accepted.Id
 
 	log.Println("Accepted", accepted.Id)
