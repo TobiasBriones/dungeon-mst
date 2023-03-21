@@ -7,7 +7,7 @@ package dungeon
 import "dungeon-mst/game/graphic"
 
 type Type interface {
-	DiamondGraphic | PathGraphic | RunnerGraphic
+	DiamondGraphic | PathGraphic | RunnerGraphic | BackgroundGraphic
 }
 
 // EntityGraphics defines and loads the physical graphics for the given
@@ -25,9 +25,10 @@ func NewEntityGraphics[T Type](gs map[T]*graphic.Graphic) *EntityGraphics[T] {
 }
 
 type Graphics struct {
-	DiamondGraphics *EntityGraphics[DiamondGraphic]
-	PathGraphics    *EntityGraphics[PathGraphic]
-	RunnerGraphics  *EntityGraphics[RunnerGraphic]
+	DiamondGraphics    *EntityGraphics[DiamondGraphic]
+	PathGraphics       *EntityGraphics[PathGraphic]
+	RunnerGraphics     *EntityGraphics[RunnerGraphic]
+	BackgroundGraphics *EntityGraphics[BackgroundGraphic]
 }
 
 // LoadGraphics loads the graphic assets of the game into memory.
