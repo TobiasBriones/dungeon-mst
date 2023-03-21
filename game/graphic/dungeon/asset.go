@@ -7,7 +7,11 @@ package dungeon
 import "dungeon-mst/game/graphic"
 
 type Type interface {
-	DiamondGraphic | PathGraphic | RunnerGraphic | BackgroundGraphic
+	DiamondGraphic |
+		PathGraphic |
+		RunnerGraphic |
+		BackgroundGraphic |
+		BrickGraphic
 }
 
 // EntityGraphics defines and loads the physical graphics for the given
@@ -29,6 +33,7 @@ type Graphics struct {
 	PathGraphics       *EntityGraphics[PathGraphic]
 	RunnerGraphics     *EntityGraphics[RunnerGraphic]
 	BackgroundGraphics *EntityGraphics[BackgroundGraphic]
+	BrickGraphics      *EntityGraphics[BrickGraphic]
 }
 
 // LoadGraphics loads the graphic assets of the game into memory.
@@ -39,11 +44,15 @@ func LoadGraphics() *Graphics {
 	diamonds := LoadDiamondGraphics(loadNamedGraphic)
 	paths := LoadPathGraphics(loadNamedGraphic)
 	runners := LoadRunnerGraphics()
+	backgrounds := LoadBackgroundGraphics(loadNamedGraphic)
+	bricks := LoadBrickGraphics(loadNamedGraphic)
 
 	return &Graphics{
-		DiamondGraphics: NewEntityGraphics(diamonds),
-		PathGraphics:    NewEntityGraphics(paths),
-		RunnerGraphics:  NewEntityGraphics(runners),
+		DiamondGraphics:    NewEntityGraphics(diamonds),
+		PathGraphics:       NewEntityGraphics(paths),
+		RunnerGraphics:     NewEntityGraphics(runners),
+		BackgroundGraphics: NewEntityGraphics(backgrounds),
+		BrickGraphics:      NewEntityGraphics(bricks),
 	}
 }
 

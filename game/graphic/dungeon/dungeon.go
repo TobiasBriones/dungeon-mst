@@ -7,6 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/game/graphic"
 	"dungeon-mst/geo"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type BackgroundGraphic uint8
@@ -30,4 +31,46 @@ func NewBackgroundDrawing(
 	rect *geo.Rect,
 ) graphic.Draw {
 	return graphic.NewDrawing(graphics.Get(Background), rect)
+}
+
+type BrickGraphic uint8
+
+const (
+	Brick  BrickGraphic = iota
+	BrickY BrickGraphic = iota
+)
+
+func (g BrickGraphic) Name() graphic.Name {
+	return map[BrickGraphic]graphic.Name{
+		Brick:  "brick.png",
+		BrickY: "brick_y.png",
+	}[g]
+}
+
+type BrickGraphics map[BrickGraphic]*graphic.Graphic
+
+func LoadBrickGraphics(load graphic.Load) BrickGraphics {
+	return BrickGraphics{
+		Brick:  load(Brick),
+		BrickY: load(BrickY),
+	}
+}
+
+type brickDrawing struct {
+	graphics EntityGraphics[BrickGraphic]
+	rect     *geo.Rect
+}
+
+func (p brickDrawing) Draw(screen *ebiten.Image) {
+	// TODO
+}
+
+func NewBrickDrawing(
+	graphics EntityGraphics[BrickGraphic],
+	rect *geo.Rect,
+) graphic.Draw {
+	return brickDrawing{
+		graphics: graphics,
+		rect:     rect,
+	}
 }
