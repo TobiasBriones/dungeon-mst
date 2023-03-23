@@ -5,9 +5,9 @@
 package main
 
 import (
+	"dungeon-mst/core/geo"
 	"dungeon-mst/dungeon"
 	graphicdungeon "dungeon-mst/game/graphic/dungeon"
-	"dungeon-mst/geo"
 	"dungeon-mst/mst"
 )
 

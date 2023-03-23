@@ -5,8 +5,8 @@
 package mst
 
 import (
+	"dungeon-mst/core/geo"
 	"dungeon-mst/dungeon"
-	"dungeon-mst/geo"
 )
 
 func NewRandomMatch(

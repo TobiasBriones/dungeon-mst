@@ -5,7 +5,7 @@
 package dungeon
 
 import (
-	"dungeon-mst/geo"
+	"dungeon-mst/core/geo"
 )
 
 // TODO these constants are duplicated with the graphic impl and should be

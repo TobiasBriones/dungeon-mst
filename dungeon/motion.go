@@ -4,7 +4,9 @@
 
 package dungeon
 
-import "dungeon-mst/geo"
+import (
+	"dungeon-mst/core/geo"
+)
 
 const (
 	MoveNone      = -1

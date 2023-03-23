@@ -5,7 +5,7 @@
 package dungeon
 
 import (
-	"dungeon-mst/geo"
+	"dungeon-mst/core/geo"
 )
 
 type Player struct {

@@ -5,7 +5,7 @@
 package graphic
 
 import (
-	"dungeon-mst/geo"
+	"dungeon-mst/core/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"

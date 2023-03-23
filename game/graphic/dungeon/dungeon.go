@@ -5,9 +5,9 @@
 package dungeon
 
 import (
+	"dungeon-mst/core/geo"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/graphic"
-	"dungeon-mst/geo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 )

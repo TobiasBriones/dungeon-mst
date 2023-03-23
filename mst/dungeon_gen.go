@@ -5,9 +5,9 @@
 package mst
 
 import (
+	"dungeon-mst/core/geo"
 	"dungeon-mst/dungeon"
 	dungeon2 "dungeon-mst/game/graphic/dungeon"
-	"dungeon-mst/geo"
 	"math"
 	"math/rand"
 	"time"
