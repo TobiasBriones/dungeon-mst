@@ -11,7 +11,8 @@ type Type interface {
 		PathGraphic |
 		RunnerGraphic |
 		BackgroundGraphic |
-		BrickGraphic
+		BrickGraphic |
+		DungeonBackgroundGraphic
 }
 
 // EntityGraphics defines and loads the physical graphics for the given
@@ -29,11 +30,12 @@ func NewEntityGraphics[T Type](gs map[T]*graphic.Graphic) *EntityGraphics[T] {
 }
 
 type Graphics struct {
-	DiamondGraphics    *EntityGraphics[DiamondGraphic]
-	PathGraphics       *EntityGraphics[PathGraphic]
-	RunnerGraphics     *EntityGraphics[RunnerGraphic]
-	BackgroundGraphics *EntityGraphics[BackgroundGraphic]
-	BrickGraphics      *EntityGraphics[BrickGraphic]
+	DiamondGraphics           *EntityGraphics[DiamondGraphic]
+	PathGraphics              *EntityGraphics[PathGraphic]
+	RunnerGraphics            *EntityGraphics[RunnerGraphic]
+	BackgroundGraphics        *EntityGraphics[BackgroundGraphic]
+	BrickGraphics             *EntityGraphics[BrickGraphic]
+	DungeonBackgroundGraphics *EntityGraphics[DungeonBackgroundGraphic]
 }
 
 // LoadGraphics loads the graphic assets of the game into memory.
@@ -46,13 +48,15 @@ func LoadGraphics() *Graphics {
 	runners := LoadRunnerGraphics()
 	backgrounds := LoadBackgroundGraphics(loadNamedGraphic)
 	bricks := LoadBrickGraphics(loadNamedGraphic)
+	dungeonBackgrounds := LoadDungeonBackgroundGraphics(loadNamedGraphic)
 
 	return &Graphics{
-		DiamondGraphics:    NewEntityGraphics(diamonds),
-		PathGraphics:       NewEntityGraphics(paths),
-		RunnerGraphics:     NewEntityGraphics(runners),
-		BackgroundGraphics: NewEntityGraphics(backgrounds),
-		BrickGraphics:      NewEntityGraphics(bricks),
+		DiamondGraphics:           NewEntityGraphics(diamonds),
+		PathGraphics:              NewEntityGraphics(paths),
+		RunnerGraphics:            NewEntityGraphics(runners),
+		BackgroundGraphics:        NewEntityGraphics(backgrounds),
+		BrickGraphics:             NewEntityGraphics(bricks),
+		DungeonBackgroundGraphics: NewEntityGraphics(dungeonBackgrounds),
 	}
 }
 

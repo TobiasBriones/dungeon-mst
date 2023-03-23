@@ -8,7 +8,6 @@ import (
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/client"
 	game "dungeon-mst/game/dungeon"
-	"dungeon-mst/geo"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -19,7 +18,6 @@ import (
 	"image/color"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"strconv"
 	"time"
 )
@@ -30,8 +28,7 @@ const (
 )
 
 var (
-	bgImage *ebiten.Image
-	user    User
+	user User
 )
 
 type User struct {
@@ -115,7 +112,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawStartScreen(screen)
 		return
 	}
-	screen.DrawImage(bgImage, nil)
+
+	g.match.Bg.Draw(screen)
 
 	for _, d := range g.match.Dungeons {
 		d.DrawBarrier(screen)
@@ -158,9 +156,9 @@ func (g *Game) setCurrentDungeonAndPaths(runner *dungeon.Runner) {
 	var currentDungeon *dungeon.Dungeon = nil
 	var currentPaths []*dungeon.Path
 
-	for _, dungeon := range g.match.Dungeons {
-		if dungeon.InBounds(runner.Rect()) {
-			currentDungeon = dungeon
+	for _, d := range g.match.Dungeons {
+		if d.InBounds(runner.Rect()) {
+			currentDungeon = d.Dungeon
 			break
 		}
 	}
@@ -173,7 +171,7 @@ func (g *Game) setCurrentDungeonAndPaths(runner *dungeon.Runner) {
 	runner.SetCurrentPaths(currentPaths)
 
 	if runner.IsOutSide() {
-		runner.SetDungeon(g.match.Dungeons[0])
+		runner.SetDungeon(g.match.Dungeons[0].Dungeon)
 	}
 }
 
@@ -312,26 +310,8 @@ func newGame() Game {
 	return game
 }
 
-func getSize() geo.Dimension {
-	return geo.NewDimension(screenWidth, screenHeight)
-}
-
 func init() {
-	loadBg()
 	loadUser()
-	dungeon.InitAssets()
-}
-
-func loadBg() {
-	rand.Seed(time.Now().UnixNano())
-	bgNumber := rand.Intn(3) + 1
-	bgName := "bg_" + strconv.Itoa(bgNumber) + ".png"
-	bgImg, _, err := ebitenutil.NewImageFromFile("./assets/" + bgName)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	bgImage = bgImg
 }
 
 func loadUser() {

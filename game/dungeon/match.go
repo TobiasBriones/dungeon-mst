@@ -6,6 +6,7 @@ package dungeon
 
 import (
 	"dungeon-mst/dungeon"
+	"dungeon-mst/game/graphic"
 	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 )
 
@@ -15,9 +16,10 @@ type NewPlayer interface {
 
 type Match struct {
 	Graphics graphicdungeon.Graphics
-	Dungeons []*dungeon.Dungeon
+	Dungeons []*Dungeon
 	Paths    []*Path
 	Diamonds []*Diamond
+	Bg       graphic.Draw
 }
 
 func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
@@ -26,7 +28,7 @@ func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
 	var diamonds []*dungeon.Diamond
 
 	for _, d := range m.Dungeons {
-		dungeons = append(dungeons, d)
+		dungeons = append(dungeons, d.Dungeon)
 	}
 
 	for _, path := range m.Paths {
@@ -51,12 +53,12 @@ func (m *Match) NewPlayer(name string) *Player {
 
 func NewMatch(m *dungeon.Match) *Match {
 	graphics := graphicdungeon.LoadGraphics()
-	var dungeons []*dungeon.Dungeon
+	var dungeons []*Dungeon
 	var paths []*Path
 	var diamonds []*Diamond
 
 	for _, d := range m.Dungeons {
-		dungeons = append(dungeons, d)
+		dungeons = append(dungeons, NewDungeonFrom(d, *graphics))
 	}
 
 	for _, path := range m.Paths {
@@ -66,10 +68,16 @@ func NewMatch(m *dungeon.Match) *Match {
 	for _, diamond := range m.Diamonds {
 		diamonds = append(diamonds, NewDiamondFrom(*diamond, graphics))
 	}
+
+	bg := graphicdungeon.NewBackgroundDrawing(
+		*graphics.BackgroundGraphics,
+		graphicdungeon.GetRandomBackground(),
+	)
 	return &Match{
 		Graphics: *graphics,
 		Dungeons: dungeons,
 		Paths:    paths,
 		Diamonds: diamonds,
+		Bg:       bg,
 	}
 }
