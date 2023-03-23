@@ -65,5 +65,5 @@ func LoadGraphics() *Graphics {
 }
 
 func loadNamedGraphic(g graphic.NamedGraphic) *graphic.Graphic {
-	return graphic.NewGraphicFromAssets(string(g.Name()))
+	return graphic.LoadGraphicFromAssets(string(g.Name()))
 }

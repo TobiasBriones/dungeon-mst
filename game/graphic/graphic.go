@@ -15,7 +15,7 @@ type Graphic struct {
 	*ebiten.Image
 }
 
-func NewGraphicFromAssets(name string) *Graphic {
+func LoadGraphicFromAssets(name string) *Graphic {
 	image, _, err := ebitenutil.NewImageFromFile("assets/" + name)
 
 	if err != nil {
