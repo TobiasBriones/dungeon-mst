@@ -11,10 +11,13 @@ import (
 	"log"
 )
 
+// Graphic defines a unit of graphic (i.e. an image) of the game.
 type Graphic struct {
 	*ebiten.Image
 }
 
+// LoadGraphicFromAssets loads the given asset from the "assets" directory where
+// the program is being executed.
 func LoadGraphicFromAssets(name string) *Graphic {
 	image, _, err := ebitenutil.NewImageFromFile("assets/" + name)
 
@@ -24,12 +27,19 @@ func LoadGraphicFromAssets(name string) *Graphic {
 	return &Graphic{image}
 }
 
+// Name defines the name of one graphic. It should be the physical name of the
+// image file.
 type Name string
 
+// NamedGraphic it defines a Graphic object that has a name.
+//
+// See Name.
 type NamedGraphic interface {
 	Name() Name
 }
 
+// Load defines a func type that loads a NamedGraphic from the FS to an
+// in-memory high-level Graphic.
 type Load func(g NamedGraphic) *Graphic
 
 // Draw defines an object that draws itself on a given canvas like the game
