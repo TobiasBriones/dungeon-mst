@@ -6,6 +6,7 @@ package dungeon
 
 import (
 	"dungeon-mst/game/graphic"
+	"dungeon-mst/geo"
 	"math/rand"
 	"time"
 )
@@ -40,7 +41,8 @@ func NewBackgroundDrawing(
 	graphics EntityGraphics[BackgroundGraphic],
 	bg BackgroundGraphic,
 ) graphic.Draw {
-	return graphic.NewDrawing(graphics.Get(bg), nil)
+	rect := geo.NewRect(0, 0, 1, 1) // Full size from origin
+	return graphic.NewDrawing(graphics.Get(bg), &rect)
 }
 
 func GetRandomBackground() BackgroundGraphic {
