@@ -10,7 +10,6 @@ import (
 	game "dungeon-mst/game/dungeon"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font"
@@ -40,7 +39,6 @@ type Game struct {
 	match         *game.Match
 	arena         *Arena
 	count         int
-	legendImage   *ebiten.Image
 	matchCh       chan *client.MatchInit
 	updateCh      chan *client.Update
 	sendUpdateCh  chan *client.Update
@@ -125,8 +123,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		d.Draw(screen)
 	}
 
-	// Draw legend image
-	screen.DrawImage(g.legendImage, nil)
+	// Draw generic graphics, e.g. legend, etc.
+	g.match.Game.Draw(screen)
 
 	// Draw diamonds
 	for _, diamond := range g.match.Diamonds {
@@ -275,11 +273,9 @@ func Run() {
 }
 
 func newGame() Game {
-	legendImage := loadLegendImage()
 	arena := NewArena()
 	game := Game{
-		arena:       &arena,
-		legendImage: legendImage,
+		arena: &arena,
 	}
 
 	matchCh := make(chan *client.MatchInit)
@@ -324,15 +320,6 @@ func loadUser() {
 	if err := json.Unmarshal(content, &user); err != nil {
 		log.Fatal("Failed to parse user")
 	}
-}
-
-func loadLegendImage() *ebiten.Image {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/keyboard_legend.png")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
 }
 
 func remove(slice []*game.Diamond, s int) []*game.Diamond {

@@ -20,6 +20,7 @@ type Match struct {
 	Paths    []*Path
 	Diamonds []*Diamond
 	Bg       graphic.Draw
+	Game     graphic.Draw
 }
 
 func (m *Match) ToMatchJSON() *dungeon.MatchJSON {
@@ -73,11 +74,14 @@ func NewMatch(m *dungeon.Match) *Match {
 		*graphics.BackgroundGraphics,
 		graphicdungeon.GetRandomBackground(),
 	)
+	game := graphicdungeon.NewGameDrawing(*graphics.GameGraphics)
+
 	return &Match{
 		Graphics: *graphics,
 		Dungeons: dungeons,
 		Paths:    paths,
 		Diamonds: diamonds,
 		Bg:       bg,
+		Game:     game,
 	}
 }
