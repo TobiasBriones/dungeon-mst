@@ -6,7 +6,7 @@ package dungeon
 
 import (
 	"dungeon-mst/core/geo"
-	"dungeon-mst/game/graphic"
+	"dungeon-mst/core/graphic"
 	"math/rand"
 	"time"
 )

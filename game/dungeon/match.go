@@ -5,8 +5,8 @@
 package dungeon
 
 import (
+	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	"dungeon-mst/game/graphic"
 	graphicdungeon "dungeon-mst/game/graphic/dungeon"
 )
 

@@ -4,7 +4,9 @@
 
 package dungeon
 
-import "dungeon-mst/game/graphic"
+import (
+	"dungeon-mst/core/graphic"
+)
 
 type Type interface {
 	DiamondGraphic |
