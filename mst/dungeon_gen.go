@@ -7,7 +7,7 @@ package mst
 import (
 	"dungeon-mst/core/geo"
 	"dungeon-mst/dungeon"
-	dungeon2 "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 	"math"
 	"math/rand"
 	"time"
@@ -27,7 +27,7 @@ func GenerateDungeons(dimension geo.Dimension) []*dungeon.Dungeon {
 	maxDim := getMaxSize()
 	xMap := map[int]bool{}
 	yMap := map[int]bool{}
-	pathWidthPx := int(dungeon2.PathSize())
+	pathWidthPx := int(asset.PathSize())
 
 	for i := 0; i < n; i++ {
 		p := getRandomPoint(dimension, maxDim)
@@ -130,7 +130,7 @@ func GetPaths(dungeons []*dungeon.Dungeon) []*dungeon.Path {
 			tree = append(tree, b)
 			done[b] = true
 
-			path := a.GetPathFor(b, dungeon2.PathSize())
+			path := a.GetPathFor(b, asset.PathSize())
 			//a.AddDoor(path) coming next
 			paths = append(paths, path)
 		}

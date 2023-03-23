@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -31,14 +31,14 @@ func (d Dungeon) DrawBarrier(screen *ebiten.Image) {
 
 func NewDungeonFrom(
 	dungeon *dungeon.Dungeon,
-	gs graphicdungeon.Graphics,
+	gs asset.Graphics,
 ) *Dungeon {
 	return &Dungeon{
 		Dungeon: dungeon,
-		bg: graphicdungeon.NewDungeonBackgroundDrawing(
+		bg: asset.NewDungeonBackgroundDrawing(
 			*gs.DungeonBackgroundGraphics,
 			dungeon.Rect(),
 		),
-		barrier: graphicdungeon.NewBrickDrawing(*gs.BrickGraphics, dungeon.Barrier()),
+		barrier: asset.NewBrickDrawing(*gs.BrickGraphics, dungeon.Barrier()),
 	}
 }

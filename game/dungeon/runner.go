@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 )
 
 type Runner struct {
@@ -17,11 +17,11 @@ type Runner struct {
 
 func NewRunnerFrom(
 	runner *dungeon.Runner,
-	gs *graphicdungeon.Graphics,
+	gs *asset.Graphics,
 ) *Runner {
 	return &Runner{
 		runner,
-		graphicdungeon.NewRunnerDrawing(
+		asset.NewRunnerDrawing(
 			*gs.RunnerGraphics,
 			runner,
 		),

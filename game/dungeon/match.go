@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 )
 
 type NewPlayer interface {
@@ -15,7 +15,7 @@ type NewPlayer interface {
 }
 
 type Match struct {
-	Graphics graphicdungeon.Graphics
+	Graphics asset.Graphics
 	Dungeons []*Dungeon
 	Paths    []*Path
 	Diamonds []*Diamond
@@ -53,7 +53,7 @@ func (m *Match) NewPlayer(name string) *Player {
 }
 
 func NewMatch(m *dungeon.Match) *Match {
-	graphics := graphicdungeon.LoadGraphics()
+	graphics := asset.LoadGraphics()
 	var dungeons []*Dungeon
 	var paths []*Path
 	var diamonds []*Diamond
@@ -70,11 +70,11 @@ func NewMatch(m *dungeon.Match) *Match {
 		diamonds = append(diamonds, NewDiamondFrom(*diamond, graphics))
 	}
 
-	bg := graphicdungeon.NewBackgroundDrawing(
+	bg := asset.NewBackgroundDrawing(
 		*graphics.BackgroundGraphics,
-		graphicdungeon.GetRandomBackground(),
+		asset.GetRandomBackground(),
 	)
-	game := graphicdungeon.NewGameDrawing(*graphics.GameGraphics)
+	game := asset.NewGameDrawing(*graphics.GameGraphics)
 
 	return &Match{
 		Graphics: *graphics,

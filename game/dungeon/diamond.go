@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 )
 
 type Diamond struct {
@@ -16,9 +16,9 @@ type Diamond struct {
 }
 
 // NewDiamondFrom Creates a new game Diamond from the given state.
-func NewDiamondFrom(diamond dungeon.Diamond, gs *graphicdungeon.Graphics) *Diamond {
+func NewDiamondFrom(diamond dungeon.Diamond, gs *asset.Graphics) *Diamond {
 	return &Diamond{
 		diamond,
-		graphicdungeon.NewDiamondDrawing(*gs.DiamondGraphics, diamond.Rect()),
+		asset.NewDiamondDrawing(*gs.DiamondGraphics, diamond.Rect()),
 	}
 }

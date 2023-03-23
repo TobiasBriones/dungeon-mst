@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // This file is part of https://github.com/tobiasbriones/dungeon-mst
 
-package dungeon
+package asset
 
 import (
 	"dungeon-mst/core/graphic"
@@ -42,9 +42,9 @@ type Graphics struct {
 	GameGraphics              *EntityGraphics[GameGraphic]
 }
 
-// LoadGraphics loads the graphic assets of the game into memory.
+// LoadGraphics loads the asset assets of the game into memory.
 // These graphics only need to be loaded once, and be reused when drawing.
-// That is, there's a 1:n relation between a graphic and the instances of the
+// That is, there's a 1:n relation between a asset and the instances of the
 // same entities that appear on the game.
 func LoadGraphics() *Graphics {
 	diamonds := LoadDiamondGraphics(loadNamedGraphic)

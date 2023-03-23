@@ -6,7 +6,7 @@ package dungeon
 
 import (
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -59,7 +59,7 @@ func (p Player) drawName(screen *ebiten.Image) {
 
 func NewPlayerFrom(
 	player *dungeon.Player,
-	gs *graphicdungeon.Graphics,
+	gs *asset.Graphics,
 ) *Player {
 	runner := player.GetCharacter()
 	return &Player{

@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-// Graphic defines a unit of graphic (i.e. an image) of the game.
+// Graphic defines a unit of asset (i.e. an image) of the game.
 type Graphic struct {
 	*ebiten.Image
 }
@@ -27,7 +27,7 @@ func LoadGraphicFromAssets(name string) *Graphic {
 	return &Graphic{image}
 }
 
-// Name defines the name of one graphic. It should be the physical name of the
+// Name defines the name of one asset. It should be the physical name of the
 // image file.
 type Name string
 

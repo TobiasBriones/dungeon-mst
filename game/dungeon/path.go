@@ -7,7 +7,7 @@ package dungeon
 import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	graphicdungeon "dungeon-mst/game/graphic/dungeon"
+	"dungeon-mst/game/asset"
 )
 
 type Path struct {
@@ -16,10 +16,10 @@ type Path struct {
 }
 
 // NewPathFrom Creates a new game Diamond from the given state.
-func NewPathFrom(path dungeon.Path, gs *graphicdungeon.Graphics) *Path {
+func NewPathFrom(path dungeon.Path, gs *asset.Graphics) *Path {
 	return &Path{
 		path,
-		graphicdungeon.NewPathDrawing(
+		asset.NewPathDrawing(
 			*gs.PathGraphics,
 			path.HRect(),
 			path.VRect(),
