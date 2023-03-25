@@ -15,23 +15,23 @@ type Draw interface {
 	Draw(screen *ebiten.Image)
 }
 
-// Drawing Defines a simple drawable object that has one Graphic and a geo.Rect
-// as position model.
+// BasicDrawing Defines a simple drawable object that has one Graphic and a
+// geo.Rect as position model.
 //
 // See Draw.
-type Drawing struct {
+type BasicDrawing struct {
 	*Graphic
 	*geo.Rect
 }
 
-func NewDrawing(graphic *Graphic, rect *geo.Rect) Drawing {
-	return Drawing{
+func NewBasicDrawing(graphic *Graphic, rect *geo.Rect) BasicDrawing {
+	return BasicDrawing{
 		Graphic: graphic,
 		Rect:    rect,
 	}
 }
 
-func (d Drawing) Draw(screen *ebiten.Image) {
+func (d BasicDrawing) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(float64(d.Left()), float64(d.Top()))

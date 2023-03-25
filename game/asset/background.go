@@ -42,7 +42,7 @@ func NewBackgroundDrawing(
 	bg BackgroundGraphic,
 ) graphic.Draw {
 	rect := geo.NewRect(0, 0, 1, 1) // Full size from origin
-	return graphic.NewDrawing(graphics.Get(bg), &rect)
+	return graphic.NewBasicDrawing(graphics.Get(bg), &rect)
 }
 
 func GetRandomBackground() BackgroundGraphic {

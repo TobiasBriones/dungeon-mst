@@ -30,7 +30,7 @@ func NewDiamondDrawing(
 	graphics EntityGraphics[DiamondGraphic],
 	rect *geo.Rect,
 ) graphic.Draw {
-	return graphic.NewDrawing(graphics.Get(Diamond), rect)
+	return graphic.NewBasicDrawing(graphics.Get(Diamond), rect)
 }
 
 func DiamondSize() dungeon.DiamondDimension {
