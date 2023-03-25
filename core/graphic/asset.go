@@ -7,14 +7,15 @@ package graphic
 import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
+	"path/filepath"
 )
 
-const (
-	AssetsDirPath = "asset/assets"
-)
+func GetAssetsDirPath() string {
+	return filepath.Join("asset", "assets")
+}
 
 func GetAssetPath(name string) string {
-	return AssetsDirPath + name
+	return filepath.Join(GetAssetsDirPath(), name)
 }
 
 // LoadGraphicFromAssets loads the given asset from the "asset/assets" directory
