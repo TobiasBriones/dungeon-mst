@@ -8,14 +8,6 @@ import (
 	"dungeon-mst/core/graphic"
 )
 
-// TODO check for duplication on constants
-
-const (
-	horizontalUnitWidthPx  = 64
-	horizontalUnitHeightPx = 12
-	wallWidth              = horizontalUnitHeightPx
-)
-
 type DungeonBackgroundGraphic uint8
 
 const (
