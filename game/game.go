@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/client"
 	game "dungeon-mst/game/dungeon"
+	"dungeon-mst/global"
 	"encoding/json"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -19,11 +20,6 @@ import (
 	"log"
 	"strconv"
 	"time"
-)
-
-const (
-	screenWidth  = 1280
-	screenHeight = 720
 )
 
 var (
@@ -135,7 +131,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.arena.Draw(screen)
 
 	timeLeft := strconv.FormatInt(int64(g.remainingTime/time.Second), 10)
-	text.Draw(screen, timeLeft, mplusNormalFont, screenWidth-200, 96, color.White)
+	text.Draw(
+		screen,
+		timeLeft,
+		mplusNormalFont,
+		global.ScreenWidth-200,
+		96,
+		color.White,
+	)
 
 	if g.IsPaused() {
 		g.drawPauseScreen(screen)
@@ -143,7 +146,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(int, int) (int, int) {
-	return screenWidth, screenHeight
+	return global.ScreenWidth, global.ScreenHeight
 }
 
 func (g *Game) onCharacterMotion(move int) {
@@ -184,11 +187,11 @@ func (g *Game) drawStartScreen(screen *ebiten.Image) {
 func (g *Game) drawPauseScreen(screen *ebiten.Image) {
 	player := g.arena.player
 	str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
-	text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 96, color.Black)
+	text.Draw(screen, str, mplusNormalFont, global.ScreenWidth/2-200, 96, color.Black)
 
 	for i, player := range g.arena.remotePlayers {
 		str := player.GetName() + "(" + strconv.Itoa(player.GetScore()) + ")"
-		text.Draw(screen, str, mplusNormalFont, screenWidth/2-200, 64+(i+1)*96, color.Black)
+		text.Draw(screen, str, mplusNormalFont, global.ScreenWidth/2-200, 64+(i+1)*96, color.Black)
 	}
 }
 
@@ -206,7 +209,7 @@ func (g *Game) watchRemainingTime() {
 func Run() {
 	g := newGame()
 
-	ebiten.SetWindowSize(screenWidth, screenHeight)
+	ebiten.SetWindowSize(global.ScreenWidth, global.ScreenHeight)
 	ebiten.SetWindowTitle("Dungeon MST")
 
 	go func() {

@@ -6,15 +6,13 @@ package dungeon
 
 import (
 	"dungeon-mst/core/geo"
+	"dungeon-mst/global"
 )
 
 // TODO these constants are duplicated with the graphic impl and should be
 // avoided due to coupling reasons
 
 const (
-	screenWidth  = 1280
-	screenHeight = 720
-
 	frameWidth       = 32
 	frameHeight      = 32
 	movementLengthPx = 1
@@ -71,8 +69,8 @@ func (r *Runner) Update() {
 }
 
 func (r *Runner) Center() {
-	x := int(-(frameWidth*r.scale)/2) + screenWidth/2
-	y := int(-(frameHeight*r.scale)/2) + screenHeight/2
+	x := int(-(frameWidth*r.scale)/2) + global.ScreenWidth/2
+	y := int(-(frameHeight*r.scale)/2) + global.ScreenHeight/2
 	r.setPosition(x, y)
 }
 
