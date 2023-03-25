@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/asset"
+	"dungeon-mst/game/drawing"
 )
 
 type Diamond struct {
@@ -19,6 +20,6 @@ type Diamond struct {
 func NewDiamondFrom(diamond dungeon.Diamond, gs *asset.Graphics) *Diamond {
 	return &Diamond{
 		diamond,
-		asset.NewDiamondDrawing(*gs.DiamondGraphics, diamond.Rect()),
+		drawing.NewDiamondDrawing(*gs.DiamondGraphics, diamond.Rect()),
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/asset"
+	"dungeon-mst/game/drawing"
 )
 
 type NewPlayer interface {
@@ -70,11 +71,11 @@ func NewMatch(m *dungeon.Match) *Match {
 		diamonds = append(diamonds, NewDiamondFrom(*diamond, graphics))
 	}
 
-	bg := asset.NewBackgroundDrawing(
+	bg := drawing.NewBackgroundDrawing(
 		*graphics.BackgroundGraphics,
 		asset.GetRandomBackground(),
 	)
-	game := asset.NewGameDrawing(*graphics.GameGraphics)
+	game := drawing.NewGameDrawing(*graphics.GameGraphics)
 
 	return &Match{
 		Graphics: *graphics,

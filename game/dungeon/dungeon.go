@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/asset"
+	"dungeon-mst/game/drawing"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -35,10 +36,10 @@ func NewDungeonFrom(
 ) *Dungeon {
 	return &Dungeon{
 		Dungeon: dungeon,
-		bg: asset.NewDungeonBackgroundDrawing(
+		bg: drawing.NewDungeonBackgroundDrawing(
 			*gs.DungeonBackgroundGraphics,
 			dungeon.Rect(),
 		),
-		barrier: asset.NewBrickDrawing(*gs.BrickGraphics, dungeon.Barrier()),
+		barrier: drawing.NewBrickDrawing(*gs.BrickGraphics, dungeon.Barrier()),
 	}
 }

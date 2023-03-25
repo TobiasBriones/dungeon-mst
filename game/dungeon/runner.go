@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/asset"
+	"dungeon-mst/game/drawing"
 )
 
 type Runner struct {
@@ -21,7 +22,7 @@ func NewRunnerFrom(
 ) *Runner {
 	return &Runner{
 		runner,
-		asset.NewRunnerDrawing(
+		drawing.NewRunnerDrawing(
 			*gs.RunnerGraphics,
 			runner,
 		),

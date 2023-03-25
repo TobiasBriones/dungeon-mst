@@ -8,6 +8,7 @@ import (
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
 	"dungeon-mst/game/asset"
+	"dungeon-mst/game/drawing"
 )
 
 type Path struct {
@@ -19,7 +20,7 @@ type Path struct {
 func NewPathFrom(path dungeon.Path, gs *asset.Graphics) *Path {
 	return &Path{
 		path,
-		asset.NewPathDrawing(
+		drawing.NewPathDrawing(
 			*gs.PathGraphics,
 			path.HRect(),
 			path.VRect(),

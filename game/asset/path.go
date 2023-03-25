@@ -5,11 +5,8 @@
 package asset
 
 import (
-	"dungeon-mst/core/geo"
 	"dungeon-mst/core/graphic"
 	"dungeon-mst/dungeon"
-	"github.com/hajimehoshi/ebiten/v2"
-	"image"
 )
 
 type PathGraphic uint8
@@ -32,53 +29,6 @@ func LoadPathGraphics(load graphic.Load) PathGraphics {
 	return PathGraphics{
 		Path:  load(Path),
 		PathY: load(PathY),
-	}
-}
-
-type pathDrawing struct {
-	graphics EntityGraphics[PathGraphic]
-	hRect    *geo.Rect
-	vRect    *geo.Rect
-}
-
-func (p pathDrawing) Draw(screen *ebiten.Image) {
-	p.drawHorizontalLine(screen)
-	p.drawVerticalLine(screen)
-}
-
-func (p pathDrawing) drawHorizontalLine(screen *ebiten.Image) {
-	rect := p.hRect
-	img := p.graphics.Get(Path)
-	x := rect.Left()
-	y := rect.Top()
-	op := &ebiten.DrawImageOptions{}
-	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
-
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(img.SubImage(subRect).(*ebiten.Image), op)
-}
-
-func (p pathDrawing) drawVerticalLine(screen *ebiten.Image) {
-	rect := p.vRect
-	img := p.graphics.Get(PathY)
-	x := rect.Left()
-	y := rect.Top()
-	op := &ebiten.DrawImageOptions{}
-	subRect := image.Rect(0, 0, rect.Width(), rect.Height())
-
-	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(img.SubImage(subRect).(*ebiten.Image), op)
-}
-
-func NewPathDrawing(
-	graphics EntityGraphics[PathGraphic],
-	hRect *geo.Rect,
-	vRect *geo.Rect,
-) graphic.Draw {
-	return pathDrawing{
-		graphics: graphics,
-		hRect:    hRect,
-		vRect:    vRect,
 	}
 }
 
